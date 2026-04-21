@@ -2,6 +2,7 @@ import { Navigate, type RouteObject } from "react-router-dom";
 import HomeView from "@/pages/Home/HomeView";
 import MainLayout from "@/layout/MainLayout";
 import SearchView from "@/pages/Search/SearchView";
+import ProgramsView from "@/pages/Programs/ProgramsView";
 
 export const APP_ROUTES: RouteObject[] = [
     {
@@ -22,7 +23,7 @@ export const APP_ROUTES: RouteObject[] = [
             },
             {
                 path: "programas",
-                element: <div>Programas</div>
+                element: <ProgramsView />
             },
             {
                 path: "en-vivo",

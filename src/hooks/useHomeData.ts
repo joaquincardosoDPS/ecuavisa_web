@@ -27,26 +27,10 @@ export const useHomeData = () => {
     });
 
     return {
-        slider: {
-            data: sliderQuery.data?.data || [],
-            isLoading: sliderQuery.isLoading,
-            isError: sliderQuery.isError
-        },
-        categories: {
-            data: categoriesQuery.data?.data || [],
-            isLoading: categoriesQuery.isLoading,
-            isError: categoriesQuery.isError
-        },
-        playlistPremium: {
-            data: playlistPremiumQuery.data || [],
-            isLoading: playlistPremiumQuery.isLoading,
-            isError: playlistPremiumQuery.isError
-        },
-        recommended: {
-            data: recommendedQuery.data?.data || [],
-            isLoading: recommendedQuery.isLoading,
-            isError: recommendedQuery.isError
-        },
+        slider: sliderQuery.data?.data || [],
+        categories: categoriesQuery.data?.data || [],
+        playlistPremium: playlistPremiumQuery.data || [],
+        recommended: recommendedQuery.data?.data || [],
         isLoading: sliderQuery.isLoading || categoriesQuery.isLoading || playlistPremiumQuery.isLoading || recommendedQuery.isLoading,
         isError: sliderQuery.isError || categoriesQuery.isError || playlistPremiumQuery.isError || recommendedQuery.isError
     };

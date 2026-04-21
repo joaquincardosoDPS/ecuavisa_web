@@ -1,7 +1,7 @@
 
 import { useHomeData } from "@/hooks/useHomeData";
 import Banner from "./components/Banner";
-import CarrouselContainer from "@/components/ProgramCard/CarrouselContainer";
+import CarrouselContainerHome from "@/components/ProgramCard/CarrouselContainerHome";
 import { FullScreenSpinner } from "@/components/ui/FullScreenSpinner";
 import CardCarrousel from '@/components/ProgramCard/CardCarrousel';
 
@@ -14,7 +14,7 @@ function HomeView() {
         return <FullScreenSpinner message="Cargando Portada..." />;
     }
 
-    if (isError || !slider.data) {
+    if (isError || !slider) {
         return (
             <div className="flex items-center justify-center min-h-[50vh] text-white">
                 <p className="text-red-500 font-title text-xl">Error al cargar el catálogo.</p>
@@ -22,23 +22,24 @@ function HomeView() {
         );
     }
 
+    console.log(categories)
     return (
         <div className="relative min-h-screen overflow-x-hidden">
             <Banner
-                slider={slider.data}
+                slider={slider}
             />
 
             <div className="flex flex-col pb-20 gap-5">
                 {/* Listado de categorías */}
 
-                {categories.data.map(category => (
-                    <CarrouselContainer key={category.key} category={category} />
+                {categories.map(category => (
+                    category.programs.length > 0 && <CarrouselContainerHome key={category.key} category={category} />
                 ))}
 
                 {/* Recomendados */}
                 <div className='px-20 flex flex-col gap-5 mt-5 mb-5' style={{ fontFamily: 'var(--font-family-category)' }}>
                     <h2 className="text-2xl font-bold text-white line-height-7">Recomendados para ti</h2>
-                    <CardCarrousel programs={recommended.data} orientation='vertical' />
+                    <CardCarrousel programs={recommended} orientation='vertical' />
                 </div>
 
             </div>
