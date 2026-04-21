@@ -1,0 +1,38 @@
+// src/hooks/useAppInitilization.ts
+import { useQuery } from '@tanstack/react-query';
+import { fetchAppConfig } from '../services/configService';
+import { useConfigStore } from '../features/config/useConfigStore';
+import { useEffect } from 'react';
+
+export const useAppInitialization = () => {
+    const setConfig = useConfigStore((state) => state.setConfig);
+
+    const query = useQuery({
+        queryKey: ['app-config'],
+        queryFn: fetchAppConfig,
+        staleTime: Infinity,
+    });
+
+    useEffect(() => {
+        if (query.data?.data) {
+            const configData = query.data.data;
+            setConfig(configData);
+
+            // Injecta variables CSS dinámicamente
+            const root = document.documentElement;
+
+            Object.entries(configData).forEach(([key, value]) => {
+                // Filtra solo las propiedades de estilo
+                if (
+                    key.startsWith('clr-') ||
+                    key.startsWith('foc-') ||
+                    key.startsWith('grad-')
+                ) {
+                    root.style.setProperty(`--${key}`, value as string);
+                }
+            });
+        }
+    }, [query.data, setConfig]);
+
+    return query;
+};

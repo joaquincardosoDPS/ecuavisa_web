@@ -1,0 +1,28 @@
+# API Configuration for PHP endpoints
+# Allows React app to access PHP API endpoints
+
+# Enable CORS for API requests
+<IfModule mod_headers.c>
+    # Allow all origins for development
+    Header always set Access-Control-Allow-Origin "*"
+    Header always set Access-Control-Allow-Methods "GET, POST, OPTIONS, PUT, DELETE"
+    Header always set Access-Control-Allow-Headers "Content-Type, Authorization"
+    
+    # Handle preflight requests
+    RewriteEngine On
+    RewriteCond %{REQUEST_METHOD} OPTIONS
+    RewriteRule ^(.*)$ $1 [R=200,L]
+</IfModule>
+
+# API endpoint rewrites
+RewriteEngine On
+
+# Redirect /api/config to api-config.php
+RewriteRule ^api/config/?$ api-config.php [QSA,L]
+
+# Allow direct access to PHP files
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+
+# For React Router - redirect all other requests to index.html
+RewriteRule . /index.html [L]

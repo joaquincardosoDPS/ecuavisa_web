@@ -1,0 +1,118 @@
+@import "tailwindcss";
+
+@theme {
+  /* Dimensiones de Botones */
+  --spacing-banner-btn-h: var(--tam-banner-button-height);
+  --spacing-banner-btn-w: var(--tam-banner-button-width);
+  --spacing-primary-btn-h: var(--tam-primary-button-height);
+  --spacing-primary-btn-w: var(--tam-primary-button-width);
+
+  /* Tipografía */
+  --font-title: var(--font-family-title);
+  --font-subtitle: var(--font-family-subtitle);
+  --font-text: var(--font-family-text);
+
+  --text-title: var(--font-size-title);
+  --text-subtitle: var(--font-size-subtitle);
+  --text-base-app: var(--font-size-text);
+
+  /* Colores */
+  --color-brand-primary: var(--clr-primary);
+  --color-brand-secondary: var(--clr-secondary);
+  --color-brand-accent: var(--clr-secondary-button);
+  --color-brand-focus: var(--foc-primary);
+
+  /* Bordes y Radio */
+  --radius-brand-pill: var(--bor-primary-radius);
+  --radius-brand-card: var(--bor-tertiary-radius);
+}
+
+:root {
+  /* Dimensiones de Botones */
+  --tam-banner-button-height: 9vh;
+  --tam-banner-button-width: 14vw;
+  --tam-primary-button-height: 7vh;
+  --tam-primary-button-width: 6vw;
+  --tam-tertiary-button-height: 1vh;
+  --tam-tertiary-button-width: 11vw;
+  --tam-secondary-button-width: 180px;
+  --tam-secondary-button-height: 80px;
+  --tam-quaternary-button-width: 13vw;
+  --tam-quaternary-button-height: 6vh;
+
+  /* Tipografía */
+  --font-size-title: 2.5rem;
+  --font-size-subtitle: 1.5rem;
+  --font-size-text: 1.2rem;
+  --font-size-subtext: 0.7rem;
+  --font-siz-icon: 4rem;
+
+  --font-weight-title: bold;
+  --font-weight-subtitle: bold;
+  --font-weight-text: normal;
+  --font-weight-subtext: normal;
+  --font-weight-button: bold;
+
+  --font-family-title: 'Poppins', Arial, Helvetica, sans-serif;
+  --font-family-subtitle: 'Poppins', Arial, Helvetica, sans-serif;
+  --font-family-text: 'Poppins', Arial, Helvetica, sans-serif;
+  --font-family-button: 'Poppins', Arial, Helvetica, sans-serif;
+  --font-family-category: 'Archia', Arial, Helvetica, sans-serif;
+
+  /* Bordes y Sombras */
+  --bor-primary-radius: 5rem;
+  --bor-secondary-radius: 3rem;
+  --bor-tertiary-radius: 1rem;
+  --shadow-primary: 0 0 10px 5px hsla(168, 100%, 41%, 0.75);
+  --shadow-secondary: 0 0 20px 15px hsla(168, 100%, 41%, 0.55);
+
+  /* Contenedores */
+  --tam-banner-width: 100vw;
+  --tam-banner-height: 50vh;
+  --tam-primary-container-width: 12.5vw;
+  --tam-primary-container-height: 37vh;
+  --tam-secondary-container-width: 20vw;
+  --tam-secondary-container-height: 21vh;
+  --tam-quaternary-container-width: 15vw;
+  --tam-quaternary-container-height: 15vh;
+
+  /* Avatar */
+  --avatar-size: 200px;
+  --avatar-border-radius: 50%;
+
+  /* Variables de fallback para evitar errores antes de la carga de API */
+  --clr-primary: #001a28;
+  --foc-primary: #ff1376;
+  --grad-sidebar: #054668;
+}
+
+/* Clases de utilidad específicas solicitadas */
+.chapter-card-img-full img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 16px;
+  display: block;
+  transition: all 0.2s ease-in-out;
+}
+
+.chapter-card-img-full:focus-within img,
+.chapter-card-img-full.focused img {
+  outline: 3px solid var(--foc-primary);
+  outline-offset: -3px;
+  box-shadow: var(--shadow-primary);
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: var(--clr-primary);
+  color: white;
+  @apply antialiased;
+}
