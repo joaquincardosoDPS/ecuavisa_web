@@ -7,6 +7,8 @@ const client = new URLSearchParams(window.location.search).get('client') || wind
 export const CLIENT = client || '';
 export const BASENAME = window.location.pathname.startsWith('/web/') ? `/web/${CLIENT}` : '/';
 
+export const ADS_FALLBACK_DOMAIN = 'https://www.chv.cl';
+
 // Social Login Configuration - These will be loaded from API
 export const GOOGLE_CLIENT_ID = 'https://consumers.rudo.video/users/login_rrss'; // Will be loaded from API configuration  
 export const APPLE_CLIENT_ID = 'https://consumers.rudo.video/users/login_rrss'; // Will be loaded from API configuration

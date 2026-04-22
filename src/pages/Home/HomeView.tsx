@@ -7,9 +7,6 @@ import CardCarrousel from '@/components/ProgramCard/CardCarrousel';
 
 function HomeView() {
     const { slider, categories, recommended, playlistPremium, isLoading, isError } = useHomeData();
-    console.log("categories", categories)
-
-
     if (isLoading) {
         return <FullScreenSpinner message="Cargando Portada..." />;
     }
@@ -21,8 +18,6 @@ function HomeView() {
             </div>
         );
     }
-
-    console.log(categories)
     return (
         <div className="relative min-h-screen overflow-x-hidden">
             <Banner

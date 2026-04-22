@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
 
 @theme {
   /* Dimensiones de Botones */
@@ -114,5 +115,7 @@ body,
 body {
   background-color: var(--clr-primary);
   color: white;
+  font-family: var(--font-family-title);
   @apply antialiased;
+
 }

@@ -14,13 +14,6 @@ function SearchView() {
         enabled: debouncedQuery.trim().length > 0, // Solo buscar si hay texto
     });
 
-    // Muestra el resultado solo en console.log de momento
-    useEffect(() => {
-        if (searchResults) {
-            console.log('Resultados de Búsqueda:', searchResults);
-        }
-    }, [searchResults]);
-
     return (
         <div className='max-w-[70vw] mx-auto pt-16'>
             <input

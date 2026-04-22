@@ -10,13 +10,13 @@ function ProgramsView() {
 
     // Carga el primer programa como seleccionado por defecto al cargar la vista
     useEffect(() => {
-        if (!activeProgram && categories.data && categories.data.length > 0) {
-            const firstCategory = categories.data.find(c => c.format === 'default' && c.programs && c.programs.length > 0);
+        if (!activeProgram && categories && categories.length > 0) {
+            const firstCategory = categories.find(c => c.format === 'default' && c.programs && c.programs.length > 0);
             if (firstCategory) {
                 setActiveProgram(firstCategory.programs[0]);
             }
         }
-    }, [categories.data, activeProgram, setActiveProgram]);
+    }, [categories, activeProgram, setActiveProgram]);
 
     // Carga la imagen de fondo
     const currentBgImage = activeProgram?.image_slider?.big || activeProgram?.image_land?.big || '';
@@ -40,7 +40,7 @@ function ProgramsView() {
             return [...lastLoaded, { src: currentBgImage, loaded: isAlreadyCached }];
         });
     }, [currentBgImage]);
-    console.log(categories)
+
     return (
         <div className="relative min-h-screen">
             <div className="fixed top-0 left-0 w-full h-[60vh] z-20 bg-(--clr-primary) overflow-hidden">
@@ -86,7 +86,7 @@ function ProgramsView() {
             </div>
 
             <div className="relative z-10 mt-[50vh] pb-20 pt-10">
-                {categories.data
+                {categories
                     ?.filter((category) => category.format === 'default')
                     .map((category) => (
                         <div key={category.key}>

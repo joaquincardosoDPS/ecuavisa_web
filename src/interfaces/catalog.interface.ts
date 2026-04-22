@@ -38,15 +38,17 @@ export interface Program {
     description_short: string;
     description: string;
     status_ads: boolean;
-    classification: Classification;
     image_port: ImageSet;
     image_land: ImageSet;
     image_logo: ImageSet;
     image_slider: ImageSet;
-    anio_production: string;
+    image_background?: ImageSet;
+    classification?: string;
+    anio_production?: string;
     "max-cap": MaxCap | null;
     segments: Segment[];
-    genders: Gender[];
+    genders?: Gender[];
+    actors?: string;
 }
 
 export interface SliderResponse {
@@ -134,4 +136,39 @@ export interface RecommendedProgramsResponse {
     total_display_records: number;
     last_page: number;
     data: Program[];
+}
+
+export interface ProgramDetailResponse {
+    status: string;
+    code: number;
+    data: Program;
+}
+
+export interface Chapter {
+    chapter: number;
+    date_create: string;
+    date_update: string;
+    description: string;
+    duration: string;
+    image: string;
+    image_land: ImageSet;
+    key: string;
+    key_segment: string;
+    m3u8: string;
+    name_program: string;
+    name_segment: string;
+    restriction: string;
+    season: number;
+    slug: string;
+    title: string;
+    title_complete: string;
+}
+
+export interface ChaptersResponse {
+    status: string;
+    code: number;
+    total_records: number;
+    total_display_records: number;
+    last_page: number;
+    data: Chapter[];
 }

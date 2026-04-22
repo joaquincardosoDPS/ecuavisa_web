@@ -22,8 +22,10 @@ function Header({ isTransparent }: Props) {
 
     return (
         <header
-            className="fixed top-0 left-0 w-full z-50 px-25 py-3.5 flex flex-row justify-between items-center h-[84px] transition-colors duration-300"
-            style={{ background: isTransparent ? 'transparent' : 'var(--grad-sidebar)' }}
+            className={twMerge(
+                "fixed top-0 left-0 w-full z-50 px-25 py-3.5 flex flex-row justify-between items-center h-[84px] transition-colors duration-300",
+                isTransparent ? "bg-transparent hover:bg-brand-secondary" : "bg-brand-secondary"
+            )}
         >
             <button onClick={onClickLogo} className="cursor-pointer">
                 <img src={logo} alt="Logo" className="h-14 w-auto" />

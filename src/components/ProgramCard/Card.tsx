@@ -1,6 +1,7 @@
 import type { Program } from '@/interfaces/catalog.interface';
 import { useProgramsStore } from '@/features/programs/programsStore';
 import { useRef } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 interface CardProps {
     program: Program;
@@ -8,7 +9,11 @@ interface CardProps {
 }
 
 function Card({ program, orientation = 'horizontal' }: CardProps) {
+
+    const navigate = useNavigate();
+    const { pathname } = useLocation();
     const isVertical = orientation === 'vertical';
+    const isProgramsView = pathname === '/programas';
     const imageSrc = isVertical ? program.image_port?.small : program.image_land?.medium;
 
     const setActiveProgram = useProgramsStore((state) => state.setActiveProgram);
@@ -16,12 +21,15 @@ function Card({ program, orientation = 'horizontal' }: CardProps) {
     const FOCUS_DELAY_MS = 200;
 
     const handleFocusEnter = () => {
+        if (!isProgramsView) return;
+
         hoverTimeout.current = setTimeout(() => {
             setActiveProgram(program);
         }, FOCUS_DELAY_MS);
     };
 
     const handleFocusLeave = () => {
+        if (!isProgramsView) return;
         if (hoverTimeout.current) {
             clearTimeout(hoverTimeout.current);
         }
@@ -35,6 +43,7 @@ function Card({ program, orientation = 'horizontal' }: CardProps) {
             onMouseLeave={handleFocusLeave}
             onFocus={handleFocusEnter}
             onBlur={handleFocusLeave}
+            onClick={() => navigate(`/programas/${program.key}`)}
         >
             {imageSrc ? (
                 <img

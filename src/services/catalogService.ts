@@ -6,6 +6,9 @@ import {
     RUDO_PLAYLIST_PREMIUM_URL,
     RUDO_VOD_FEATURED,
     RUDO_VOD_SEARCH,
+    RUDO_VOD_DETAIL,
+    RUDO_VOD_CHAPTERS,
+    RUDO_VOD_NEXT_CHAPTER,
     CLIENT
 } from '@/config-global';
 import type {
@@ -13,11 +16,14 @@ import type {
     CategoriesResponse,
     PlaylistPremiumResponse,
     RecommendedProgramsResponse,
+    ProgramDetailResponse,
+    ChaptersResponse,
+    Chapter,
 } from '@/interfaces/catalog.interface';
 
 export const catalogService = {
     getSlider: async (): Promise<SliderResponse> => {
-        const { data } = await axios.post(
+        const { data } = await axios.post<SliderResponse>(
             `${RUDO_VOD_BANNER}`,
             qs.stringify({ client: CLIENT }),
             {
@@ -29,10 +35,19 @@ export const catalogService = {
         return data;
     },
 
-    getCategories: async (): Promise<CategoriesResponse> => {
-        const { data } = await axios.post(
+    getCategories: async (options?: {
+        page?: number;
+        limit?: number;
+        limit_prog?: number;
+        type?: 0 | 1;
+        show_event?: boolean;
+    }): Promise<CategoriesResponse> => {
+        const { data } = await axios.post<CategoriesResponse>(
             `${RUDO_VOD_CATEGORY}`,
-            qs.stringify({ client: CLIENT }),
+            qs.stringify({
+                ...options,
+                client: CLIENT,
+            }),
             {
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
@@ -48,7 +63,7 @@ export const catalogService = {
     },
 
     getRecommendedPrograms: async (): Promise<RecommendedProgramsResponse> => {
-        const { data } = await axios.post(
+        const { data } = await axios.post<RecommendedProgramsResponse>(
             `${RUDO_VOD_FEATURED}`,
             qs.stringify({ client: CLIENT }),
             {
@@ -61,7 +76,7 @@ export const catalogService = {
     },
 
     searchPrograms: async (query: string): Promise<RecommendedProgramsResponse> => {
-        const { data } = await axios.post(
+        const { data } = await axios.post<RecommendedProgramsResponse>(
             `${RUDO_VOD_SEARCH}`,
             qs.stringify({ client: CLIENT, search: query }),
             {
@@ -71,5 +86,55 @@ export const catalogService = {
             }
         );
         return data;
-    }
+    },
+
+    getProgramDetail: async (slug: string): Promise<ProgramDetailResponse> => {
+        const { data } = await axios.post<ProgramDetailResponse>(
+            `${RUDO_VOD_DETAIL}`,
+            qs.stringify({ client: CLIENT, program: slug }),
+            {
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                }
+            }
+        );
+        return data;
+    },
+
+    getChapters: async (slug: string, season: number, segmentSlug: string, page: number = 1): Promise<ChaptersResponse> => {
+        const { data } = await axios.post<ChaptersResponse>(
+            `${RUDO_VOD_CHAPTERS}`,
+            qs.stringify({
+                client: CLIENT,
+                program: slug,
+                page,
+                limit: 20,
+                season: season,
+                segment: segmentSlug
+            }),
+            {
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                }
+            }
+        );
+        return data;
+    },
+
+    /**
+     * Obtiene la data completa de un capítulo por su slug.
+     * Incluye m3u8, key, título, etc.
+     */
+    getChapterBySlug: async (segment: string, season: number, chapter: number): Promise<{ status: string; code: number; data: Chapter }> => {
+        const { data } = await axios.post<{ status: string; code: number; data: Chapter }>(
+            `${RUDO_VOD_NEXT_CHAPTER}`,
+            qs.stringify({ client: CLIENT, segment, season, chapter }),
+            {
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                }
+            }
+        );
+        return data;
+    },
 };

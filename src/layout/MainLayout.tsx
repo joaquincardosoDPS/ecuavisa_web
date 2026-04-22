@@ -5,7 +5,7 @@ import { twMerge } from 'tailwind-merge';
 function MainLayout() {
 
     const { pathname } = useLocation();
-    const isTransparent = pathname === "/home";
+    const isTransparent = pathname === "/home" || pathname.startsWith("/programas/");
 
     const headerClasses = (isTransparent: boolean) =>
         twMerge(
