@@ -1,10 +1,11 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { useQueryClient } from "@tanstack/react-query";
 import { catalogService } from "@/services/catalogService";
 import { adsService } from "@/services/adsService";
 import { VideoPlayer } from "@/components/VideoPlayer/VideoPlayer";
 import { Spinner } from "@/components/ui/Spinner";
-
+import type { Chapter, ProgramDetailResponse } from "@/interfaces/catalog.interface";
 
 function PlayerView() {
   const { segment, season, chapter } = useParams<{
@@ -13,6 +14,7 @@ function PlayerView() {
     chapter: string;
   }>();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -21,6 +23,10 @@ function PlayerView() {
   const [episodeTitle, setEpisodeTitle] = useState("");
   const [programTitle, setProgramTitle] = useState("");
   const [currentKey, setCurrentKey] = useState("");
+
+  // Episodios para el VideoPlayer (actual + siguiente)
+  const [episodes, setEpisodes] = useState<Chapter[]>([]);
+  const [programSlug, setProgramSlug] = useState("");
 
   useEffect(() => {
     let cancelled = false;
@@ -36,12 +42,17 @@ function PlayerView() {
           return;
         }
 
+        const seasonNum = parseInt(season, 10);
+        const chapterNum = parseInt(chapter, 10);
+
+        // Cargar capítulo actual
         const response = await catalogService.getChapterBySlug(
           segment,
-          parseInt(season, 10),
-          parseInt(chapter, 10),
+          seasonNum,
+          chapterNum,
         );
         const chapterData = response?.data;
+        console.log("chapterData", chapterData);
 
         if (!chapterData?.m3u8) {
           if (!cancelled) {
@@ -51,23 +62,55 @@ function PlayerView() {
           return;
         }
 
+        // Intentar cargar siguiente capítulo
+        let nextChapterData: Chapter | null = null;
+        try {
+          const nextResponse = await catalogService.getChapterBySlug(
+            segment,
+            seasonNum,
+            chapterNum + 1,
+          );
+          if (nextResponse?.data?.m3u8) {
+            nextChapterData = nextResponse.data;
+          }
+        } catch {
+          // No hay siguiente capítulo, no es un error
+          console.log("[PlayerView] No hay siguiente capítulo disponible");
+        }
+
+        // Resolver ads
         let resolvedVastUrl: string | undefined;
         try {
           const vmapData = await adsService.getVodAds(chapterData.key);
           if (vmapData) {
             resolvedVastUrl = adsService.getPrerollVastUrl(vmapData);
-            console.log('[PlayerView] VAST URL resuelta:', resolvedVastUrl ? 'encontrada' : 'sin preroll');
+            console.log(
+              "[PlayerView] VAST URL resuelta:",
+              resolvedVastUrl ? "encontrada" : "sin preroll",
+            );
           }
         } catch (adsError) {
-          console.warn('[PlayerView] Error obteniendo ads, continuando sin publicidad:', adsError);
+          console.warn(
+            "[PlayerView] Error obteniendo ads, continuando sin publicidad:",
+            adsError,
+          );
         }
 
         if (!cancelled) {
           setVideoUrl(chapterData.m3u8);
           setVastUrl(resolvedVastUrl);
-          setEpisodeTitle(chapterData.title);
-          setProgramTitle(chapterData.name_program || "");
+          setEpisodeTitle(chapterData.name_program);
+          setProgramTitle(`T${chapterData.season}:E${chapterData.chapter}`);
           setCurrentKey(chapterData.key);
+          setProgramSlug(chapterData.slug);
+
+          // Construir lista de episodios para VideoPlayer
+          const episodeList: Chapter[] = [chapterData];
+          if (nextChapterData) {
+            episodeList.push(nextChapterData);
+          }
+          setEpisodes(episodeList);
+
           setLoading(false);
         }
       } catch (err: any) {
@@ -85,6 +128,32 @@ function PlayerView() {
       cancelled = true;
     };
   }, [segment, season, chapter]);
+
+  // Cuando el VideoPlayer selecciona el siguiente episodio, navegar a su ruta
+  const handleEpisodeSelect = useCallback(
+    (ep: Chapter) => {
+      navigate(
+        `/player/${ep.key_segment}/${ep.season}/${ep.chapter}`,
+        { replace: true },
+      );
+    },
+    [navigate],
+  );
+
+  // Leer imagen de fondo del programa desde el cache de TanStack Query
+  const programBackgroundImage = useMemo(() => {
+    if (!programSlug) return undefined;
+    const cached = queryClient.getQueryData<ProgramDetailResponse>(
+      ["programDetail", programSlug],
+    );
+    if (!cached?.data) return undefined;
+    const program = cached.data;
+    return (
+      program.image_slider?.big ||
+      program.image_background?.big ||
+      program.image_land?.big
+    );
+  }, [programSlug, queryClient]);
 
   // Fullscreen loading
   if (loading) {
@@ -158,6 +227,10 @@ function PlayerView() {
         description={programTitle}
         vastUrl={vastUrl}
         rudoKey={currentKey}
+        episodes={episodes}
+        currentEpisodeKey={currentKey}
+        onEpisodeSelect={handleEpisodeSelect}
+        programBackgroundImage={programBackgroundImage}
         onBack={() => navigate(-1)}
       />
     </div>

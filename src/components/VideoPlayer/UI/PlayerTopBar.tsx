@@ -1,5 +1,7 @@
-import React from "react";
+import React, { useState } from "react";
 import iconoVolver from "@/assets/img/icons/iconos-volver.svg";
+import { CastButton } from "./CastButton";
+import { SubtitlesButton } from "./SubtitlesButton";
 
 interface PlayerTopBarProps {
   title: string;
@@ -18,78 +20,113 @@ const PlayerTopBarComponent = ({
   onBackClick,
   isNextEpisodeOverlayVisible,
 }: PlayerTopBarProps) => {
-
   return (
     <div
       style={{
         position: "fixed",
-        top: 62, // 12 * 8
-        left: 40, // 12 * 8
+        top: 44,
+        left: 40,
+        right: 40,
         zIndex: 2001,
         opacity: isVisible ? 1 : 0,
         transition: "opacity .3s ease",
         pointerEvents: isVisible ? "auto" : "none",
         display: "flex",
-        alignItems: "start",
-        gap: "16px", // spacing(2)
+        alignItems: "flex-start",
+        justifyContent: "space-between",
+        gap: "10px",
+        color: "#b9b9b9",
       }}
     >
-      {/* Botón Volver */}
-      {!isLive && (
-        <button
-          onClick={onBackClick}
-          style={{
-            width: "56px",
-            height: "56px",
-            borderRadius: "50%",
-            border: "2px solid rgba(255, 255, 255, 0.6)",
-            color: "#fff",
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            cursor: "pointer",
-            outline: "none",
-            transition: "all 0.2s ease",
-            padding: 0,
-            flexShrink: 0,
-          }}
-        >
-          <img src={iconoVolver} alt="Volver" width={22} height={22} />
-        </button>
-      )}
-
-      {/* Textos */}
       <div
         style={{
           display: "flex",
-          flexDirection: "column",
-          color: "#fff",
-          pointerEvents: "none",
-          maxWidth: "80vw",
+          flexDirection: "row",
+          alignItems: "center",
+          gap: "10px",
+          marginTop: "20px",
         }}
       >
-        <h1
-          style={{
-            margin: 0,
-            fontWeight: 800,
-            fontSize: "2.5rem",
-            lineHeight: 1,
-          }}
-        >
-          {title}
-        </h1>
-        {description && (
-          <h2
+        {/* Botón Volver */}
+        {!isLive && (
+          <button
+            onClick={onBackClick}
+            onMouseEnter={(e) => {
+              const img = e.currentTarget.querySelector("img");
+              if (img) img.style.filter = "brightness(1)";
+            }}
+            onMouseLeave={(e) => {
+              const img = e.currentTarget.querySelector("img");
+              if (img) img.style.filter = "brightness(0.725)";
+            }}
             style={{
-              marginTop: "10px",
-              fontWeight: 500,
-              fontSize: "1.5rem",
-              opacity: 0.9,
+              width: "56px",
+              height: "56px",
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              cursor: "pointer",
+              outline: "none",
+              padding: 0,
+              flexShrink: 0,
+              background: "none",
+              border: "none",
             }}
           >
-            {description}
-          </h2>
+            <img
+              src={iconoVolver}
+              alt="Volver"
+              style={{
+                filter: "brightness(0.725)",
+                transition: "filter 0.15s ease",
+              }}
+            />
+          </button>
         )}
+
+        {/* Textos */}
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            pointerEvents: "none",
+            maxWidth: "60vw",
+          }}
+        >
+          <h1
+            style={{
+              margin: 0,
+              fontWeight: 500,
+              fontSize: "1.4rem",
+              lineHeight: 1,
+            }}
+          >
+            {title}
+          </h1>
+          {description && (
+            <h2
+              style={{
+                fontWeight: 500,
+                fontSize: "1rem",
+                opacity: 0.9,
+              }}
+            >
+              {description}
+            </h2>
+          )}
+        </div>
+      </div>
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "row",
+          alignItems: "start",
+          justifyContent: "start",
+          gap: "10px",
+        }}
+      >
+        {/* <CastButton />
+        <SubtitlesButton /> */}
       </div>
     </div>
   );

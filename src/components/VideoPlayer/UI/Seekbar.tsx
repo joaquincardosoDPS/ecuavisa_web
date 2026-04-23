@@ -1,12 +1,25 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
+import { SkipButton } from "./SkipButton";
+import { PlayPauseButton } from "./PlayPauseButton";
+import { VolumeControl } from "./VolumeControl";
+import { FullscreenButton } from "./FullscreenButton";
 
 interface SeekbarProps {
   seekTime?: number;
+  previewSeekTime?: number | null;
   loadedTime?: number;
   duration?: number;
   isLive?: boolean;
+  playing?: boolean;
+  volume?: number;
+  muted?: boolean;
   onSeek?: (time: number) => void;
   onSeekStart?: () => void;
+  onPlayPause?: () => void;
+  onSkip?: (seconds: number) => void;
+  onVolumeChange?: (volume: number) => void;
+  onMuteToggle?: () => void;
+  onFullscreen?: () => void;
 }
 
 const formatTime = (seconds: number) => {
@@ -22,16 +35,28 @@ const formatTime = (seconds: number) => {
 
 const SeekbarComponent = ({
   seekTime = 0,
+  previewSeekTime = null,
   loadedTime = 0,
   duration = 0,
   isLive = false,
+  playing = false,
+  volume = 1,
+  muted = false,
   onSeek,
+  onPlayPause,
+  onSkip,
+  onVolumeChange,
+  onMuteToggle,
+  onFullscreen,
 }: SeekbarProps) => {
   const [position, setPosition] = useState(0);
   const [isSeeking, setIsSeeking] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
 
+  const trackRef = useRef<HTMLDivElement>(null);
   const consecutiveSeeksRef = useRef(0);
   const lastTargetPositionRef = useRef<number | null>(null);
+  const dragPositionRef = useRef(0);
 
   const applySeek = useCallback(
     (newPos: number) => {
@@ -47,23 +72,117 @@ const SeekbarComponent = ({
     [onSeek],
   );
 
-  const handleTrackClick = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
-    if (isLive || duration <= 0) return;
+  // --- Utilidad: calcular posición a partir de un clientX ---
+  const calcPositionFromClientX = useCallback(
+    (clientX: number): number => {
+      if (!trackRef.current || duration <= 0) return 0;
+      const rect = trackRef.current.getBoundingClientRect();
+      const ratio = Math.max(
+        0,
+        Math.min(1, (clientX - rect.left) / rect.width),
+      );
+      return ratio * duration;
+    },
+    [duration],
+  );
 
-    // Obtener la posición relativa del clic
-    const rect = e.currentTarget.getBoundingClientRect();
-    const clickX = e.clientX - rect.left;
-    const percentage = Math.max(0, Math.min(1, clickX / rect.width));
-    const newPos = percentage * duration;
+  // --- Click directo sobre la barra (sin drag) ---
+  const handleTrackClick = useCallback(
+    (e: React.MouseEvent<HTMLDivElement>) => {
+      if (isLive || duration <= 0) return;
+      // Ignorar el click si acabamos de soltar un drag
+      if (isDragging) return;
 
-    setPosition(newPos);
-    applySeek(newPos);
-  }, [isLive, duration, applySeek]);
+      const newPos = calcPositionFromClientX(e.clientX);
+      setPosition(newPos);
+      applySeek(newPos);
+    },
+    [isLive, duration, isDragging, calcPositionFromClientX, applySeek],
+  );
 
+  // --- Drag handlers ---
+  const handleDragMove = useCallback(
+    (clientX: number) => {
+      const newPos = calcPositionFromClientX(clientX);
+      dragPositionRef.current = newPos;
+      setPosition(newPos);
+    },
+    [calcPositionFromClientX],
+  );
 
-  // Sincronización natural de playback vs seeking
+  const handleDragEnd = useCallback(() => {
+    setIsDragging(false);
+    setIsSeeking(false);
+    applySeek(dragPositionRef.current);
+  }, [applySeek]);
+
+  // Mouse events
+  const onMouseMove = useCallback(
+    (e: MouseEvent) => handleDragMove(e.clientX),
+    [handleDragMove],
+  );
+  const onMouseUp = useCallback(() => handleDragEnd(), [handleDragEnd]);
+
+  // Touch events
+  const onTouchMove = useCallback(
+    (e: TouchEvent) => {
+      if (e.touches.length > 0) handleDragMove(e.touches[0].clientX);
+    },
+    [handleDragMove],
+  );
+  const onTouchEnd = useCallback(() => handleDragEnd(), [handleDragEnd]);
+
+  // Registrar/desregistrar listeners globales al hacer drag
   useEffect(() => {
-    if (isSeeking) return;
+    if (!isDragging) return;
+
+    document.addEventListener("mousemove", onMouseMove);
+    document.addEventListener("mouseup", onMouseUp);
+    document.addEventListener("touchmove", onTouchMove, { passive: true });
+    document.addEventListener("touchend", onTouchEnd);
+
+    return () => {
+      document.removeEventListener("mousemove", onMouseMove);
+      document.removeEventListener("mouseup", onMouseUp);
+      document.removeEventListener("touchmove", onTouchMove);
+      document.removeEventListener("touchend", onTouchEnd);
+    };
+  }, [isDragging, onMouseMove, onMouseUp, onTouchMove, onTouchEnd]);
+
+  // Iniciar drag con mouse
+  const handleThumbMouseDown = useCallback(
+    (e: React.MouseEvent) => {
+      if (isLive || duration <= 0) return;
+      e.preventDefault();
+      e.stopPropagation();
+      setIsDragging(true);
+      setIsSeeking(true);
+      dragPositionRef.current = position;
+    },
+    [isLive, duration, position],
+  );
+
+  // Iniciar drag con touch
+  const handleThumbTouchStart = useCallback(
+    (e: React.TouchEvent) => {
+      if (isLive || duration <= 0) return;
+      e.stopPropagation();
+      setIsDragging(true);
+      setIsSeeking(true);
+      dragPositionRef.current = position;
+    },
+    [isLive, duration, position],
+  );
+
+  // Sincronización natural de playback vs seeking/dragging
+  useEffect(() => {
+    // Si hay preview de teclado, usarlo como posición absoluta
+    if (previewSeekTime !== null && previewSeekTime !== undefined) {
+      setPosition(previewSeekTime);
+      return;
+    }
+
+    if (isSeeking || isDragging) return;
 
     if (lastTargetPositionRef.current !== null) {
       const diff = Math.abs(seekTime - lastTargetPositionRef.current);
@@ -74,11 +193,19 @@ const SeekbarComponent = ({
     } else {
       setPosition(seekTime);
     }
-  }, [seekTime, isSeeking]);
+  }, [seekTime, previewSeekTime, isSeeking, isDragging]);
 
   // Cálculo visual
-  const percentage = isLive ? 0 : (duration > 0 ? (position / duration) * 100 : 0);
-  const loadedPercentage = isLive ? 0 : (duration > 0 ? (loadedTime / duration) * 100 : 0);
+  const percentage = isLive
+    ? 0
+    : duration > 0
+      ? (position / duration) * 100
+      : 0;
+  const loadedPercentage = isLive
+    ? 0
+    : duration > 0
+      ? (loadedTime / duration) * 100
+      : 0;
   const barColor = isLive ? "#888888" : "#FFFFFF";
 
   return (
@@ -88,8 +215,80 @@ const SeekbarComponent = ({
         width: "100%",
       }}
     >
+      {/* Controles y tiempo */}
+      {!isLive && (
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            width: "100%",
+            marginBottom: "10px",
+            color: "#b9b9b9",
+          }}
+        >
+          {/* Tiempo actual */}
+          <div
+            style={{
+              display: "flex",
+              gap: "0.5rem",
+              fontWeight: "normal",
+            }}
+          >
+            <div
+              style={{
+                width: "65px",
+                textAlign: "start",
+              }}
+            >
+              {formatTime(position)}
+            </div>
+            <span>{" / "}</span>
+            <div
+              style={{
+                width: "65px",
+                textAlign: "right",
+              }}
+            >
+              {formatTime(duration)}
+            </div>
+          </div>
+
+          {/* Botones centrales */}
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "10px",
+            }}
+          >
+            <SkipButton seconds={-10} onClick={() => onSkip && onSkip(-10)} />
+            <PlayPauseButton playing={playing} onClick={onPlayPause} />
+            <SkipButton seconds={10} onClick={() => onSkip && onSkip(10)} />
+          </div>
+
+          {/* Botones finales */}
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "10px",
+            }}
+          >
+            <VolumeControl
+              volume={volume}
+              muted={muted}
+              onVolumeChange={onVolumeChange}
+              onMuteToggle={onMuteToggle}
+            />
+            <FullscreenButton onClick={onFullscreen} />
+          </div>
+        </div>
+      )}
+
       {/* Barra de progreso */}
       <div
+        ref={trackRef}
         className="seekbar-track"
         onClick={handleTrackClick}
         style={{
@@ -101,6 +300,7 @@ const SeekbarComponent = ({
           transition: "outline 0.2s ease",
           opacity: 1,
           marginBottom: "10px",
+          cursor: isLive ? "default" : "pointer",
         }}
       >
         <div
@@ -126,60 +326,31 @@ const SeekbarComponent = ({
             width: `${percentage}%`,
             backgroundColor: barColor,
             borderRadius: "999px",
-            transition: isSeeking ? "none" : "width 0.2s linear",
+            transition: isSeeking || isDragging ? "none" : "width 0.2s linear",
           }}
         />
         {!isLive && (
           <div
             className="seekbar-thumb"
+            onMouseDown={handleThumbMouseDown}
+            onTouchStart={handleThumbTouchStart}
             style={{
               position: "absolute",
               left: `${percentage}%`,
               top: "50%",
               transform: "translate(-50%, -50%)",
-              width: "30px",
-              height: "30px",
+              width: "15px",
+              height: "15px",
               backgroundColor: "#FFFFFF",
               border: "3px solid #FFFFFF",
               borderRadius: "50%",
-              transition: "all 0.15s ease",
+              cursor: isDragging ? "grabbing" : "grab",
+              transition: isDragging ? "none" : "all 0.15s ease",
+              touchAction: "none",
             }}
           />
         )}
       </div>
-      {!isLive && (
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            width: "100%",
-          }}
-        >
-          <div
-            style={{
-              color: "white",
-              fontSize: "1.2rem",
-              fontWeight: "bold",
-              width: "75px",
-              textAlign: "start",
-            }}
-          >
-            {formatTime(position)}
-          </div>
-          <div
-            style={{
-              color: "white",
-              fontSize: "1.2rem",
-              fontWeight: "bold",
-              width: "75px",
-              textAlign: "right",
-            }}
-          >
-            {formatTime(duration)}
-          </div>
-        </div>
-      )}
     </div>
   );
 };

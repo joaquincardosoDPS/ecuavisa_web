@@ -6,7 +6,6 @@ import { VastPlayer } from "@/components/VastPlayer/VastPlayer";
 import { Spinner } from "@/components/ui/Spinner";
 import { PlayerTopBar } from "./UI/PlayerTopBar";
 import { PlayerControls } from "./UI/PlayerControls";
-import { NextEpisodeOverlay } from "./UI/NextEpisodeOverlay";
 import type { VideoPlayerProps } from "@/interfaces/player";
 import "./VideoPlayer.css";
 
@@ -31,6 +30,7 @@ const VideoPlayerComponent = ({
   onQualityChange,
   onAdsPlaying,
   onAdsFinished,
+  programBackgroundImage,
   initialSeconds,
 }: VideoPlayerProps) => {
   const [playingAds, setPlayingAds] = useState(false);
@@ -40,18 +40,28 @@ const VideoPlayerComponent = ({
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const hideTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // Next Episode Overlay state
-  const [showNextEpisode, setShowNextEpisode] = useState(false);
-  const [nextEpisode, setNextEpisode] = useState<any>(null);
-  const [nextEpisodeCountdown, setNextEpisodeCountdown] = useState(60);
-  const nextEpisodeTriggeredRef = useRef(false);
+  // Volume state
+  const [volume, setVolume] = useState(1);
+  const [muted, setMuted] = useState(false);
 
-  // Resetear Next Episode al cambiar capítulo
+  // End-of-episode PiP transition state
+  const [isEndingTransition, setIsEndingTransition] = useState(false);
+  const [nextEpisode, setNextEpisode] = useState<any>(null);
+  const [endingCountdown, setEndingCountdown] = useState(10);
+  const endingTriggeredRef = useRef(false);
+
+  // Hold-to-seek state
+  const [keySeekPreview, setKeySeekPreview] = useState<number | null>(null);
+  const keySeekIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const keySeekDirectionRef = useRef<number>(0);
+  const seekTargetRef = useRef<number | null>(null);
+
+  // Resetear transición al cambiar capítulo
   useEffect(() => {
-    nextEpisodeTriggeredRef.current = false;
-    setShowNextEpisode(false);
+    endingTriggeredRef.current = false;
+    setIsEndingTransition(false);
     setNextEpisode(null);
-    setNextEpisodeCountdown(60);
+    setEndingCountdown(10);
   }, [currentEpisodeKey]);
 
   // HLS Qualities
@@ -65,7 +75,7 @@ const VideoPlayerComponent = ({
     vastUrl,
   });
 
-  console.log('[VideoPlayer] Ads debug:', { vastUrl, effectiveVastUrl, shouldPlayAds, evaluated, playingAds });
+  // console.log('[VideoPlayer] Ads debug:', { vastUrl, effectiveVastUrl, shouldPlayAds, evaluated, playingAds });
 
   // Activar ads al inicio si corresponde
   useEffect(() => {
@@ -96,6 +106,14 @@ const VideoPlayerComponent = ({
     pause,
   } = hlsPlayer;
 
+  // Forzar pausa del video HLS cuando las ads están reproduciéndose
+  useEffect(() => {
+    if (playingAds && videoRef.current) {
+      videoRef.current.pause();
+      videoRef.current.muted = true;
+    }
+  }, [playingAds, videoRef]);
+
   // Overlay Mouse / Key visibility logic
   const resetUIVisibility = useCallback(() => {
     setIsUIVisible(true);
@@ -109,46 +127,18 @@ const VideoPlayerComponent = ({
   }, [isSidebarOpen]);
 
   useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      const code = e.keyCode;
-
-      // Back: ESC(27), Backspace(8), Tizen Back(10009), webOS Back(461)
-      if (code === 27 || code === 8 || code === 10009 || code === 461) {
-        e.preventDefault();
-        if (onBack) onBack();
-        return;
-      }
-
-      // Reproducir/Pausar con Enter (13) si NO es en vivo y NO hay overlay visible
-      if (code === 13 && !isLive && !isUIVisible) {
-        e.preventDefault();
-        if (isPlaying) {
-          pause();
-        } else {
-          play();
-        }
-        resetUIVisibility();
-        return;
-      }
-
-      // Para los demás botones, mostrar la interfaz
-      resetUIVisibility();
-    };
-
     // Start the timeout on mount natively without forcing a state update
     if (isUIVisible && !hideTimeoutRef.current) {
       resetUIVisibility();
     }
 
     window.addEventListener("mousemove", resetUIVisibility);
-    window.addEventListener("keydown", handleKeyDown);
 
     return () => {
       window.removeEventListener("mousemove", resetUIVisibility);
-      window.removeEventListener("keydown", handleKeyDown);
       if (hideTimeoutRef.current) clearTimeout(hideTimeoutRef.current);
     };
-  }, [resetUIVisibility, onBack, isLive, isUIVisible, isPlaying, play, pause]);
+  }, [resetUIVisibility, isUIVisible]);
 
   // Extraer calidades de HLS JS
   useEffect(() => {
@@ -161,7 +151,10 @@ const VideoPlayerComponent = ({
       const unique = lvls.filter(
         (v, i, a) => a.findIndex((t) => t.value === v.value) === i,
       );
-      const newQualities = [{ value: "auto", label: "Auto" }, ...unique.reverse()];
+      const newQualities = [
+        { value: "auto", label: "Auto" },
+        ...unique.reverse(),
+      ];
       setQualities(newQualities); // Mayor resolución arriba
       if (onQualitiesChange) onQualitiesChange(newQualities);
     }
@@ -184,7 +177,7 @@ const VideoPlayerComponent = ({
       } else {
         const closest = hlsRef.current.levels.reduce((prev, curr) =>
           Math.abs(curr.height - targetHeight) <
-            Math.abs(prev.height - targetHeight)
+          Math.abs(prev.height - targetHeight)
             ? curr
             : prev,
         );
@@ -194,8 +187,25 @@ const VideoPlayerComponent = ({
   }, []);
 
   // Analytics y Tracking de VOD
-  const currentEpisodeDetails = episodes?.find((e: any) => e.key === currentEpisodeKey);
-  const analytics = usePlayerAnalytics(rudoKey, currentEpisodeDetails, description);
+  const currentEpisodeDetails = episodes?.find(
+    (e: any) => e.key === currentEpisodeKey,
+  );
+  const analytics = usePlayerAnalytics(
+    rudoKey,
+    currentEpisodeDetails,
+    description,
+  );
+
+  // Limpiar preview de seek cuando el currentTime alcanza la posición objetivo
+  useEffect(() => {
+    if (seekTargetRef.current !== null && keySeekPreview !== null && !keySeekIntervalRef.current) {
+      const diff = Math.abs(currentTime - seekTargetRef.current);
+      if (diff < 3) {
+        seekTargetRef.current = null;
+        setKeySeekPreview(null);
+      }
+    }
+  }, [currentTime, keySeekPreview]);
 
   // Reportar progreso en cada timeupdate
   useEffect(() => {
@@ -205,39 +215,52 @@ const VideoPlayerComponent = ({
     }
   }, [currentTime, duration, playingAds, isLive, analytics]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Chequear tiempo restante para Next Episode
+  // Chequear tiempo restante para transición PiP de fin de episodio
   useEffect(() => {
-    if (isLive || !episodes || episodes.length === 0 || !currentEpisodeKey || duration <= 0) return;
+    if (isLive || duration <= 0) return;
 
     const timeLeft = duration - currentTime;
-    const NEXT_EP_THRESHOLD = 60;
+    const PIP_THRESHOLD = 10;
 
-    if (timeLeft <= NEXT_EP_THRESHOLD && timeLeft >= -1) {
-      const currentIndex = episodes.findIndex((ep: any) => ep.key === currentEpisodeKey);
-      const nextIndex = currentIndex + 1;
-      if (currentIndex >= 0 && nextIndex < episodes.length) {
-        if (!nextEpisodeTriggeredRef.current) {
-          nextEpisodeTriggeredRef.current = true;
-          setNextEpisode(episodes[nextIndex]);
-          setShowNextEpisode(true);
+    if (timeLeft <= PIP_THRESHOLD && timeLeft >= -1) {
+      if (!endingTriggeredRef.current) {
+        endingTriggeredRef.current = true;
+        setIsEndingTransition(true);
+
+        // Buscar siguiente episodio si existe
+        if (episodes && episodes.length > 0 && currentEpisodeKey) {
+          const currentIndex = episodes.findIndex(
+            (ep: any) => ep.key === currentEpisodeKey,
+          );
+          const nextIndex = currentIndex + 1;
+          if (currentIndex >= 0 && nextIndex < episodes.length) {
+            setNextEpisode(episodes[nextIndex]);
+          }
         }
-        setNextEpisodeCountdown(Math.max(0, Math.ceil(timeLeft)));
       }
-    } else if (nextEpisodeTriggeredRef.current && timeLeft > NEXT_EP_THRESHOLD) {
-      nextEpisodeTriggeredRef.current = false;
-      setShowNextEpisode(false);
+      setEndingCountdown(Math.max(0, Math.ceil(timeLeft)));
+
+      // Auto-navegar al siguiente cuando llega a 0
+      if (timeLeft <= 0 && nextEpisode && onEpisodeSelect) {
+        onEpisodeSelect(nextEpisode);
+      }
+    } else if (
+      endingTriggeredRef.current &&
+      timeLeft > PIP_THRESHOLD
+    ) {
+      endingTriggeredRef.current = false;
+      setIsEndingTransition(false);
       setNextEpisode(null);
     }
-  }, [currentTime, duration, isLive, episodes, currentEpisodeKey]);
+  }, [currentTime, duration, isLive, episodes, currentEpisodeKey, nextEpisode, onEpisodeSelect]);
 
-  const handleNextEpisodeSelect = useCallback((ep: any) => {
-    setShowNextEpisode(false);
-    if (onEpisodeSelect) onEpisodeSelect(ep);
-  }, [onEpisodeSelect]);
-
-  const handleNextEpisodeDismiss = useCallback(() => {
-    setShowNextEpisode(false);
-  }, []);
+  const handleNextEpisodeSelect = useCallback(
+    (ep: any) => {
+      setIsEndingTransition(false);
+      if (onEpisodeSelect) onEpisodeSelect(ep);
+    },
+    [onEpisodeSelect],
+  );
 
   // Callbacks de VAST
   const handleAdsPlaying = useCallback(() => {
@@ -251,10 +274,13 @@ const VideoPlayerComponent = ({
   const handleAdsFinished = useCallback(() => {
     console.log("[VideoPlayer] Ads finalizados");
     setPlayingAds(false);
+    if (videoRef.current) {
+      videoRef.current.muted = false;
+    }
     play();
     analytics.onAdCompleted();
     if (onAdsFinished) onAdsFinished();
-  }, [play, analytics, onAdsFinished]);
+  }, [play, analytics, onAdsFinished, videoRef]);
 
   // (Manejo de Back ahora integrado en el keydown principal para evitar conflictos de listeners)
 
@@ -270,17 +296,280 @@ const VideoPlayerComponent = ({
         return;
       }
 
+      // No pausar durante la transición PiP de fin de episodio
+      if (isEndingTransition) return;
+
+      // No interactuar durante los ads
+      if (playingAds) return;
+
       // En VOD, el click central en el área vacía pausa o reanuda
       if (!isLive) {
         if (isPlaying) pause();
         else play();
       }
     },
-    [isLive, isPlaying, play, pause],
+    [isLive, isPlaying, play, pause, isEndingTransition, playingAds],
   );
+
+  // --- Volume / Skip / Fullscreen handlers ---
+  const handleVolumeChange = useCallback(
+    (newVolume: number) => {
+      setVolume(newVolume);
+      if (videoRef.current) {
+        videoRef.current.volume = newVolume;
+        if (newVolume > 0 && muted) {
+          videoRef.current.muted = false;
+          setMuted(false);
+        }
+      }
+    },
+    [videoRef, muted],
+  );
+
+  const handleMuteToggle = useCallback(() => {
+    setMuted((prev) => {
+      const next = !prev;
+      if (videoRef.current) {
+        videoRef.current.muted = next;
+      }
+      return next;
+    });
+  }, [videoRef]);
+
+  const handleSkip = useCallback(
+    (seconds: number) => {
+      if (videoRef.current && duration > 0) {
+        const newTime = Math.max(
+          0,
+          Math.min(duration, videoRef.current.currentTime + seconds),
+        );
+        videoRef.current.currentTime = newTime;
+      }
+    },
+    [videoRef, duration],
+  );
+
+  const handleFullscreen = useCallback(() => {
+    const container = videoRef.current?.closest(
+      ".video-player-container",
+    ) as HTMLElement | null;
+    if (!container) return;
+
+    if (document.fullscreenElement) {
+      document.exitFullscreen();
+    } else {
+      container.requestFullscreen().catch(console.error);
+    }
+  }, [videoRef]);
+
+  // Refs estables para keyboard (evitar que el effect se re-ejecute cada frame)
+  const currentTimeRef = useRef(currentTime);
+  const durationRef = useRef(duration);
+  currentTimeRef.current = currentTime;
+  durationRef.current = duration;
+
+  // Keyboard controls con hold-to-seek
+  useEffect(() => {
+    const SEEK_STEP = 15; // segundos por tick
+    const SEEK_INTERVAL = 60; // ms entre ticks al mantener
+
+    const startKeySeeking = (direction: number) => {
+      if (keySeekIntervalRef.current) return;
+      keySeekDirectionRef.current = direction;
+      const startTime = videoRef.current?.currentTime ?? currentTimeRef.current;
+      const firstPreview = Math.max(0, Math.min(durationRef.current, startTime + direction * SEEK_STEP));
+      setKeySeekPreview(firstPreview);
+      resetUIVisibility();
+
+      keySeekIntervalRef.current = setInterval(() => {
+        setKeySeekPreview((prev) => {
+          const base = prev ?? currentTimeRef.current;
+          return Math.max(0, Math.min(durationRef.current, base + direction * SEEK_STEP));
+        });
+        resetUIVisibility();
+      }, SEEK_INTERVAL);
+    };
+
+    const stopKeySeeking = () => {
+      if (keySeekIntervalRef.current) {
+        clearInterval(keySeekIntervalRef.current);
+        keySeekIntervalRef.current = null;
+      }
+      // Aplicar el seek y mantener preview hasta que currentTime alcance
+      setKeySeekPreview((prev) => {
+        if (prev !== null && videoRef.current) {
+          videoRef.current.currentTime = prev;
+          seekTargetRef.current = prev;
+        }
+        return prev;
+      });
+      keySeekDirectionRef.current = 0;
+    };
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      const code = e.keyCode;
+      if (playingAds) return;
+
+      // Back: ESC(27), Backspace(8), Tizen Back(10009), webOS Back(461)
+      if (code === 27 || code === 8 || code === 10009 || code === 461) {
+        e.preventDefault();
+        if (onBack) onBack();
+        return;
+      }
+
+      // Reproducir/Pausar con Enter (13) o Espacio (32)
+      if ((code === 13 || code === 32) && !isLive) {
+        e.preventDefault();
+        if (isPlaying) pause(); else play();
+        resetUIVisibility();
+        return;
+      }
+
+      // Flechas izquierda (37) / derecha (39): hold-to-seek
+      if ((code === 37 || code === 39) && !isLive && durationRef.current > 0) {
+        e.preventDefault();
+        const dir = code === 37 ? -1 : 1;
+        startKeySeeking(dir);
+        return;
+      }
+
+      // Flechas arriba (38) / abajo (40): subir/bajar volumen
+      if (code === 38 || code === 40) {
+        e.preventDefault();
+        const delta = code === 38 ? 0.1 : -0.1;
+        const newVolume = Math.max(0, Math.min(1, volume + delta));
+        handleVolumeChange(newVolume);
+        resetUIVisibility();
+        return;
+      }
+
+      resetUIVisibility();
+    };
+
+    const handleKeyUp = (e: KeyboardEvent) => {
+      const code = e.keyCode;
+      if ((code === 37 || code === 39) && keySeekIntervalRef.current) {
+        stopKeySeeking();
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    window.addEventListener("keyup", handleKeyUp);
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+      window.removeEventListener("keyup", handleKeyUp);
+      if (keySeekIntervalRef.current) {
+        clearInterval(keySeekIntervalRef.current);
+        keySeekIntervalRef.current = null;
+      }
+    };
+  }, [resetUIVisibility, onBack, isLive, isPlaying, play, pause, playingAds, handleVolumeChange, volume, videoRef]);
 
   return (
     <div className="video-player-container" onClick={handleBackgroundClick}>
+      {/* Fondo durante transición PiP */}
+      {isEndingTransition && (
+        <div
+          style={{
+            position: "absolute",
+            inset: 0,
+            backgroundImage: programBackgroundImage
+              ? `url(${programBackgroundImage})`
+              : "none",
+            backgroundColor: "#000",
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+            zIndex: 0,
+            animation: "fadeIn 0.6s ease-out forwards",
+          }}
+        >
+          {/* Overlay oscuro para legibilidad */}
+          <div
+            style={{
+              position: "absolute",
+              inset: 0,
+              background:
+                "linear-gradient(to bottom, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0.8) 100%)",
+            }}
+          />
+          {/* Info del siguiente episodio */}
+          {nextEpisode && (
+            <div
+              style={{
+                position: "absolute",
+                top: "50%",
+                left: "50%",
+                transform: "translate(-50%, -50%)",
+                textAlign: "center",
+                color: "#fff",
+                zIndex: 2,
+              }}
+            >
+              <div
+                style={{
+                  fontSize: "1rem",
+                  color: "#b9b9b9",
+                  marginBottom: "12px",
+                  textTransform: "uppercase",
+                  letterSpacing: "2px",
+                }}
+              >
+                A continuación
+              </div>
+              <div
+                style={{
+                  fontSize: "2rem",
+                  fontWeight: 700,
+                  marginBottom: "8px",
+                }}
+              >
+                {nextEpisode.title}
+              </div>
+              <div
+                style={{
+                  fontSize: "1.1rem",
+                  color: "#b9b9b9",
+                  marginBottom: "24px",
+                }}
+              >
+                T{nextEpisode.season}:E{nextEpisode.chapter}
+              </div>
+              <div
+                style={{
+                  fontSize: "0.9rem",
+                  color: "#b9b9b9",
+                  marginBottom: "16px",
+                }}
+              >
+                Reproduciendo en {endingCountdown}s
+              </div>
+              <button
+                onClick={() => handleNextEpisodeSelect(nextEpisode)}
+                style={{
+                  padding: "12px 32px",
+                  borderRadius: "999px",
+                  border: "none",
+                  backgroundColor: "var(--clr-secondary-button, #FA6428)",
+                  color: "var(--clr-text-primary-button, #fff)",
+                  fontSize: "1rem",
+                  fontWeight: 600,
+                  cursor: "pointer",
+                  transition: "transform 0.15s ease, opacity 0.15s ease",
+                }}
+                onMouseEnter={(e) =>
+                  (e.currentTarget.style.transform = "scale(1.05)")
+                }
+                onMouseLeave={(e) =>
+                  (e.currentTarget.style.transform = "scale(1)")
+                }
+              >
+                Reproducir ahora
+              </button>
+            </div>
+          )}
+        </div>
+      )}
+
       {/* VAST Ads overlay */}
       {playingAds && effectiveVastUrl && (
         <VastPlayer
@@ -290,7 +579,7 @@ const VideoPlayerComponent = ({
         />
       )}
 
-      {/* Video principal */}
+      {/* Video principal — se achica a PiP cuando isEndingTransition */}
       <video
         id="hls-video-player"
         ref={videoRef}
@@ -300,10 +589,34 @@ const VideoPlayerComponent = ({
         controls={false}
         muted={playingAds}
         tabIndex={-1}
+        onClick={(e) => {
+          if (isEndingTransition) {
+            e.stopPropagation();
+            setIsEndingTransition(false);
+            setNextEpisode(null);
+          }
+        }}
+        style={{
+          transition: "all 0.6s cubic-bezier(0.4, 0, 0.2, 1)",
+          ...(isEndingTransition && !playingAds
+            ? {
+                position: "absolute",
+                bottom: "40px",
+                right: "40px",
+                width: "320px",
+                height: "180px",
+                borderRadius: "12px",
+                boxShadow: "0 8px 32px rgba(0,0,0,0.6)",
+                zIndex: 10,
+                objectFit: "cover",
+                cursor: "pointer",
+              }
+            : {}),
+        }}
       />
 
-      {/* UI Overlay */}
-      {!playingAds && !hideUI && (
+      {/* UI Overlay (ocultar durante transición PiP) */}
+      {!playingAds && !hideUI && !isEndingTransition && (
         <>
           <PlayerTopBar
             title={title}
@@ -311,7 +624,7 @@ const VideoPlayerComponent = ({
             isVisible={isUIVisible}
             isLive={isLive}
             onBackClick={onBack}
-            isNextEpisodeOverlayVisible={showNextEpisode}
+            isNextEpisodeOverlayVisible={isEndingTransition}
           />
           <PlayerControls
             playing={hlsPlayer.isPlaying}
@@ -319,7 +632,10 @@ const VideoPlayerComponent = ({
             isLive={isLive}
             duration={hlsPlayer.duration}
             seekTime={hlsPlayer.currentTime}
+            previewSeekTime={keySeekPreview}
             loadedTime={hlsPlayer.loadedTime}
+            volume={volume}
+            muted={muted}
             onPlayButtonClick={
               hlsPlayer.isPlaying ? hlsPlayer.pause : hlsPlayer.play
             }
@@ -328,28 +644,19 @@ const VideoPlayerComponent = ({
                 hlsPlayer.videoRef.current.currentTime = time;
               }
             }}
+            onSkip={handleSkip}
+            onVolumeChange={handleVolumeChange}
+            onMuteToggle={handleMuteToggle}
+            onFullscreen={handleFullscreen}
             availableQualities={qualities}
             currentQuality={currentQuality}
             onQualityChange={handleQualityChange}
-            episodes={episodes}
             currentEpisodeKey={currentEpisodeKey}
-            onEpisodeSelect={onEpisodeSelect}
             onHideControls={() => setIsUIVisible(false)}
             onSidebarVisibilityChange={setIsSidebarOpen}
-            isNextEpisodeOverlayVisible={showNextEpisode}
+            isNextEpisodeOverlayVisible={isEndingTransition}
           />
         </>
-      )}
-
-      {/* Siguiente Episodio Overlay */}
-      {showNextEpisode && nextEpisode && !isLive && !playingAds && (
-        <NextEpisodeOverlay
-          episode={nextEpisode}
-          countdown={nextEpisodeCountdown}
-          controlsVisible={isUIVisible}
-          onSelect={handleNextEpisodeSelect}
-          onDismiss={handleNextEpisodeDismiss}
-        />
       )}
 
       {/* Spinner de carga */}

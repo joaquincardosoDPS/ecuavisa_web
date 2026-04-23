@@ -18,12 +18,15 @@ const VastPlayerComponent = ({ url, onAdsPlaying, onAdsFinished }: VastPlayerPro
     const containerRef = useRef<HTMLDivElement>(null);
     const videoRef = useRef<HTMLVideoElement>(null);
     const imaPlayerRef = useRef<any>(null);
-    const destroyedRef = useRef(false);
+    const mountIdRef = useRef(0);
     const adTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
-        destroyedRef.current = false;
+        // Cada mount obtiene un ID único; si otro mount ocurre, el ID cambia
+        // y las operaciones async del mount anterior se abortan
+        const currentMountId = ++mountIdRef.current;
+        const isStale = () => mountIdRef.current !== currentMountId;
 
         const initAds = async () => {
             try {
@@ -50,13 +53,13 @@ const VastPlayerComponent = ({ url, onAdsPlaying, onAdsFinished }: VastPlayerPro
                 const enrichedUrl = appendAdParamsToVastUrl(decodedUrl, adInfo);
                 console.log('[VAST] URL enriquecida:', enrichedUrl);
 
-                if (destroyedRef.current) return;
+                if (isStale()) return;
 
                 // Cargar IMA SDK
                 const ima = await loadImaSdk();
                 console.log('[VAST] IMA SDK cargado');
 
-                if (destroyedRef.current) return;
+                if (isStale()) return;
 
                 ima.settings.setLocale('es_cl');
                 ima.settings.setVpaidMode(ima.ImaSdkSettings.VpaidMode.ENABLED);
@@ -77,7 +80,6 @@ const VastPlayerComponent = ({ url, onAdsPlaying, onAdsFinished }: VastPlayerPro
 
                 // No usar autoResize — IMA lo sobreescribe a width:0
                 const playerOptions = new PlayerOptions();
-                playerOptions.clickTrackingElement = containerRef.current;
 
                 const imaPlayer = new Player(
                     ima,
@@ -131,6 +133,14 @@ const VastPlayerComponent = ({ url, onAdsPlaying, onAdsFinished }: VastPlayerPro
                     onAdsPlaying?.();
                 });
 
+                // Si el usuario hace click en el ad (se pausa), finalizar VAST
+                imaPlayer.addEventListener('AdPaused', () => {
+                    console.log('[VAST] Ad pausado por click, finalizando VAST');
+                    try { imaPlayer.destroy?.(); } catch (_e) { /* ignore */ }
+                    imaPlayerRef.current = null;
+                    onAdsFinished?.();
+                });
+
                 imaPlayer.addEventListener('AdAllAdsCompleted', () => {
                     console.log('[VAST] Todos los ads completados');
                     if (adTimeoutRef.current) clearTimeout(adTimeoutRef.current);
@@ -179,7 +189,6 @@ const VastPlayerComponent = ({ url, onAdsPlaying, onAdsFinished }: VastPlayerPro
 
         // Cleanup
         return () => {
-            destroyedRef.current = true;
             if (adTimeoutRef.current) clearTimeout(adTimeoutRef.current);
             if (imaPlayerRef.current) {
                 try {

@@ -1,4 +1,3 @@
-
 import { EpisodeSidebar } from "./EpisodeSidebar";
 import { Seekbar } from "./Seekbar";
 import type { ProgramChapter } from "@/interfaces/vod";
@@ -21,7 +20,6 @@ export const PlayerOptionButton = ({
   icon,
   onClick,
 }: PlayerOptionButtonProps) => {
-
   return (
     <button
       onClick={onClick}
@@ -54,11 +52,7 @@ interface QualityOptionProps {
   onClose: () => void;
 }
 
-const QualityOption = ({
-  label,
-  onSelect,
-}: QualityOptionProps) => {
-
+const QualityOption = ({ label, onSelect }: QualityOptionProps) => {
   return (
     <div
       onClick={onSelect}
@@ -117,7 +111,10 @@ export const PlayerQualityButton = ({
         }}
       >
         <img src={iconosConfig} alt="Configuración" width={26} height={26} />
-        Calidad <span style={{ marginLeft: "10px", color: "gray" }}>{qualities.find((o) => o.value === value)?.label || "Auto"}</span>
+        Calidad{" "}
+        <span style={{ marginLeft: "10px", color: "gray" }}>
+          {qualities.find((o) => o.value === value)?.label || "Auto"}
+        </span>
       </button>
 
       {open && (
@@ -155,11 +152,14 @@ export const PlayerQualityButton = ({
 
 interface PlayerControlsProps {
   seekTime?: number;
+  previewSeekTime?: number | null;
   loadedTime?: number;
   duration?: number;
   playing?: boolean;
   visible?: boolean;
   isLive?: boolean;
+  volume?: number;
+  muted?: boolean;
   episodes?: ProgramChapter[];
   currentEpisodeKey?: string;
   availableQualities?: { value: string; label: string }[];
@@ -167,6 +167,10 @@ interface PlayerControlsProps {
   onPlayButtonClick?: () => void;
   onSeek?: (time: number) => void;
   onSeekStart?: () => void;
+  onSkip?: (seconds: number) => void;
+  onVolumeChange?: (volume: number) => void;
+  onMuteToggle?: () => void;
+  onFullscreen?: () => void;
   onQualityChange?: (val: string) => void;
   onEpisodeSelect?: (episode: ProgramChapter) => void;
   onHideControls?: () => void;
@@ -176,11 +180,14 @@ interface PlayerControlsProps {
 
 const PlayerControlsComponent = ({
   seekTime = 0,
+  previewSeekTime = null,
   loadedTime = 0,
   duration = 0,
   playing,
   visible,
   isLive = false,
+  volume = 1,
+  muted = false,
   episodes = [],
   currentEpisodeKey,
   availableQualities = [],
@@ -188,6 +195,10 @@ const PlayerControlsComponent = ({
   onPlayButtonClick,
   onSeek,
   onSeekStart,
+  onSkip,
+  onVolumeChange,
+  onMuteToggle,
+  onFullscreen,
   onQualityChange,
   onEpisodeSelect,
   onHideControls,
@@ -208,7 +219,6 @@ const PlayerControlsComponent = ({
     }
   }, [isChaptersSidebarOpen, onSidebarVisibilityChange]);
 
-
   return (
     <div
       style={{
@@ -227,7 +237,7 @@ const PlayerControlsComponent = ({
       <div
         style={{
           position: "absolute",
-          bottom: "0px",
+          bottom: "50px",
           left: 0,
           right: 0,
           padding: "0 55px",
@@ -245,11 +255,20 @@ const PlayerControlsComponent = ({
         >
           <Seekbar
             seekTime={seekTime}
+            previewSeekTime={previewSeekTime}
             loadedTime={loadedTime}
             duration={duration}
             isLive={isLive}
+            playing={playing}
+            volume={volume}
+            muted={muted}
             onSeek={onSeek}
             onSeekStart={onSeekStart}
+            onPlayPause={onPlayButtonClick}
+            onSkip={onSkip}
+            onVolumeChange={onVolumeChange}
+            onMuteToggle={onMuteToggle}
+            onFullscreen={onFullscreen}
           />
         </div>
 
@@ -280,10 +299,9 @@ const PlayerControlsComponent = ({
             />
           )}
 
-          {/* Episodios y Reinicio Solo si NO es VIVO */}
+          {/* Episodios y Reinicio Solo si NO es VIVO
           {!isLive && (
             <>
-              {/* Replay */}
               <PlayerOptionButton
                 onClick={() => onSeek && onSeek(0)}
                 icon={
@@ -296,7 +314,6 @@ const PlayerControlsComponent = ({
                 }
               />
 
-              {/* Chapters */}
               {episodes.length > 0 && (
                 <PlayerOptionButton
                   onClick={() => setIsChaptersSidebarOpen(true)}
@@ -311,14 +328,13 @@ const PlayerControlsComponent = ({
                 />
               )}
             </>
-          )}
+          )} */}
 
-          <PlayerQualityButton
+          {/* <PlayerQualityButton
             value={currentQuality}
             qualities={availableQualities}
             onChange={onQualityChange}
-
-          />
+          /> */}
         </div>
       </div>
 

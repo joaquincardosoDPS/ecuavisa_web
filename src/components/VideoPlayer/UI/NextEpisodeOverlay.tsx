@@ -1,10 +1,10 @@
-import React, { useEffect, memo, useCallback } from 'react';
-import type { ProgramChapter } from '@/interfaces/vod';
+import React, { memo, useCallback } from 'react';
+import type { Chapter } from '@/interfaces/catalog.interface';
 
 
 interface NextEpisodeOverlayProps {
-    episode: ProgramChapter;
-    onSelect: (episode: ProgramChapter) => void;
+    episode: Chapter;
+    onSelect: (episode: Chapter) => void;
     onDismiss?: () => void;
     focusKey?: string;
     countdown?: number;

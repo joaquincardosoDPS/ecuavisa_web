@@ -1,5 +1,5 @@
 // Interfaces del reproductor de video
-import type { ProgramChapter } from "@/interfaces/vod";
+import type { Chapter } from "@/interfaces/catalog.interface";
 export interface VideoPlayerProps {
     src: string;
     title: string;
@@ -12,14 +12,15 @@ export interface VideoPlayerProps {
     packs?: string[];
     autoplay?: boolean;
     onBack?: () => void;
-    episodes?: ProgramChapter[];
+    episodes?: Chapter[];
     currentEpisodeKey?: string;
-    onEpisodeSelect?: (episode: ProgramChapter) => void;
+    onEpisodeSelect?: (episode: Chapter) => void;
     hideUI?: boolean;
     onQualitiesChange?: (qualities: { value: string; label: string }[]) => void;
     onQualityChange?: (quality: string) => void;
     onAdsPlaying?: () => void;
     onAdsFinished?: () => void;
+    programBackgroundImage?: string;
     initialSeconds?: number;
 }
 
