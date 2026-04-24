@@ -3,13 +3,9 @@
  * para Google Ad Manager (VAST).
  */
 
-import { ADS_FALLBACK_DOMAIN } from '@/config-global';
+import type { DeviceAdInfo } from '../types';
 
-export interface DeviceAdInfo {
-    rdid: string;
-    is_lat: string;
-    idtype: string;
-}
+const DEFAULT_FALLBACK_DOMAIN = 'https://www.chv.cl';
 
 var cachedInfo: DeviceAdInfo | null = null;
 
@@ -21,7 +17,6 @@ export function getDeviceAdInfo(): Promise<DeviceAdInfo> {
     if (cachedInfo) {
         return Promise.resolve(cachedInfo);
     }
-    
     const info = getGenericAdInfo();
     cachedInfo = info;
     return Promise.resolve(info);
@@ -51,7 +46,7 @@ function getGenericAdInfo(): DeviceAdInfo {
 }
 
 // Enriquece URL VAST con parámetros del dispositivo
-export function appendAdParamsToVastUrl(vastUrl: string, adInfo: DeviceAdInfo): string {
+export function appendAdParamsToVastUrl(vastUrl: string, adInfo: DeviceAdInfo, fallbackDomain?: string): string {
     if (!vastUrl) return vastUrl;
 
     // Limpieza de &amp; recursiva
@@ -152,10 +147,10 @@ export function appendAdParamsToVastUrl(vastUrl: string, adInfo: DeviceAdInfo): 
         // 1. Corregir url si es inválida
         if (isInvalidUrlParam(paramsMap['url'])) {
             // Usar description_url como fallback si tiene un dominio real
-            var fallbackDomain = (!isInvalidUrlParam(paramsMap['description_url']))
+            var fallbackUrl = (!isInvalidUrlParam(paramsMap['description_url']))
                 ? decodeURIComponent(paramsMap['description_url'])
-                : ADS_FALLBACK_DOMAIN;
-            paramsMap['url'] = encodeURIComponent(fallbackDomain);
+                : fallbackDomain || DEFAULT_FALLBACK_DOMAIN;
+            paramsMap['url'] = encodeURIComponent(fallbackUrl);
         }
 
         // 2. Corregir ref si es inválida

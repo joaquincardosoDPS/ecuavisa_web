@@ -2,10 +2,12 @@
 import { useQuery } from '@tanstack/react-query';
 import { fetchAppConfig } from '../services/configService';
 import { useConfigStore } from '../features/config/useConfigStore';
-import { useEffect } from 'react';
+import { useAuthStore } from '../features/auth/authStore';
+import { useEffect, useRef } from 'react';
 
 export const useAppInitialization = () => {
     const setConfig = useConfigStore((state) => state.setConfig);
+    const sessionChecked = useRef(false);
 
     const query = useQuery({
         queryKey: ['app-config'],
@@ -31,8 +33,18 @@ export const useAppInitialization = () => {
                     root.style.setProperty(`--${key}`, value as string);
                 }
             });
+
+            // Validar sesión una vez al cargar la app
+            if (!sessionChecked.current) {
+                sessionChecked.current = true;
+                const { token, validateSession } = useAuthStore.getState();
+                if (token) {
+                    validateSession();
+                }
+            }
         }
     }, [query.data, setConfig]);
 
     return query;
 };
+

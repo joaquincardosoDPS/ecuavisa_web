@@ -1,12 +1,13 @@
 import React, { useCallback, useEffect, useState, useRef } from "react";
-import { useHlsPlayer } from "@/hooks/useHlsPlayer";
-import { useAdsPolicy } from "@/hooks/useAdsPolicy";
-import { usePlayerAnalytics } from "@/hooks/usePlayerAnalytics";
-import { VastPlayer } from "@/components/VastPlayer/VastPlayer";
+import { useHlsPlayer } from "./hooks/useHlsPlayer";
+import { useAdsPolicy } from "./hooks/useAdsPolicy";
+import { usePlayerAnalytics } from "./hooks/usePlayerAnalytics";
+import { useWatchHistory } from "./hooks/useWatchHistory";
+import { VastPlayer } from "./ads/VastPlayer";
 import { Spinner } from "@/components/ui/Spinner";
 import { PlayerTopBar } from "./UI/PlayerTopBar";
 import { PlayerControls } from "./UI/PlayerControls";
-import type { VideoPlayerProps } from "@/interfaces/player";
+import type { VideoPlayerProps } from "./types";
 import "./VideoPlayer.css";
 
 /**
@@ -27,11 +28,13 @@ const VideoPlayerComponent = ({
   onEpisodeSelect,
   hideUI = false,
   onQualitiesChange,
-  onQualityChange,
   onAdsPlaying,
   onAdsFinished,
   programBackgroundImage,
   initialSeconds,
+  vodSlug,
+  userToken,
+  userProfile,
 }: VideoPlayerProps) => {
   const [playingAds, setPlayingAds] = useState(false);
 
@@ -49,26 +52,25 @@ const VideoPlayerComponent = ({
   const [nextEpisode, setNextEpisode] = useState<any>(null);
   const [endingCountdown, setEndingCountdown] = useState(10);
   const endingTriggeredRef = useRef(false);
+  const nextEpisodeRef = useRef<any>(null);
+  const autoNavFiredRef = useRef(false);
 
   // Hold-to-seek state
   const [keySeekPreview, setKeySeekPreview] = useState<number | null>(null);
-  const keySeekIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const keySeekDirectionRef = useRef<number>(0);
+  const keySeekIntervalRef = useRef<ReturnType<typeof setInterval> | null>(
+    null,
+  );
   const seekTargetRef = useRef<number | null>(null);
 
   // Resetear transición al cambiar capítulo
   useEffect(() => {
     endingTriggeredRef.current = false;
+    autoNavFiredRef.current = false;
+    nextEpisodeRef.current = null;
     setIsEndingTransition(false);
     setNextEpisode(null);
     setEndingCountdown(10);
   }, [currentEpisodeKey]);
-
-  // HLS Qualities
-  const [qualities, setQualities] = useState<
-    { value: string; label: string }[]
-  >([]);
-  const [currentQuality, setCurrentQuality] = useState("auto");
 
   // Evaluar política de ads
   const { shouldPlayAds, effectiveVastUrl, evaluated } = useAdsPolicy({
@@ -95,7 +97,6 @@ const VideoPlayerComponent = ({
   });
 
   const {
-    hlsRef,
     levels: hlsLevels,
     videoRef,
     isPlaying,
@@ -140,14 +141,13 @@ const VideoPlayerComponent = ({
     };
   }, [resetUIVisibility, isUIVisible]);
 
-  // Extraer calidades de HLS JS
+  // Notificar calidades disponibles al padre
   useEffect(() => {
-    if (hlsLevels && hlsLevels.length > 0) {
+    if (hlsLevels && hlsLevels.length > 0 && onQualitiesChange) {
       const lvls = hlsLevels.map((l) => ({
         value: l.height.toString(),
         label: l.height === 0 ? "Audio" : `${l.height}p`,
       }));
-      // Eliminar duplicados si los hay (ej: variantes de bitrate misma resolución)
       const unique = lvls.filter(
         (v, i, a) => a.findIndex((t) => t.value === v.value) === i,
       );
@@ -155,36 +155,9 @@ const VideoPlayerComponent = ({
         { value: "auto", label: "Auto" },
         ...unique.reverse(),
       ];
-      setQualities(newQualities); // Mayor resolución arriba
-      if (onQualitiesChange) onQualitiesChange(newQualities);
+      onQualitiesChange(newQualities);
     }
   }, [hlsLevels, onQualitiesChange]);
-
-  const handleQualityChange = useCallback((quality: string) => {
-    setCurrentQuality(quality);
-    if (onQualityChange) onQualityChange(quality);
-    if (!hlsRef.current || hlsRef.current.levels.length === 0) return;
-
-    if (quality === "auto") {
-      hlsRef.current.currentLevel = -1;
-    } else {
-      const targetHeight = parseInt(quality);
-      const levelIndex = hlsRef.current.levels.findIndex(
-        (l) => l.height === targetHeight,
-      );
-      if (levelIndex !== -1) {
-        hlsRef.current.currentLevel = levelIndex;
-      } else {
-        const closest = hlsRef.current.levels.reduce((prev, curr) =>
-          Math.abs(curr.height - targetHeight) <
-          Math.abs(prev.height - targetHeight)
-            ? curr
-            : prev,
-        );
-        hlsRef.current.currentLevel = hlsRef.current.levels.indexOf(closest);
-      }
-    }
-  }, []);
 
   // Analytics y Tracking de VOD
   const currentEpisodeDetails = episodes?.find(
@@ -196,9 +169,25 @@ const VideoPlayerComponent = ({
     description,
   );
 
+  // Guardado periódico de historial "Seguir viendo"
+  const { saveProgress } = useWatchHistory({
+    vodSlug,
+    currentTime,
+    duration,
+    isPlaying,
+    isLive,
+    playingAds,
+    token: userToken,
+    profile: userProfile,
+  });
+
   // Limpiar preview de seek cuando el currentTime alcanza la posición objetivo
   useEffect(() => {
-    if (seekTargetRef.current !== null && keySeekPreview !== null && !keySeekIntervalRef.current) {
+    if (
+      seekTargetRef.current !== null &&
+      keySeekPreview !== null &&
+      !keySeekIntervalRef.current
+    ) {
       const diff = Math.abs(currentTime - seekTargetRef.current);
       if (diff < 3) {
         seekTargetRef.current = null;
@@ -210,10 +199,20 @@ const VideoPlayerComponent = ({
   // Reportar progreso en cada timeupdate
   useEffect(() => {
     if (!isLive && !playingAds && currentTime > 0 && duration > 0) {
-      // console.log('[VideoPlayer] Tracking heart-beat:', { currentTime, duration });
       analytics.onPlaybackProgress(currentTime, duration);
     }
-  }, [currentTime, duration, playingAds, isLive, analytics]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [currentTime, duration, playingAds, isLive, analytics]);
+
+  // Función para auto-navegar al siguiente episodio (guarded)
+  const autoNavigateToNext = useCallback(() => {
+    if (autoNavFiredRef.current) return;
+    const ep = nextEpisodeRef.current;
+    if (ep && onEpisodeSelect) {
+      autoNavFiredRef.current = true;
+      console.log("[VideoPlayer] Auto-playing next episode:", ep.title);
+      onEpisodeSelect(ep);
+    }
+  }, [onEpisodeSelect]);
 
   // Chequear tiempo restante para transición PiP de fin de episodio
   useEffect(() => {
@@ -234,25 +233,41 @@ const VideoPlayerComponent = ({
           );
           const nextIndex = currentIndex + 1;
           if (currentIndex >= 0 && nextIndex < episodes.length) {
-            setNextEpisode(episodes[nextIndex]);
+            const next = episodes[nextIndex];
+            nextEpisodeRef.current = next;
+            setNextEpisode(next);
           }
         }
       }
       setEndingCountdown(Math.max(0, Math.ceil(timeLeft)));
 
-      // Auto-navegar al siguiente cuando llega a 0
-      if (timeLeft <= 0 && nextEpisode && onEpisodeSelect) {
-        onEpisodeSelect(nextEpisode);
+      // Auto-navegar cuando timeLeft llega a 0
+      if (timeLeft <= 0) {
+        autoNavigateToNext();
       }
-    } else if (
-      endingTriggeredRef.current &&
-      timeLeft > PIP_THRESHOLD
-    ) {
+    } else if (endingTriggeredRef.current && timeLeft > PIP_THRESHOLD) {
       endingTriggeredRef.current = false;
+      autoNavFiredRef.current = false;
+      nextEpisodeRef.current = null;
       setIsEndingTransition(false);
       setNextEpisode(null);
     }
-  }, [currentTime, duration, isLive, episodes, currentEpisodeKey, nextEpisode, onEpisodeSelect]);
+  }, [
+    currentTime,
+    duration,
+    isLive,
+    episodes,
+    currentEpisodeKey,
+    autoNavigateToNext,
+  ]);
+
+  // Fallback: auto-navegar cuando el video emite 'ended'
+  useEffect(() => {
+    if (hlsPlayer.isEnded) {
+      saveProgress(1); // Marcar episodio actual como finalizado
+      autoNavigateToNext();
+    }
+  }, [hlsPlayer.isEnded, autoNavigateToNext, saveProgress]);
 
   const handleNextEpisodeSelect = useCallback(
     (ep: any) => {
@@ -375,16 +390,21 @@ const VideoPlayerComponent = ({
 
     const startKeySeeking = (direction: number) => {
       if (keySeekIntervalRef.current) return;
-      keySeekDirectionRef.current = direction;
       const startTime = videoRef.current?.currentTime ?? currentTimeRef.current;
-      const firstPreview = Math.max(0, Math.min(durationRef.current, startTime + direction * SEEK_STEP));
+      const firstPreview = Math.max(
+        0,
+        Math.min(durationRef.current, startTime + direction * SEEK_STEP),
+      );
       setKeySeekPreview(firstPreview);
       resetUIVisibility();
 
       keySeekIntervalRef.current = setInterval(() => {
         setKeySeekPreview((prev) => {
           const base = prev ?? currentTimeRef.current;
-          return Math.max(0, Math.min(durationRef.current, base + direction * SEEK_STEP));
+          return Math.max(
+            0,
+            Math.min(durationRef.current, base + direction * SEEK_STEP),
+          );
         });
         resetUIVisibility();
       }, SEEK_INTERVAL);
@@ -403,15 +423,14 @@ const VideoPlayerComponent = ({
         }
         return prev;
       });
-      keySeekDirectionRef.current = 0;
     };
 
     const handleKeyDown = (e: KeyboardEvent) => {
       const code = e.keyCode;
       if (playingAds) return;
 
-      // Back: ESC(27), Backspace(8), Tizen Back(10009), webOS Back(461)
-      if (code === 27 || code === 8 || code === 10009 || code === 461) {
+      // Back: ESC(27), Backspace(8)
+      if (code === 27 || code === 8) {
         e.preventDefault();
         if (onBack) onBack();
         return;
@@ -420,7 +439,8 @@ const VideoPlayerComponent = ({
       // Reproducir/Pausar con Enter (13) o Espacio (32)
       if ((code === 13 || code === 32) && !isLive) {
         e.preventDefault();
-        if (isPlaying) pause(); else play();
+        if (isPlaying) pause();
+        else play();
         resetUIVisibility();
         return;
       }
@@ -463,7 +483,18 @@ const VideoPlayerComponent = ({
         keySeekIntervalRef.current = null;
       }
     };
-  }, [resetUIVisibility, onBack, isLive, isPlaying, play, pause, playingAds, handleVolumeChange, volume, videoRef]);
+  }, [
+    resetUIVisibility,
+    onBack,
+    isLive,
+    isPlaying,
+    play,
+    pause,
+    playingAds,
+    handleVolumeChange,
+    volume,
+    videoRef,
+  ]);
 
   return (
     <div className="video-player-container" onClick={handleBackgroundClick}>
@@ -624,7 +655,6 @@ const VideoPlayerComponent = ({
             isVisible={isUIVisible}
             isLive={isLive}
             onBackClick={onBack}
-            isNextEpisodeOverlayVisible={isEndingTransition}
           />
           <PlayerControls
             playing={hlsPlayer.isPlaying}
@@ -648,13 +678,9 @@ const VideoPlayerComponent = ({
             onVolumeChange={handleVolumeChange}
             onMuteToggle={handleMuteToggle}
             onFullscreen={handleFullscreen}
-            availableQualities={qualities}
-            currentQuality={currentQuality}
-            onQualityChange={handleQualityChange}
             currentEpisodeKey={currentEpisodeKey}
             onHideControls={() => setIsUIVisible(false)}
             onSidebarVisibilityChange={setIsSidebarOpen}
-            isNextEpisodeOverlayVisible={isEndingTransition}
           />
         </>
       )}

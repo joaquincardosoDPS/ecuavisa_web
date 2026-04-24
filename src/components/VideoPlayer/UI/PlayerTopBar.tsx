@@ -1,7 +1,5 @@
-import React, { useState } from "react";
+import React from "react";
 import iconoVolver from "@/assets/img/icons/iconos-volver.svg";
-import { CastButton } from "./CastButton";
-import { SubtitlesButton } from "./SubtitlesButton";
 
 interface PlayerTopBarProps {
   title: string;
@@ -9,7 +7,6 @@ interface PlayerTopBarProps {
   isVisible: boolean;
   isLive?: boolean;
   onBackClick?: () => void;
-  isNextEpisodeOverlayVisible?: boolean;
 }
 
 const PlayerTopBarComponent = ({
@@ -18,7 +15,6 @@ const PlayerTopBarComponent = ({
   isVisible,
   isLive = false,
   onBackClick,
-  isNextEpisodeOverlayVisible,
 }: PlayerTopBarProps) => {
   return (
     <div

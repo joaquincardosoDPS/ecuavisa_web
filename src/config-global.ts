@@ -2,9 +2,11 @@ export const RUDO_CDN_URL = 'https://cdn.rudo.video';
 export const RUDO_API_URL = 'https://consumers.rudo.video/categories/all';
 export const RUDO_BASE_USER = 'https://consumers.rudo.video/users'
 
-const client = new URLSearchParams(window.location.search).get('client') || window.location.pathname.split('/')[2];
+const client = new URLSearchParams(window.location.search).get('client')
+    || (location.protocol !== 'file:' ? window.location.pathname.split('/')[2] : '')
+    || '';
 
-export const CLIENT = client || '';
+export const CLIENT = client || 'chv';
 export const BASENAME = window.location.pathname.startsWith('/web/') ? `/web/${CLIENT}` : '/';
 
 export const ADS_FALLBACK_DOMAIN = 'https://www.chv.cl';

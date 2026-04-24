@@ -25,6 +25,7 @@ function ChaptersContainer({
   const chapters =
     chaptersData?.pages?.flatMap((page) => page?.data || []) || [];
 
+  console.log("chapters", chapters);
   return (
     <div className="flex flex-col gap-10 animate-in fade-in duration-500">
       <div className="grid grid-cols-6 gap-5">

@@ -1,9 +1,7 @@
 import { EpisodeSidebar } from "./EpisodeSidebar";
 import { Seekbar } from "./Seekbar";
-import type { ProgramChapter } from "@/interfaces/vod";
+import type { ProgramChapter } from "../types";
 
-import iconosReiniciar from "@/assets/img/icons/iconos-reiniciar.svg";
-import iconosFila from "@/assets/img/icons/iconos-fila.svg";
 import iconosConfig from "@/assets/img/icons/iconos-config.svg";
 import iconosPlay from "@/assets/img/icons/iconos-play.svg";
 import iconosPause from "@/assets/img/icons/iconos-pause.svg";
@@ -49,7 +47,6 @@ export const PlayerOptionButton = ({
 interface QualityOptionProps {
   label: string;
   onSelect: () => void;
-  onClose: () => void;
 }
 
 const QualityOption = ({ label, onSelect }: QualityOptionProps) => {
@@ -132,14 +129,11 @@ export const PlayerQualityButton = ({
             minWidth: "120px",
           }}
         >
-          {qualities.map((opt, i) => (
+          {qualities.map((opt) => (
             <QualityOption
               key={opt.value}
               label={opt.label}
               onSelect={() => handleSelect(opt.value)}
-              onClose={() => {
-                setOpen(false);
-              }}
             />
           ))}
         </div>
@@ -162,20 +156,19 @@ interface PlayerControlsProps {
   muted?: boolean;
   episodes?: ProgramChapter[];
   currentEpisodeKey?: string;
-  availableQualities?: { value: string; label: string }[];
-  currentQuality?: string;
+
   onPlayButtonClick?: () => void;
   onSeek?: (time: number) => void;
-  onSeekStart?: () => void;
+
   onSkip?: (seconds: number) => void;
   onVolumeChange?: (volume: number) => void;
   onMuteToggle?: () => void;
   onFullscreen?: () => void;
-  onQualityChange?: (val: string) => void;
+
   onEpisodeSelect?: (episode: ProgramChapter) => void;
   onHideControls?: () => void;
   onSidebarVisibilityChange?: (isOpen: boolean) => void;
-  isNextEpisodeOverlayVisible?: boolean;
+
 }
 
 const PlayerControlsComponent = ({
@@ -190,20 +183,15 @@ const PlayerControlsComponent = ({
   muted = false,
   episodes = [],
   currentEpisodeKey,
-  availableQualities = [],
-  currentQuality = "auto",
   onPlayButtonClick,
   onSeek,
-  onSeekStart,
   onSkip,
   onVolumeChange,
   onMuteToggle,
   onFullscreen,
-  onQualityChange,
   onEpisodeSelect,
   onHideControls,
   onSidebarVisibilityChange,
-  isNextEpisodeOverlayVisible,
 }: PlayerControlsProps) => {
   const [isChaptersSidebarOpen, setIsChaptersSidebarOpen] = useState(false);
 
@@ -263,7 +251,6 @@ const PlayerControlsComponent = ({
             volume={volume}
             muted={muted}
             onSeek={onSeek}
-            onSeekStart={onSeekStart}
             onPlayPause={onPlayButtonClick}
             onSkip={onSkip}
             onVolumeChange={onVolumeChange}

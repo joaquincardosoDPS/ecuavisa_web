@@ -6,7 +6,7 @@ import { FullScreenSpinner } from "@/components/ui/FullScreenSpinner";
 import CardCarrousel from '@/components/ProgramCard/CardCarrousel';
 
 function HomeView() {
-    const { slider, categories, recommended, playlistPremium, isLoading, isError } = useHomeData();
+    const { slider, categories, recommended, isLoading, isError } = useHomeData();
     if (isLoading) {
         return <FullScreenSpinner message="Cargando Portada..." />;
     }

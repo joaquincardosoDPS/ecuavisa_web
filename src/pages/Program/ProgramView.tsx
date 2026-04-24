@@ -45,7 +45,7 @@ function ProgramView() {
     return <FullScreenSpinner message="Cargando Programa..." />;
   }
 
-  if (isError) {
+  if (isError || !programDetail) {
     return (
       <div className="flex items-center justify-center min-h-screen text-red-500">
         Error al cargar el programa

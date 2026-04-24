@@ -18,7 +18,6 @@ export interface AppConfig {
     logo: string | null;
     base_ads: string;
     "android-version": string;
-    "androidtv-version": string;
     "clr-icon": string;
     "clr-primary": string;
     "clr-primary-subtitle": string;
@@ -37,6 +36,5 @@ export interface AppConfig {
     timezone_name: string;
     "politicas-privacidad": string;
     "terminos-condiciones": string;
-    "url-tv-vincular": string;
 }
 

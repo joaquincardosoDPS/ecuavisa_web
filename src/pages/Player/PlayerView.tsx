@@ -3,9 +3,12 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
 import { catalogService } from "@/services/catalogService";
 import { adsService } from "@/services/adsService";
-import { VideoPlayer } from "@/components/VideoPlayer/VideoPlayer";
+import { VideoPlayer } from "@/components/VideoPlayer";
 import { Spinner } from "@/components/ui/Spinner";
-import type { Chapter, ProgramDetailResponse } from "@/interfaces/catalog.interface";
+import type {
+  Chapter,
+  ProgramDetailResponse,
+} from "@/interfaces/catalog.interface";
 
 function PlayerView() {
   const { segment, season, chapter } = useParams<{
@@ -108,7 +111,11 @@ function PlayerView() {
           const episodeList: Chapter[] = [chapterData];
           if (nextChapterData) {
             episodeList.push(nextChapterData);
+            console.log('[PlayerView] ✅ Siguiente episodio encontrado:', nextChapterData.title, 'key:', nextChapterData.key);
+          } else {
+            console.log('[PlayerView] ❌ No hay siguiente episodio');
           }
+          console.log('[PlayerView] Episodes list:', episodeList.map(e => ({ key: e.key, title: e.title })));
           setEpisodes(episodeList);
 
           setLoading(false);
@@ -132,10 +139,9 @@ function PlayerView() {
   // Cuando el VideoPlayer selecciona el siguiente episodio, navegar a su ruta
   const handleEpisodeSelect = useCallback(
     (ep: Chapter) => {
-      navigate(
-        `/player/${ep.key_segment}/${ep.season}/${ep.chapter}`,
-        { replace: true },
-      );
+      navigate(`/play/${ep.key_segment}/${ep.season}/${ep.chapter}`, {
+        replace: true,
+      });
     },
     [navigate],
   );
@@ -143,9 +149,10 @@ function PlayerView() {
   // Leer imagen de fondo del programa desde el cache de TanStack Query
   const programBackgroundImage = useMemo(() => {
     if (!programSlug) return undefined;
-    const cached = queryClient.getQueryData<ProgramDetailResponse>(
-      ["programDetail", programSlug],
-    );
+    const cached = queryClient.getQueryData<ProgramDetailResponse>([
+      "programDetail",
+      programSlug,
+    ]);
     if (!cached?.data) return undefined;
     const program = cached.data;
     return (
@@ -154,6 +161,8 @@ function PlayerView() {
       program.image_land?.big
     );
   }, [programSlug, queryClient]);
+
+  console.log("programBackgroundImage", programBackgroundImage);
 
   // Fullscreen loading
   if (loading) {

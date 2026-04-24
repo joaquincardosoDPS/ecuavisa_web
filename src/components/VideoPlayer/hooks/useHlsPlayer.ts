@@ -161,8 +161,8 @@ export function useHlsPlayer({ src, autoplay = true, isLive = false, livetoken, 
                 }
             });
         } else {
-            // Soporte nativo (Safari, webOS, Tizen)
-            videoElement.src = isLive ? buildLiveUrl(src, livetoken) : src;
+            // Soporte nativo (Safari / iOS)
+            videoElement.src = isLive ? buildLiveUrl(src, livetoken ?? '') : src;
             videoElement.addEventListener('loadedmetadata', () => {
                 setIsReady(true);
                 if (videoElement) {

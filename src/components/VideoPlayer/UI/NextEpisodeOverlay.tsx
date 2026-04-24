@@ -1,12 +1,9 @@
-import React, { memo, useCallback } from 'react';
-import type { Chapter } from '@/interfaces/catalog.interface';
-
+import { memo, useCallback } from 'react';
+import type { Chapter } from '../types';
 
 interface NextEpisodeOverlayProps {
     episode: Chapter;
     onSelect: (episode: Chapter) => void;
-    onDismiss?: () => void;
-    focusKey?: string;
     countdown?: number;
     controlsVisible?: boolean;
 }
@@ -15,7 +12,6 @@ export const NEXT_EPISODE_FOCUS_KEY = 'next-episode-overlay';
 
 const NextEpisodeOverlayComponent = ({ episode, onSelect, countdown, controlsVisible }: NextEpisodeOverlayProps) => {
 
-    const cardRef = React.useRef<HTMLDivElement | null>(null);
     const bottomPosition = controlsVisible ? '12vw' : '4vw';
 
     const handleSelect = useCallback(() => {

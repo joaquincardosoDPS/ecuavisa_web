@@ -8,7 +8,7 @@ interface HlsBackgroundVideoProps {
 
 /**
  * Componente para reproducir video HLS como fondo (sin audio, en bucle).
- * Forza la resolución más baja (level 0) para ahorrar ancho de banda en TVs (Regla 1 y 5).
+ * Forza la resolución más baja (level 0) para ahorrar ancho de banda.
  */
 export const HlsBackgroundVideo = ({ url, style }: HlsBackgroundVideoProps) => {
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -53,7 +53,7 @@ export const HlsBackgroundVideo = ({ url, style }: HlsBackgroundVideoProps) => {
         }
       });
     } else if (videoElement.canPlayType("application/vnd.apple.mpegurl")) {
-      // Soporte nativo (Safari / WebOS / Tizen)
+      // Soporte nativo (Safari / iOS)
       videoElement.src = url;
     }
 

@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { Player, PlayerOptions, loadImaSdk } from '@glomex/vast-ima-player';
-import { getDeviceAdInfo, appendAdParamsToVastUrl } from '@/services/deviceAdService';
+import { getDeviceAdInfo, appendAdParamsToVastUrl } from './deviceAdService';
 import he from 'he';
 import './VastPlayer.css';
 

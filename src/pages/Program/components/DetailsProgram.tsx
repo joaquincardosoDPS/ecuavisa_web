@@ -5,7 +5,7 @@ function DetailsProgram({ programDetail }: { programDetail: Program }) {
 
 
     const yearProduction = programDetail.anio_production
-    const genders = programDetail.genders.map(gender => gender.name).join(', ')
+    const genders = programDetail.genders?.map(gender => gender.name).join(', ')
     const casting = programDetail.actors || ''
 
     return (

@@ -21,7 +21,7 @@ function Banner({ program }: { program: Program }) {
     const bgImg = program?.image_slider?.big || program?.image_background?.big || program.image_land.big;
     const logoImg = program?.image_logo?.big;
     const maxSeasons = program.segments[0].max_temp;
-    const genderNames = program.genders.map((gender) => gender.name).join(", ");
+    const genderNames = program.genders?.map((gender) => gender.name).join(", ");
     return (
         <>
             <div className="fixed inset-0 -z-10 bg-(--clr-primary)">

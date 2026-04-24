@@ -1,5 +1,5 @@
-import React, { useEffect, useRef } from "react";
-import type { ProgramChapter } from "@/interfaces/vod";
+import React from "react";
+import type { ProgramChapter } from "../types";
 
 interface EpisodeSidebarProps {
   episodes: ProgramChapter[];
@@ -12,15 +12,13 @@ interface EpisodeSidebarProps {
 
 interface EpisodeItemProps {
   episode: ProgramChapter;
-  index: number;
   isCurrent: boolean;
   onSelect: (episode: ProgramChapter) => void;
-  onClose: () => void;
   onCloseAll: () => void;
   currentEpisodeKey?: string;
 }
 
-const EpisodeItemComponent = ({ episode, index, isCurrent, onSelect, onClose, onCloseAll, currentEpisodeKey }: EpisodeItemProps) => {
+const EpisodeItemComponent = ({ episode, isCurrent, onSelect, onCloseAll, currentEpisodeKey }: EpisodeItemProps) => {
 
   return (
     <div
@@ -64,18 +62,6 @@ const EpisodeSidebarComponent = ({
   onEpisodeSelect,
 }: EpisodeSidebarProps) => {
 
-  const sidebarRef = useRef<HTMLDivElement | null>(null);
-
-  useEffect(() => {
-    if (visible && episodes.length > 0) {
-      const timer = setTimeout(() => {
-        const currentIndex = episodes.findIndex((ep) => ep.key === currentEpisodeKey);
-        const targetIndex = currentIndex >= 0 ? currentIndex : 0;
-
-      }, 300);
-      return () => clearTimeout(timer);
-    }
-  }, [visible, episodes, currentEpisodeKey]);
 
   return (
     <>
@@ -98,9 +84,6 @@ const EpisodeSidebarComponent = ({
 
       {/* Contenedor del Sidebar */}
       <div
-        ref={(node) => {
-          sidebarRef.current = node;
-        }}
         onClick={(e) => e.stopPropagation()}
         style={{
           position: "fixed",
@@ -122,10 +105,8 @@ const EpisodeSidebarComponent = ({
             <EpisodeItem
               key={episode.key || index}
               episode={episode}
-              index={index}
               isCurrent={episode.key === currentEpisodeKey}
               onSelect={onEpisodeSelect}
-              onClose={onClose}
               onCloseAll={onCloseAll}
               currentEpisodeKey={currentEpisodeKey}
             />
