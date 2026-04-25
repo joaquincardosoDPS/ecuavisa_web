@@ -46,7 +46,7 @@ export const profileService = {
     update: async (token: string, id: string, name_perfil: string, avatar: string | null): Promise<ProfileMutationResponse> => {
         const { data } = await axios.post<ProfileMutationResponse>(
             RUDO_PROFILE_UPDATE,
-            qs.stringify({ client: CLIENT, token, id, name_perfil, avatar: avatar ?? '' }),
+            qs.stringify({ client: CLIENT, token, id, name_perfil, avatar: avatar ?? null }),
             { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }
         );
         return data;

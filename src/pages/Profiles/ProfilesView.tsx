@@ -46,7 +46,7 @@ function ProfilesView() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-(--clr-primary) px-25 py-3.5">
+    <div className="min-h-screen flex flex-col px-25 py-3.5">
       {/* Header */}
       <div className="flex items-center justify-between">
         <img src={logo} alt="Logo" className="h-14 w-auto" />

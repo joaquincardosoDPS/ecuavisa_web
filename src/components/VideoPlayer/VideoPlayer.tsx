@@ -317,11 +317,9 @@ const VideoPlayerComponent = ({
       // No interactuar durante los ads
       if (playingAds) return;
 
-      // En VOD, el click central en el área vacía pausa o reanuda
-      if (!isLive) {
-        if (isPlaying) pause();
-        else play();
-      }
+      // Click central pausa o reanuda
+      if (isPlaying) pause();
+      else play();
     },
     [isLive, isPlaying, play, pause, isEndingTransition, playingAds],
   );

@@ -172,3 +172,34 @@ export interface ChaptersResponse {
     last_page: number;
     data: Chapter[];
 }
+
+
+export interface EPGPictures {
+    photo: string;
+    poster: string;
+    cover: string;
+    background: string;
+}
+
+export interface EPGEvent {
+    id: string;
+    programId: string;
+    beginTime: string;
+    endTime: string;
+    title: string;
+    synopsis: string;
+    genre: string[] | null;
+    episodeTitle: string;
+    pictures: EPGPictures;
+    rating: string;
+}
+
+export interface EPGChannel {
+    key_live: string;
+    channel: string;
+    channelCode: string;
+    updated: string;
+    eventsFrom: string;
+    eventsTo: string;
+    events: EPGEvent[];
+}

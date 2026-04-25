@@ -1,9 +1,12 @@
 import React, { useState } from "react";
-import iconoFullscreen from "@/assets/img/icons/iconos-fullscreen.svg";
+import iconoFullscreenRaw from "@/assets/img/icons/iconos-fullscreen.svg?raw";
 
 interface FullscreenButtonProps {
   onClick?: () => void;
 }
+
+const resizeSvg = (raw: string, size: number) =>
+  raw.replace(/width="[^"]*"/, `width="${size}"`).replace(/height="[^"]*"/, `height="${size}"`);
 
 const FullscreenButtonComponent = ({ onClick }: FullscreenButtonProps) => {
   const [hovered, setHovered] = useState(false);
@@ -16,24 +19,21 @@ const FullscreenButtonComponent = ({ onClick }: FullscreenButtonProps) => {
       style={{
         background: "none",
         border: "none",
-        color: "#fff",
         cursor: "pointer",
         padding: "8px",
         borderRadius: "50%",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
+        color: hovered ? "var(--foc-primary)" : "#b9b9b9",
+        transition: "color 0.15s ease",
       }}
       title="Pantalla completa"
     >
-      <img
-        src={iconoFullscreen}
-        alt="Pantalla completa"
-        width={22}
-        height={22}
-        style={{
-          filter: hovered ? "brightness(1.38)" : "none",
-          transition: "filter 0.15s ease",
+      <span
+        style={{ display: "inline-flex", width: 28, height: 28 }}
+        dangerouslySetInnerHTML={{
+          __html: resizeSvg(iconoFullscreenRaw, 28),
         }}
       />
     </button>

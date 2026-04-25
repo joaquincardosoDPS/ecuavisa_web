@@ -84,3 +84,9 @@ export const RUDO_CHANGE_PASSWORD = `https://consumers.rudo.video/users/password
 
 // Login - RSS
 export const RUDO_LOGIN_RSS = `https://consumers.rudo.video/users/login_rrss` // Permite iniciar sessión con rrss - login rrss
+
+// Favoritos ----
+export const RUDO_FAVORITES_ALL = `https://consumers.rudo.video/favorites/all` // Permite ver todos los favoritos
+export const RUDO_FAVORITES_ADD = `https://consumers.rudo.video/favorites/add` // Permite agregar un favorito
+export const RUDO_FAVORITES_VALIDATE = `https://consumers.rudo.video/favorites/validate` // Permite validar si un programa esta en favoritos
+export const RUDO_FAVORITES_DELETE = `https://consumers.rudo.video/favorites/delete` // Permite eliminar un favorito

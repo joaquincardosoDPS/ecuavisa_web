@@ -46,7 +46,7 @@ function CarrouselContainer({ category, orientation }: CarrouselContainerProps) 
                     </div>
                 )}
                 <div className="flex-1 min-w-0">
-                    <CardCarrousel programs={category.programs} orientation={finalOrientation} hasIconImage={hasIconImage} />
+                    <CardCarrousel programs={category.programs} orientation={finalOrientation} hasIconImage={hasIconImage} categorySlug={category.key} />
                 </div>
             </div>
         </div>

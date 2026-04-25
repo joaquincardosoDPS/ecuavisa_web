@@ -3,6 +3,7 @@ import { SkipButton } from "./SkipButton";
 import { PlayPauseButton } from "./PlayPauseButton";
 import { VolumeControl } from "./VolumeControl";
 import { FullscreenButton } from "./FullscreenButton";
+import { LiveControls } from "./LiveControls";
 
 interface SeekbarProps {
   seekTime?: number;
@@ -211,146 +212,126 @@ const SeekbarComponent = ({
   return (
     <div
       className="seekbar-wrapper"
-      style={{
-        width: "100%",
-      }}
+      style={{ width: "100%" }}
     >
-      {/* Controles y tiempo */}
-      {!isLive && (
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            width: "100%",
-            marginBottom: "10px",
-            color: "#b9b9b9",
-          }}
-        >
-          {/* Tiempo actual */}
-          <div
-            style={{
-              display: "flex",
-              gap: "0.5rem",
-              fontWeight: "normal",
-            }}
-          >
-            <div
-              style={{
-                width: "65px",
-                textAlign: "start",
-              }}
-            >
-              {formatTime(position)}
-            </div>
-            <span>{" / "}</span>
-            <div
-              style={{
-                width: "65px",
-                textAlign: "right",
-              }}
-            >
-              {formatTime(duration)}
-            </div>
-          </div>
-
-          {/* Botones centrales */}
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: "10px",
-            }}
-          >
-            <SkipButton seconds={-10} onClick={() => onSkip && onSkip(-10)} />
-            <PlayPauseButton playing={playing} onClick={onPlayPause} />
-            <SkipButton seconds={10} onClick={() => onSkip && onSkip(10)} />
-          </div>
-
-          {/* Botones finales */}
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: "10px",
-            }}
-          >
-            <VolumeControl
-              volume={volume}
-              muted={muted}
-              onVolumeChange={onVolumeChange}
-              onMuteToggle={onMuteToggle}
-            />
-            <FullscreenButton onClick={onFullscreen} />
-          </div>
-        </div>
+      {/* ═══════ LIVE: Controles simplificados ═══════ */}
+      {isLive && (
+        <LiveControls
+          playing={playing}
+          volume={volume}
+          muted={muted}
+          onPlayPause={onPlayPause}
+          onVolumeChange={onVolumeChange}
+          onMuteToggle={onMuteToggle}
+          onFullscreen={onFullscreen}
+        />
       )}
 
-      {/* Barra de progreso */}
-      <div
-        ref={trackRef}
-        className="seekbar-track"
-        onClick={handleTrackClick}
-        style={{
-          width: "100%",
-          height: "3px",
-          backgroundColor: "#525252",
-          borderRadius: "999px",
-          position: "relative",
-          transition: "outline 0.2s ease",
-          opacity: 1,
-          marginBottom: "10px",
-          cursor: isLive ? "default" : "pointer",
-        }}
-      >
-        <div
-          className="seekbar-loaded"
-          style={{
-            position: "absolute",
-            left: 0,
-            top: 0,
-            height: "100%",
-            width: `${loadedPercentage}%`,
-            backgroundColor: "rgba(255, 255, 255, 0.3)",
-            borderRadius: "999px",
-            transition: "width 0.2s linear",
-          }}
-        />
-        <div
-          className="seekbar-fill"
-          style={{
-            position: "absolute",
-            left: 0,
-            top: 0,
-            height: "100%",
-            width: `${percentage}%`,
-            backgroundColor: barColor,
-            borderRadius: "999px",
-            transition: isSeeking || isDragging ? "none" : "width 0.2s linear",
-          }}
-        />
-        {!isLive && (
+      {/* ═══════ VOD: Controles completos + Seekbar ═══════ */}
+      {!isLive && (
+        <>
+          {/* Fila de controles */}
           <div
-            className="seekbar-thumb"
-            onMouseDown={handleThumbMouseDown}
-            onTouchStart={handleThumbTouchStart}
             style={{
-              position: "absolute",
-              left: `${percentage}%`,
-              top: "50%",
-              transform: "translate(-50%, -50%)",
-              width: "15px",
-              height: "15px",
-              backgroundColor: "#FFFFFF",
-              border: "3px solid #FFFFFF",
-              borderRadius: "50%",
-              cursor: isDragging ? "grabbing" : "grab",
-              transition: isDragging ? "none" : "all 0.15s ease",
-              touchAction: "none",
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              width: "100%",
+              marginBottom: "10px",
+              color: "#b9b9b9",
             }}
-          />
-        )}
-      </div>
+          >
+            {/* Tiempo */}
+            <div style={{ display: "flex", gap: "0.5rem", fontWeight: "normal" }}>
+              <div style={{ textAlign: "start" }}>{formatTime(duration)}</div>
+              <span>{" / "}</span>
+              <div style={{ textAlign: "right" }}>{formatTime(position)}</div>
+            </div>
+
+            {/* Skip / Play / Skip */}
+            <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+              <SkipButton seconds={-10} onClick={() => onSkip && onSkip(-10)} />
+              <PlayPauseButton playing={playing} onClick={onPlayPause} />
+              <SkipButton seconds={10} onClick={() => onSkip && onSkip(10)} />
+            </div>
+
+            {/* Volumen / Fullscreen */}
+            <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+              <VolumeControl
+                volume={volume}
+                muted={muted}
+                onVolumeChange={onVolumeChange}
+                onMuteToggle={onMuteToggle}
+              />
+              <FullscreenButton onClick={onFullscreen} />
+            </div>
+          </div>
+
+          {/* Barra de progreso */}
+          <div
+            ref={trackRef}
+            className="seekbar-track"
+            onClick={handleTrackClick}
+            style={{
+              width: "100%",
+              height: "3px",
+              backgroundColor: "#525252",
+              borderRadius: "999px",
+              position: "relative",
+              transition: "outline 0.2s ease",
+              opacity: 1,
+              marginBottom: "10px",
+              cursor: "pointer",
+            }}
+          >
+            <div
+              className="seekbar-loaded"
+              style={{
+                position: "absolute",
+                left: 0,
+                top: 0,
+                height: "100%",
+                width: `${loadedPercentage}%`,
+                backgroundColor: "rgba(255, 255, 255, 0.3)",
+                borderRadius: "999px",
+                transition: "width 0.2s linear",
+              }}
+            />
+            <div
+              className="seekbar-fill"
+              style={{
+                position: "absolute",
+                left: 0,
+                top: 0,
+                height: "100%",
+                width: `${percentage}%`,
+                backgroundColor: barColor,
+                borderRadius: "999px",
+                transition: isSeeking || isDragging ? "none" : "width 0.2s linear",
+              }}
+            />
+            <div
+              className="seekbar-thumb"
+              onMouseDown={handleThumbMouseDown}
+              onTouchStart={handleThumbTouchStart}
+              style={{
+                position: "absolute",
+                left: `${percentage}%`,
+                top: "50%",
+                transform: "translate(-50%, -50%)",
+                width: "15px",
+                height: "15px",
+                backgroundColor: "#FFFFFF",
+                border: "3px solid #FFFFFF",
+                borderRadius: "50%",
+                cursor: isDragging ? "grabbing" : "grab",
+                transition: isDragging ? "none" : "all 0.15s ease",
+                touchAction: "none",
+              }}
+            />
+          </div>
+        </>
+      )}
     </div>
   );
 };

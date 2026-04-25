@@ -104,6 +104,14 @@
   box-shadow: var(--shadow-primary);
 }
 
+html {
+  scrollbar-width: none; /* Firefox */
+}
+
+html::-webkit-scrollbar {
+  display: none; /* Chrome, Edge, Safari */
+}
+
 html,
 body,
 #root {

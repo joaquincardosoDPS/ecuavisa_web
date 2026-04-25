@@ -10,6 +10,10 @@ import LoginView from "@/pages/Auth/LoginView";
 import RegisterView from "@/pages/Auth/RegisterView";
 import ProfilesView from "@/pages/Profiles/ProfilesView";
 import EditProfileView from "@/pages/Profiles/EditProfileView";
+import MyListView from "@/pages/MyList/MyListView";
+import CategoryView from "@/pages/Category/CategoryView";
+import MyAccountView from "@/pages/MyAccount/MyAccountView";
+import LiveView from "@/pages/Live/LiveView";
 
 export const APP_ROUTES: RouteObject[] = [
   {
@@ -28,8 +32,9 @@ export const APP_ROUTES: RouteObject[] = [
       { path: "buscar", element: <SearchView /> },
       { path: "programas", element: <ProgramsView /> },
       { path: "programas/:slug", element: <ProgramView /> },
-      { path: "en-vivo", element: <div>En vivo</div> },
-      { path: "favoritos", element: <div>Favoritos</div> },
+      { path: "categoria/:slug", element: <CategoryView /> },
+      { path: "en-vivo", element: <LiveView /> },
+      { path: "mi-lista", element: <MyListView /> },
     ],
   },
   {
@@ -39,6 +44,7 @@ export const APP_ROUTES: RouteObject[] = [
   {
     element: <ProtectedRoute />,
     children: [
+      { path: "cuenta", element: <MyAccountView /> },
       { path: "perfiles", element: <ProfilesView /> },
       { path: "perfiles/:id", element: <EditProfileView /> },
     ],

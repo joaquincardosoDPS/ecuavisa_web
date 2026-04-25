@@ -49,7 +49,7 @@ function ProgramsView() {
   return (
     <div className="relative min-h-screen">
       <div className="fixed top-0 left-0 w-full h-[60vh] z-20 bg-(--clr-primary) overflow-hidden">
-        <div className="absolute inset-0 w-full h-full px-20 pt-30">
+        <div className="absolute inset-0 w-full h-full px-20 pt-25">
           {/* Imagen de fondo  */}
           <div className="relative w-full h-full">
             {images.map((img) => (
@@ -68,10 +68,10 @@ function ProgramsView() {
                 style={{ backgroundColor: "var(--clr-primary)" }}
               />
             ))}
-            <div className="absolute inset-x-0 bottom-0 h-40 bg-linear-to-t from-(--clr-primary) to-transparent pointer-events-none"></div>
+            <div className="absolute inset-x-0 bottom-0 h-20 bg-linear-to-t from-(--clr-primary) to-transparent pointer-events-none"></div>
 
             {/* Información del Programa  */}
-            <div className="absolute inset-0 p-8 md:p-12 flex flex-col justify-end gap-5 z-10 pointer-events-none">
+            <div className="absolute inset-0 p-12 flex flex-col justify-end gap-5 z-10 pointer-events-none">
               {activeProgram?.image_logo?.normal ||
               activeProgram?.image_logo?.default ? (
                 <img
@@ -80,7 +80,7 @@ function ProgramsView() {
                     activeProgram.image_logo.default
                   }
                   alt={activeProgram.title}
-                  className="w-48 mb-4 object-contain drop-shadow-2xl"
+                  className="h-30 w-auto mb-4 object-contain drop-shadow-2xl self-start"
                 />
               ) : (
                 <h1 className="text-4xl md:text-5xl font-bold text-white mb-4 drop-shadow-lg">
@@ -89,7 +89,7 @@ function ProgramsView() {
               )}
 
               {activeProgram?.description_short && (
-                <p className="text-white/90 text-3xl max-w-4xl drop-shadow-md mb-15">
+                <p className="text-white/90 text-xl max-w-4xl drop-shadow-md mb-5">
                   {activeProgram.description_short}
                 </p>
               )}
@@ -98,7 +98,7 @@ function ProgramsView() {
         </div>
       </div>
 
-      <div className="relative z-10 mt-[50vh] pb-20 pt-10">
+      <div className="relative z-10 mt-[50vh] pb-20">
         {categories
           ?.filter((category) => category.format === "default")
           .map((category) => (

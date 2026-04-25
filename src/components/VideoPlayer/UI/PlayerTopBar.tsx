@@ -1,5 +1,5 @@
-import React from "react";
-import iconoVolver from "@/assets/img/icons/iconos-volver.svg";
+import React, { useState } from "react";
+import iconoVolverRaw from "@/assets/img/icons/iconos-volver.svg?raw";
 
 interface PlayerTopBarProps {
   title: string;
@@ -16,6 +16,8 @@ const PlayerTopBarComponent = ({
   isLive = false,
   onBackClick,
 }: PlayerTopBarProps) => {
+  const [backHovered, setBackHovered] = useState(false);
+
   return (
     <div
       style={{
@@ -24,8 +26,7 @@ const PlayerTopBarComponent = ({
         left: 40,
         right: 40,
         zIndex: 2001,
-        opacity: isVisible ? 1 : 0,
-        transition: "opacity .3s ease",
+        visibility: isVisible ? "visible" : "hidden",
         pointerEvents: isVisible ? "auto" : "none",
         display: "flex",
         alignItems: "flex-start",
@@ -44,41 +45,35 @@ const PlayerTopBarComponent = ({
         }}
       >
         {/* Botón Volver */}
-        {!isLive && (
-          <button
-            onClick={onBackClick}
-            onMouseEnter={(e) => {
-              const img = e.currentTarget.querySelector("img");
-              if (img) img.style.filter = "brightness(1)";
+        <button
+          onClick={onBackClick}
+          onMouseEnter={() => setBackHovered(true)}
+          onMouseLeave={() => setBackHovered(false)}
+          style={{
+            width: "56px",
+            height: "56px",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            cursor: "pointer",
+            outline: "none",
+            padding: 0,
+            flexShrink: 0,
+            background: "none",
+            border: "none",
+            color: backHovered ? "var(--foc-primary)" : "#b9b9b9",
+            transition: "color 0.15s ease",
+          }}
+        >
+          <span
+            style={{ display: "inline-flex", width: 20, height: 20 }}
+            dangerouslySetInnerHTML={{
+              __html: iconoVolverRaw
+                .replace(/width="[^"]*"/, 'width="20"')
+                .replace(/height="[^"]*"/, 'height="20"'),
             }}
-            onMouseLeave={(e) => {
-              const img = e.currentTarget.querySelector("img");
-              if (img) img.style.filter = "brightness(0.725)";
-            }}
-            style={{
-              width: "56px",
-              height: "56px",
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              cursor: "pointer",
-              outline: "none",
-              padding: 0,
-              flexShrink: 0,
-              background: "none",
-              border: "none",
-            }}
-          >
-            <img
-              src={iconoVolver}
-              alt="Volver"
-              style={{
-                filter: "brightness(0.725)",
-                transition: "filter 0.15s ease",
-              }}
-            />
-          </button>
-        )}
+          />
+        </button>
 
         {/* Textos */}
         <div

@@ -17,7 +17,7 @@ function CarrouselContainer({ category }: CarrouselContainerProps) {
 
             <div className="relative z-10 flex flex-row items-center gap-8">
                 <div className="flex-1 min-w-0">
-                    <CardCarrousel programs={category.programs} />
+                    <CardCarrousel programs={category.programs} categorySlug={category.key} />
                 </div>
             </div>
         </div>

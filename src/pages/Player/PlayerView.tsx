@@ -1,10 +1,12 @@
 import { useEffect, useState, useCallback, useMemo } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
 import { catalogService } from "@/services/catalogService";
 import { adsService } from "@/services/adsService";
 import { VideoPlayer } from "@/components/VideoPlayer";
 import { Spinner } from "@/components/ui/Spinner";
+import { useAuthStore } from "@/features/auth/authStore";
+import { historyService } from "@/services/historyService";
 import type {
   Chapter,
   ProgramDetailResponse,
@@ -18,6 +20,10 @@ function PlayerView() {
   }>();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const token = useAuthStore((s) => s.token);
+  const activeProfile = useAuthStore((s) => s.activeProfile);
+  const location = useLocation();
+  const resumeTime = (location.state as { resumeTime?: number })?.resumeTime;
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -30,6 +36,7 @@ function PlayerView() {
   // Episodios para el VideoPlayer (actual + siguiente)
   const [episodes, setEpisodes] = useState<Chapter[]>([]);
   const [programSlug, setProgramSlug] = useState("");
+  const [initialSeconds, setInitialSeconds] = useState<number | undefined>(undefined);
 
   useEffect(() => {
     let cancelled = false;
@@ -107,6 +114,26 @@ function PlayerView() {
           setCurrentKey(chapterData.key);
           setProgramSlug(chapterData.slug);
 
+          // Consultar progreso guardado del capítulo vía getTimeline
+          let resolvedInitialSeconds = resumeTime;
+          if (resolvedInitialSeconds === undefined && token && activeProfile) {
+            try {
+              const timelineRes = await historyService.getTimeline(
+                token,
+                activeProfile.id,
+                [chapterData.slug],
+              );
+              const timelineItem = timelineRes.data?.[0];
+              if (timelineItem && timelineItem.end === 0 && timelineItem.time > 0) {
+                resolvedInitialSeconds = timelineItem.time;
+                console.log('[PlayerView] ⏩ Resuming at', timelineItem.time, 's');
+              }
+            } catch (err) {
+              console.warn('[PlayerView] Error fetching timeline, starting from 0:', err);
+            }
+          }
+          setInitialSeconds(resolvedInitialSeconds);
+
           // Construir lista de episodios para VideoPlayer
           const episodeList: Chapter[] = [chapterData];
           if (nextChapterData) {
@@ -134,7 +161,7 @@ function PlayerView() {
     return () => {
       cancelled = true;
     };
-  }, [segment, season, chapter]);
+  }, [segment, season, chapter, token, activeProfile, resumeTime]);
 
   // Cuando el VideoPlayer selecciona el siguiente episodio, navegar a su ruta
   const handleEpisodeSelect = useCallback(
@@ -241,6 +268,10 @@ function PlayerView() {
         onEpisodeSelect={handleEpisodeSelect}
         programBackgroundImage={programBackgroundImage}
         onBack={() => navigate(-1)}
+        vodSlug={programSlug}
+        userToken={token || undefined}
+        userProfile={activeProfile?.id || undefined}
+        initialSeconds={initialSeconds}
       />
     </div>
   );

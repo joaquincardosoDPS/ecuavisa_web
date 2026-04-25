@@ -168,7 +168,6 @@ interface PlayerControlsProps {
   onEpisodeSelect?: (episode: ProgramChapter) => void;
   onHideControls?: () => void;
   onSidebarVisibilityChange?: (isOpen: boolean) => void;
-
 }
 
 const PlayerControlsComponent = ({
@@ -215,9 +214,8 @@ const PlayerControlsComponent = ({
         height: "100vh",
         top: 0,
         left: 0,
-        backgroundColor: "rgba(0, 0, 0, 0.5)",
-        opacity: visible ? 1 : 0,
-        transition: "opacity 0.3s ease",
+        backgroundColor: "transparent",
+        visibility: visible ? "visible" : "hidden",
         zIndex: 998,
         pointerEvents: visible ? "auto" : "none",
       }}
@@ -225,7 +223,7 @@ const PlayerControlsComponent = ({
       <div
         style={{
           position: "absolute",
-          bottom: "50px",
+          bottom: isLive ? "40px" : "50px",
           left: 0,
           right: 0,
           padding: "0 55px",
@@ -237,7 +235,7 @@ const PlayerControlsComponent = ({
             display: "flex",
             width: "100%",
             backgroundColor: "transparent",
-            minHeight: "94px",
+            minHeight: isLive ? "auto" : "94px",
             transition: "opacity 0.3s ease",
           }}
         >
@@ -271,21 +269,6 @@ const PlayerControlsComponent = ({
             zIndex: 2000,
           }}
         >
-          {/* Play / Pause - Solo en LIVE */}
-          {isLive && (
-            <PlayerOptionButton
-              onClick={onPlayButtonClick}
-              icon={
-                <img
-                  src={playing ? iconosPause : iconosPlay}
-                  alt={playing ? "Pausa" : "Reanudar"}
-                  width={26}
-                  height={26}
-                />
-              }
-            />
-          )}
-
           {/* Episodios y Reinicio Solo si NO es VIVO
           {!isLive && (
             <>

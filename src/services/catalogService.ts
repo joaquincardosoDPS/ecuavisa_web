@@ -9,7 +9,8 @@ import {
     RUDO_VOD_DETAIL,
     RUDO_VOD_CHAPTERS,
     RUDO_VOD_NEXT_CHAPTER,
-    CLIENT
+    CLIENT,
+    RUDO_PLAYLIST_GLOBAL_EPG_URL
 } from '@/config-global';
 import type {
     SliderResponse,
@@ -19,6 +20,7 @@ import type {
     ProgramDetailResponse,
     ChaptersResponse,
     Chapter,
+    EPGChannel,
 } from '@/interfaces/catalog.interface';
 
 export const catalogService = {
@@ -62,6 +64,11 @@ export const catalogService = {
         return data;
     },
 
+    getChannelList: async (): Promise<EPGChannel[]> => {
+        const { data } = await axios.get<EPGChannel[]>(`${RUDO_PLAYLIST_GLOBAL_EPG_URL}?random=${Math.random()}`);
+        return data;
+    },
+
     getRecommendedPrograms: async (): Promise<RecommendedProgramsResponse> => {
         const { data } = await axios.post<RecommendedProgramsResponse>(
             `${RUDO_VOD_FEATURED}`,
@@ -79,6 +86,19 @@ export const catalogService = {
         const { data } = await axios.post<RecommendedProgramsResponse>(
             `${RUDO_VOD_SEARCH}`,
             qs.stringify({ client: CLIENT, search: query }),
+            {
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                }
+            }
+        );
+        return data;
+    },
+
+    getProgramsByCategory: async (categorySlug: string, page = 1, limit = 20): Promise<RecommendedProgramsResponse> => {
+        const { data } = await axios.post<RecommendedProgramsResponse>(
+            `${RUDO_VOD_SEARCH}`,
+            qs.stringify({ client: CLIENT, category: categorySlug, page, limit }),
             {
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',

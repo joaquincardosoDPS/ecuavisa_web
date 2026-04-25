@@ -4,9 +4,10 @@ import Banner from "./components/Banner";
 import CarrouselContainerHome from "@/components/ProgramCard/CarrouselContainerHome";
 import { FullScreenSpinner } from "@/components/ui/FullScreenSpinner";
 import CardCarrousel from '@/components/ProgramCard/CardCarrousel';
+import ContinueWatchingCarousel from "@/components/ProgramCard/ContinueWatchingCarousel";
 
 function HomeView() {
-    const { slider, categories, recommended, isLoading, isError } = useHomeData();
+    const { slider, categories, recommended, continueWatching, isLoading, isError } = useHomeData();
     if (isLoading) {
         return <FullScreenSpinner message="Cargando Portada..." />;
     }
@@ -25,6 +26,11 @@ function HomeView() {
             />
 
             <div className="flex flex-col pb-20 gap-5">
+                {/* Seguir Viendo */}
+                {continueWatching.length > 0 && (
+                    <ContinueWatchingCarousel items={continueWatching} />
+                )}
+
                 {/* Listado de categorías */}
 
                 {categories.map(category => (
@@ -42,4 +48,4 @@ function HomeView() {
     );
 }
 
-export default HomeView;
+export default HomeView;

@@ -73,9 +73,14 @@ function EditProfileView() {
     setSubmitError("");
 
     try {
+      // En edición, si no se eligió avatar, mantener el avatar actual del perfil
+      const avatarToSend = isCreateMode
+        ? selectedAvatar
+        : (selectedAvatar ?? existingProfile?.avatar ?? null);
+
       const response = isCreateMode
-        ? await profileService.create(token, name.trim(), selectedAvatar)
-        : await profileService.update(token, id!, name.trim(), selectedAvatar);
+        ? await profileService.create(token, name.trim(), avatarToSend)
+        : await profileService.update(token, id!, name.trim(), avatarToSend);
 
       if (response.status === "error") {
         setSubmitError(response.msj || "Error al guardar el perfil.");
@@ -118,10 +123,18 @@ function EditProfileView() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-(--clr-primary) px-25 py-3.5">
+    <div className="min-h-screen flex flex-col px-25 py-3.5">
       {/* Header */}
       <div className="flex items-center justify-between">
         <img src={logo} alt="Logo" className="h-14 w-auto" />
+      </div>
+      <div className="flex justify-end">
+        <button
+          onClick={() => navigate(-1)}
+          className="bg-(--clr-secondary) py-2 px-6 rounded-md text-white cursor-pointer hover:brightness-110 transition-all duration-200"
+        >
+          Volver
+        </button>
       </div>
 
       <div className="grid grid-cols-4 gap-20">

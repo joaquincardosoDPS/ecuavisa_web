@@ -1,11 +1,14 @@
 import React, { useState } from "react";
-import iconoPlay from "@/assets/img/icons/iconos-play.svg";
-import iconoPause from "@/assets/img/icons/iconos-pause.svg";
+import iconoPlayRaw from "@/assets/img/icons/iconos-play.svg?raw";
+import iconoPauseRaw from "@/assets/img/icons/iconos-pause.svg?raw";
 
 interface PlayPauseButtonProps {
   playing?: boolean;
   onClick?: () => void;
 }
+
+const resizeSvg = (raw: string, size: number) =>
+  raw.replace(/width="[^"]*"/, `width="${size}"`).replace(/height="[^"]*"/, `height="${size}"`);
 
 const PlayPauseButtonComponent = ({
   playing = false,
@@ -21,7 +24,6 @@ const PlayPauseButtonComponent = ({
       style={{
         background: "none",
         border: "none",
-        color: "#fff",
         cursor: "pointer",
         padding: "8px",
         borderRadius: "50%",
@@ -30,17 +32,15 @@ const PlayPauseButtonComponent = ({
         justifyContent: "center",
         width: "40px",
         height: "40px",
+        color: hovered ? "var(--foc-primary)" : "#b9b9b9",
+        transition: "color 0.15s ease",
       }}
       title={playing ? "Pausar" : "Reproducir"}
     >
-      <img
-        src={playing ? iconoPause : iconoPlay}
-        alt={playing ? "Pausar" : "Reproducir"}
-        width={20}
-        height={20}
-        style={{
-          filter: hovered ? "brightness(1)" : "brightness(0.725)",
-          transition: "filter 0.15s ease",
+      <span
+        style={{ display: "inline-flex", width: 28, height: 28 }}
+        dangerouslySetInnerHTML={{
+          __html: resizeSvg(playing ? iconoPauseRaw : iconoPlayRaw, 28),
         }}
       />
     </button>

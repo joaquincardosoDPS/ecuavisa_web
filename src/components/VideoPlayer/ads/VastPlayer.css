@@ -13,3 +13,16 @@
     height: 100%;
     object-fit: contain;
 }
+
+/* Ocultar botones de play/pause superpuestos del IMA SDK */
+.vast-container .ima-play-pause-div,
+.vast-container [class*="ima-play"],
+.vast-container [class*="ima-pause"],
+.vast-container [class*="play-button"],
+.vast-container [class*="pause-button"],
+.vast-container [class*="ytp-large-play-button"],
+.vast-container [class*="ytp-play-button"] {
+    display: none !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+}

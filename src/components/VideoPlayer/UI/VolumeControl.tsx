@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import iconoVolumen from "@/assets/img/icons/iconos-volumen.svg";
+import iconoVolumenRaw from "@/assets/img/icons/iconos-volumen.svg?raw";
 
 interface VolumeControlProps {
   volume?: number;
@@ -7,6 +7,9 @@ interface VolumeControlProps {
   onVolumeChange?: (volume: number) => void;
   onMuteToggle?: () => void;
 }
+
+const resizeSvg = (raw: string, size: number) =>
+  raw.replace(/width="[^"]*"/, `width="${size}"`).replace(/height="[^"]*"/, `height="${size}"`);
 
 const VolumeControlComponent = ({
   volume = 1,
@@ -32,25 +35,21 @@ const VolumeControlComponent = ({
         style={{
           background: "none",
           border: "none",
-          color: "#fff",
           cursor: "pointer",
           padding: "4px",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
+          color: isHovered ? "var(--foc-primary)" : "#b9b9b9",
           opacity: muted ? 0.5 : 1,
-          transition: "opacity 0.15s ease",
+          transition: "color 0.15s ease, opacity 0.15s ease",
         }}
         title={muted ? "Activar sonido" : "Silenciar"}
       >
-        <img
-          src={iconoVolumen}
-          alt={muted ? "Silenciado" : "Volumen"}
-          width={22}
-          height={22}
-          style={{
-            filter: isHovered ? "brightness(1.38)" : "none",
-            transition: "filter 0.15s ease",
+        <span
+          style={{ display: "inline-flex", width: 28, height: 28 }}
+          dangerouslySetInnerHTML={{
+            __html: resizeSvg(iconoVolumenRaw, 28),
           }}
         />
       </button>

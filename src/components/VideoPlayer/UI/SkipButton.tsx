@@ -1,12 +1,15 @@
 import React, { useState } from "react";
-import iconoRetroceder from "@/assets/img/icons/iconos-retroceder.svg";
-import iconoAvanzar from "@/assets/img/icons/iconos-avanzar.svg";
+import iconoRetrocederRaw from "@/assets/img/icons/iconos-retroceder.svg?raw";
+import iconoAvanzarRaw from "@/assets/img/icons/iconos-avanzar.svg?raw";
 
 interface SkipButtonProps {
   /** Segundos a saltar: negativo para retroceder, positivo para avanzar */
   seconds: number;
   onClick?: () => void;
 }
+
+const resizeSvg = (raw: string, size: number) =>
+  raw.replace(/width="[^"]*"/, `width="${size}"`).replace(/height="[^"]*"/, `height="${size}"`);
 
 const SkipButtonComponent = ({ seconds, onClick }: SkipButtonProps) => {
   const [hovered, setHovered] = useState(false);
@@ -23,24 +26,21 @@ const SkipButtonComponent = ({ seconds, onClick }: SkipButtonProps) => {
       style={{
         background: "none",
         border: "none",
-        color: "#fff",
         cursor: "pointer",
         padding: "8px",
         borderRadius: "50%",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
+        color: hovered ? "var(--foc-primary)" : "#b9b9b9",
+        transition: "color 0.15s ease",
       }}
       title={label}
     >
-      <img
-        src={isForward ? iconoAvanzar : iconoRetroceder}
-        alt={label}
-        width={24}
-        height={24}
-        style={{
-          filter: hovered ? "brightness(1.38)" : "none",
-          transition: "filter 0.15s ease",
+      <span
+        style={{ display: "inline-flex", width: 32, height: 32 }}
+        dangerouslySetInnerHTML={{
+          __html: resizeSvg(isForward ? iconoAvanzarRaw : iconoRetrocederRaw, 32),
         }}
       />
     </button>

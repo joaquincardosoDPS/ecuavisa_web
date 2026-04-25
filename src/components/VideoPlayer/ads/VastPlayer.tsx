@@ -133,12 +133,10 @@ const VastPlayerComponent = ({ url, onAdsPlaying, onAdsFinished }: VastPlayerPro
                     onAdsPlaying?.();
                 });
 
-                // Si el usuario hace click en el ad (se pausa), finalizar VAST
+                // Si el ad se pausa (SIMID/TrueView play button), reanudar automáticamente
                 imaPlayer.addEventListener('AdPaused', () => {
-                    console.log('[VAST] Ad pausado por click, finalizando VAST');
-                    try { imaPlayer.destroy?.(); } catch (_e) { /* ignore */ }
-                    imaPlayerRef.current = null;
-                    onAdsFinished?.();
+                    console.log('[VAST] Ad pausado, reanudando automáticamente');
+                    try { videoRef.current?.play(); } catch (_e) { /* ignore */ }
                 });
 
                 imaPlayer.addEventListener('AdAllAdsCompleted', () => {
