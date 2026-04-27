@@ -1,6 +1,6 @@
 export interface Classification {
-    id: string;
-    name: string;
+    id: string | null;
+    name: string | null;
 }
 
 export interface ImageSet {
@@ -62,13 +62,13 @@ export interface SliderResponse {
 
 export interface Category {
     key: string;
-    format: string;
+    format: 'default' | 'event' | 'ranking';
     title: string;
     image_logo_category: ImageSet;
     image_background_category: ImageSet;
     total_records: number;
     total_display_records: number;
-    programs: Program[];
+    programs: Program[] | Event[];
 }
 
 export interface CategoriesResponse {
@@ -203,3 +203,49 @@ export interface EPGChannel {
     eventsTo: string;
     events: EPGEvent[];
 }
+
+export interface CategoryEvent {
+    key: string;
+    name: string;
+}
+
+interface ChannelAssociation {
+    key: string;
+    name: string;
+}
+
+export interface Event {
+    id: string;
+    key: string;
+    type: "live" | "program";
+    is_unlocked: boolean;
+    gmt0_unlocked: string;
+    title: string;
+    description_short: string;
+    description: string;
+    category?: CategoryEvent | CategoryEvent[];
+    image_logo: ImageSet;
+    image_background: ImageSet;
+    image_portrait: ImageSet;
+    image_landscape: ImageSet;
+    program_associated: ChannelAssociation | null;
+    live_associated: ChannelAssociation | null;
+    classification: Classification;
+}
+
+export interface EventsResponse {
+    status: string;
+    code: number;
+    total_records: number;
+    total_display_records: number;
+    last_page: number;
+    data: Event[];
+}
+
+export interface EventResponse {
+    status: string;
+    code: number;
+    data: Event;
+}
+
+

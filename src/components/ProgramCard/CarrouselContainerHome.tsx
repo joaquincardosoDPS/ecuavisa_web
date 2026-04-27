@@ -12,6 +12,7 @@ function CarrouselContainer({ category, orientation }: CarrouselContainerProps) 
     const IconImage = category.image_logo_category?.medium;
     const hasBgImage = Boolean(bgImage && bgImage !== "");
     const hasIconImage = Boolean(IconImage && IconImage !== "");
+    const format = category.format;
 
     const finalOrientation = (orientation === 'horizontal' || orientation === 'vertical')
         ? orientation
@@ -46,7 +47,13 @@ function CarrouselContainer({ category, orientation }: CarrouselContainerProps) 
                     </div>
                 )}
                 <div className="flex-1 min-w-0">
-                    <CardCarrousel programs={category.programs} orientation={finalOrientation} hasIconImage={hasIconImage} categorySlug={category.key} />
+                    <CardCarrousel
+                        programs={category.programs}
+                        orientation={finalOrientation}
+                        hasIconImage={hasIconImage}
+                        categorySlug={category.key}
+                        format={format}
+                    />
                 </div>
             </div>
         </div>

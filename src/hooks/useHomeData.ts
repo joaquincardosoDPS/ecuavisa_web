@@ -43,8 +43,6 @@ export const useHomeData = () => {
         enabled: !!token && !!activeProfile,
     });
 
-    console.log("continueWatchingQuery.data?.data", continueWatchingQuery.data?.data);
-
     return {
         slider: sliderQuery.data?.data || [],
         categories: categoriesQuery.data?.data || [],

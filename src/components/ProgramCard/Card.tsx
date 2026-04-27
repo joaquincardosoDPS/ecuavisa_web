@@ -1,31 +1,37 @@
-import type { Program } from "@/interfaces/catalog.interface";
+import type { Program, Event } from "@/interfaces/catalog.interface";
 import { useProgramsStore } from "@/features/programs/programsStore";
 import { useRef } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
 interface CardProps {
-  program: Program;
+  program: Program | Event;
   orientation?: "horizontal" | "vertical";
+  format?: string;
 }
 
-function Card({ program, orientation = "horizontal" }: CardProps) {
+function Card({ program, orientation = "horizontal", format }: CardProps) {
   const navigate = useNavigate();
   const { pathname } = useLocation();
   const isVertical = orientation === "vertical";
   const isProgramsView = pathname === "/programas";
-  const imageSrc = isVertical
-    ? program.image_port?.small
-    : program.image_land?.medium;
+
+  const isEvent = format === "event";
+  const eventData = isEvent ? (program as Event) : null;
+  const programData = !isEvent ? (program as Program) : null;
+
+  const imageSrc = isEvent
+    ? (isVertical ? eventData?.image_portrait?.small : eventData?.image_landscape?.medium)
+    : (isVertical ? programData?.image_port?.small : programData?.image_land?.medium);
 
   const setActiveProgram = useProgramsStore((state) => state.setActiveProgram);
   const hoverTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
   const FOCUS_DELAY_MS = 200;
 
   const handleFocusEnter = () => {
-    if (!isProgramsView) return;
+    if (!isProgramsView || isEvent) return;
 
     hoverTimeout.current = setTimeout(() => {
-      setActiveProgram(program);
+      setActiveProgram(program as Program);
     }, FOCUS_DELAY_MS);
   };
 
@@ -33,6 +39,18 @@ function Card({ program, orientation = "horizontal" }: CardProps) {
     if (!isProgramsView) return;
     if (hoverTimeout.current) {
       clearTimeout(hoverTimeout.current);
+    }
+  };
+
+  const handleClick = () => {
+    if (isEvent && eventData) {
+      const associatedKey =
+        eventData.live_associated?.key ?? eventData.program_associated?.key;
+      if (associatedKey) {
+        navigate(`/event/${associatedKey}`);
+      }
+    } else {
+      navigate(`/programas/${program.key}`);
     }
   };
 
@@ -44,7 +62,7 @@ function Card({ program, orientation = "horizontal" }: CardProps) {
       onMouseLeave={handleFocusLeave}
       onFocus={handleFocusEnter}
       onBlur={handleFocusLeave}
-      onClick={() => navigate(`/programas/${program.key}`)}
+      onClick={handleClick}
     >
       {imageSrc ? (
         <img

@@ -14,6 +14,8 @@ import MyListView from "@/pages/MyList/MyListView";
 import CategoryView from "@/pages/Category/CategoryView";
 import MyAccountView from "@/pages/MyAccount/MyAccountView";
 import LiveView from "@/pages/Live/LiveView";
+import EventView from "@/pages/Event/EventView";
+import NotFoundView from "@/pages/Error/NotFoundView";
 
 export const APP_ROUTES: RouteObject[] = [
   {
@@ -33,8 +35,10 @@ export const APP_ROUTES: RouteObject[] = [
       { path: "programas", element: <ProgramsView /> },
       { path: "programas/:slug", element: <ProgramView /> },
       { path: "categoria/:slug", element: <CategoryView /> },
+      { path: "event/:slug", element: <EventView /> },
       { path: "en-vivo", element: <LiveView /> },
       { path: "mi-lista", element: <MyListView /> },
+      { path: "*", element: <NotFoundView /> },
     ],
   },
   {
@@ -48,5 +52,10 @@ export const APP_ROUTES: RouteObject[] = [
       { path: "perfiles", element: <ProfilesView /> },
       { path: "perfiles/:id", element: <EditProfileView /> },
     ],
+  },
+  {
+    path: "*",
+    element: <MainLayout />,
+    children: [{ path: "*", element: <NotFoundView /> }],
   },
 ];

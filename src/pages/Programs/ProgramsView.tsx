@@ -2,6 +2,7 @@ import CarrouselContainer from "@/components/ProgramCard/CarrouselContainer";
 import { useProgramsData } from "@/hooks/useProgramsData";
 import { useProgramsStore } from "@/features/programs/programsStore";
 import { useState, useEffect } from "react";
+import type { Program } from "@/interfaces/catalog.interface";
 
 function ProgramsView() {
   const { categories } = useProgramsData();
@@ -15,7 +16,7 @@ function ProgramsView() {
         (c) => c.format === "default" && c.programs && c.programs.length > 0,
       );
       if (firstCategory) {
-        setActiveProgram(firstCategory.programs[0]);
+        setActiveProgram(firstCategory.programs[0] as Program);
       }
     }
   }, [categories, activeProgram, setActiveProgram]);
@@ -73,7 +74,7 @@ function ProgramsView() {
             {/* Información del Programa  */}
             <div className="absolute inset-0 p-12 flex flex-col justify-end gap-5 z-10 pointer-events-none">
               {activeProgram?.image_logo?.normal ||
-              activeProgram?.image_logo?.default ? (
+                activeProgram?.image_logo?.default ? (
                 <img
                   src={
                     activeProgram.image_logo.normal ||

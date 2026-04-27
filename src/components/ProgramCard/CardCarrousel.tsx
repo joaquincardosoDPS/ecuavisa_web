@@ -1,14 +1,15 @@
 import useEmblaCarousel from "embla-carousel-react";
-import type { Program } from "@/interfaces/catalog.interface";
+import type { Program, Event } from "@/interfaces/catalog.interface";
 import type { EmblaOptionsType } from "embla-carousel";
 import { useNavigate } from "react-router-dom";
 import Card from "./Card";
 
 interface CardCarrouselProps {
-  programs: Program[];
+  programs: (Program | Event)[];
   orientation?: "horizontal" | "vertical";
   hasIconImage?: boolean;
   categorySlug?: string;
+  format?: string;
 }
 
 function CardCarrousel({
@@ -16,6 +17,7 @@ function CardCarrousel({
   orientation = "horizontal",
   hasIconImage = false,
   categorySlug,
+  format,
 }: CardCarrouselProps) {
   const navigate = useNavigate();
   const [emblaRef] = useEmblaCarousel({
@@ -31,7 +33,7 @@ function CardCarrousel({
     >
       <div className="flex gap-5 items-stretch transform-gpu will-change-transform">
         {programs.map((program) => (
-          <Card key={program.id} program={program} orientation={orientation} />
+          <Card key={program.id} program={program} orientation={orientation} format={format} />
         ))}
         {programs.length === 10 && categorySlug && (
           <div

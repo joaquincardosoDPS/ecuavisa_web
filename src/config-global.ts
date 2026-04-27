@@ -115,3 +115,7 @@ export const RUDO_FAVORITES_ALL = `https://consumers.rudo.video/favorites/all` /
 export const RUDO_FAVORITES_ADD = `https://consumers.rudo.video/favorites/add` // Permite agregar un favorito
 export const RUDO_FAVORITES_VALIDATE = `https://consumers.rudo.video/favorites/validate` // Permite validar si un programa esta en favoritos
 export const RUDO_FAVORITES_DELETE = `https://consumers.rudo.video/favorites/delete` // Permite eliminar un favorito
+
+// Events
+export const RUDO_EVENT_ALL = `https://consumers.rudo.video/events/all` // Permite ver todos los eventos
+export const RUDO_EVENT_GET = `https://consumers.rudo.video/events/get` // Permite ver el detalle de un evento - event get

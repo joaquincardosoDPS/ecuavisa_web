@@ -15,7 +15,6 @@ function Banner({ program }: { program: Program }) {
     program.key,
   );
   const { item: continueWatchingItem } = useContinueWatching(program.key);
-  console.log(continueWatchingItem);
 
   const handlePlay = () => {
     if (continueWatchingItem) {
