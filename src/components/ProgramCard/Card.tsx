@@ -39,7 +39,7 @@ function Card({ program, orientation = "horizontal" }: CardProps) {
   return (
     <div
       tabIndex={0}
-      className={`group relative shrink-0 overflow-hidden cursor-pointer transition-all duration-300 hover:z-10 hover:ring-2 hover:ring-(--foc-primary) hover:shadow-[0_0_20px_rgba(255,19,118,0.3)] focus:outline-none focus:z-10 focus:ring-2 focus:ring-(--foc-primary) focus:shadow-[0_0_20px_rgba(255,19,118,0.3)] bg-[#0a0a0a] embla_slide ${isVertical ? "w-64 aspect-2/3 rounded-xl" : "w-72 aspect-video rounded-lg"}`}
+      className={`group relative shrink-0 overflow-hidden cursor-pointer transition-all duration-300 hover:z-10 hover:ring-2 hover:ring-(--foc-primary) hover:shadow-[0_0_20px_rgba(255,19,118,0.3)] focus:outline-none focus:z-10 focus:ring-2 focus:ring-(--foc-primary) focus:shadow-[0_0_20px_rgba(255,19,118,0.3)] bg-[#0a0a0a] embla_slide ${isVertical ? "w-[20vh] aspect-2/3 rounded-xl" : "w-[32vh] aspect-video rounded-lg"}`}
       onMouseEnter={handleFocusEnter}
       onMouseLeave={handleFocusLeave}
       onFocus={handleFocusEnter}

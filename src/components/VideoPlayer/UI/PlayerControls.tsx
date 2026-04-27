@@ -3,8 +3,6 @@ import { Seekbar } from "./Seekbar";
 import type { ProgramChapter } from "../types";
 
 import iconosConfig from "@/assets/img/icons/iconos-config.svg";
-import iconosPlay from "@/assets/img/icons/iconos-play.svg";
-import iconosPause from "@/assets/img/icons/iconos-pause.svg";
 import { useEffect, useState } from "react";
 import React from "react";
 

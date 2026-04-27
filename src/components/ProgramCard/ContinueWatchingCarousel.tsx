@@ -7,23 +7,6 @@ interface ContinueWatchingCarouselProps {
   items: HistoryItem[];
 }
 
-function formatDuration(duration: string): string {
-  const parts = duration.split(":");
-  if (parts.length === 3) {
-    const [h, m, s] = parts.map(Number);
-    if (h > 0) return `${h}h ${m}m`;
-    return `${m}m ${s}s`;
-  }
-  return duration;
-}
-
-function formatProgress(time: number): string {
-  const minutes = Math.floor(time / 60);
-  const seconds = time % 60;
-  if (minutes > 0) return `${minutes}m ${seconds}s`;
-  return `${seconds}s`;
-}
-
 function ContinueWatchingCarousel({ items }: ContinueWatchingCarouselProps) {
   const navigate = useNavigate();
   const [emblaRef] = useEmblaCarousel({

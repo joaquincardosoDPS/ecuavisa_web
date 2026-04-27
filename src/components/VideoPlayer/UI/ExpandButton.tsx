@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import iconosExpandirRaw from "@/assets/img/icons/iconos-expandir.svg?raw";
 import iconosContraerRaw from "@/assets/img/icons/iconos-contraer.svg?raw";
 

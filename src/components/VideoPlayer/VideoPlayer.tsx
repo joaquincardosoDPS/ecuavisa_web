@@ -629,17 +629,17 @@ const VideoPlayerComponent = ({
           transition: "all 0.6s cubic-bezier(0.4, 0, 0.2, 1)",
           ...(isEndingTransition && !playingAds
             ? {
-                position: "absolute",
-                bottom: "40px",
-                right: "40px",
-                width: "320px",
-                height: "180px",
-                borderRadius: "12px",
-                boxShadow: "0 8px 32px rgba(0,0,0,0.6)",
-                zIndex: 10,
-                objectFit: "cover",
-                cursor: "pointer",
-              }
+              position: "absolute",
+              bottom: "40px",
+              right: "40px",
+              width: "320px",
+              height: "180px",
+              borderRadius: "12px",
+              boxShadow: "0 8px 32px rgba(0,0,0,0.6)",
+              zIndex: 10,
+              objectFit: "cover",
+              cursor: "pointer",
+            }
             : {}),
         }}
       />
