@@ -3,14 +3,14 @@ import type { Event } from "@/interfaces/catalog.interface";
 
 interface CardProps {
     event: Event;
-    index: number;
 }
 
-function EventCard({ event, index }: CardProps) {
+function EventCard({ event }: CardProps) {
     const navigate = useNavigate();
     const imageSrc = event.image_landscape.default;
 
     const handleClick = () => {
+        console.log('hola')
         navigate(`/eventos/${event.key}`);
     };
 

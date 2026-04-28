@@ -15,7 +15,7 @@ export const useHomeData = () => {
 
     const categoriesQuery = useQuery({
         queryKey: ['home', 'categories'],
-        queryFn: () => catalogService.getCategories({ show_event: true }),
+        queryFn: () => catalogService.getCategories({ show_event: true, show_ranking: true }),
         staleTime: 1000 * 60 * 5,
     });
 

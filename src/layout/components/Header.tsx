@@ -84,7 +84,7 @@ function Header({ isTransparent }: Props) {
 			) : (
 				<button
 					onClick={() => navigate("/auth/login")}
-					className="bg-(--foc-primary) text-(--clr-primary-text,#fff) px-6 py-2.5 mt-3.5 rounded-md font-semibold text-sm hover:brightness-110 transition-all duration-200 cursor-pointer uppercase mr-10 xl:mr-25 shrink-0"
+					className="bg-(--clr-secondary-button) text-(--clr-text-primary-button) px-6 py-2.5 mt-3.5 rounded-md font-semibold text-sm hover:brightness-110 transition-all duration-200 cursor-pointer uppercase mr-10 xl:mr-25 shrink-0"
 				>
 					Login
 				</button>

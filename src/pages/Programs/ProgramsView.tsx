@@ -3,9 +3,10 @@ import CarrouselContainer from "@/components/ProgramCard/CarrouselContainer";
 import { useProgramsStore } from "@/features/programs/programsStore";
 import type { Program } from "@/interfaces/catalog.interface";
 import { useProgramsData } from "@/hooks/useProgramsData";
+import { FullScreenSpinner } from "@/components/ui/FullScreenSpinner";
 
 function ProgramsView() {
-	const { categories } = useProgramsData();
+	const { categories, isLoading } = useProgramsData();
 	const activeProgram = useProgramsStore((state) => state.activeProgram);
 	const setActiveProgram = useProgramsStore((state) => state.setActiveProgram);
 
@@ -48,6 +49,8 @@ function ProgramsView() {
 			return [...lastLoaded, { src: currentBgImage, loaded: isAlreadyCached }];
 		});
 	}, [currentBgImage]);
+
+	if (isLoading) return <FullScreenSpinner />;
 
 	return (
 		<div className="relative min-h-screen | xs:max-md:pt-5">

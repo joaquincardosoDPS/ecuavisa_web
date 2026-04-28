@@ -18,7 +18,6 @@ function LivePlayerSection({
 
   const rudoKey = signal?.key_live || signal?.key || null;
 
-  // Enviar play + volumeon al iframe cuando carga
   const handleIframeLoad = useCallback(() => {
     const iframe = iframeRef.current;
     if (!iframe?.contentWindow) return;
@@ -30,8 +29,6 @@ function LivePlayerSection({
     post({ event: "volumeon", value: 1 });
   }, []);
 
-  // Cuando el rudoKey cambia, el iframe se remonta por su key.
-  // Re-asignar la ref después del remount.
   useEffect(() => {
     if (iframeRef.current) {
       handleIframeLoad();

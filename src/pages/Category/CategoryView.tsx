@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useParams } from "react-router-dom";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { catalogService } from "@/services/catalogService";
-import { Spinner } from "@/components/ui/Spinner";
+import { FullScreenSpinner } from "@/components/ui/FullScreenSpinner";
 import ProgramGrid from "@/components/ProgramCard/ProgramGrid";
 
 const ITEMS_PER_PAGE = 20;
@@ -26,16 +26,11 @@ function CategoryView() {
         pageParam,
         ITEMS_PER_PAGE,
       );
+      console.log(response);
 
       // Extraer nombre de categoría del primer programa si no lo tenemos
       if (!categoryTitle && response.data?.length > 0) {
-        // Usar el slug formateado como título fallback
-        setCategoryTitle(
-          slug!
-            .split("-")
-            .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
-            .join(" "),
-        );
+        setCategoryTitle(response.data[0].name_category || slug!);
       }
 
       return response;
@@ -54,7 +49,7 @@ function CategoryView() {
   const totalRecords = data?.pages[0]?.total_records || 0;
 
   return (
-    <div className="px-25 pt-10 min-h-[calc(100vh-84px)]">
+    <div className="px-25 my-10 min-h-[calc(100vh-84px)]">
       <div className="mb-8">
         <h1 className="text-3xl font-bold">{categoryTitle || slug}</h1>
         {totalRecords > 0 && (
@@ -65,9 +60,7 @@ function CategoryView() {
       </div>
 
       {isLoading ? (
-        <div className="flex justify-center py-20">
-          <Spinner />
-        </div>
+        <FullScreenSpinner />
       ) : isError ? (
         <p className="text-red-500 text-center py-20">
           Error al cargar los programas de esta categoría.

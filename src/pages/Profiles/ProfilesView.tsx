@@ -4,7 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useAuthStore } from "@/features/auth/authStore";
 import { profileService } from "@/services/profileService";
 import type { Profile } from "@/interfaces/profile.interface";
-import { Spinner } from "@/components/ui/Spinner";
+import { FullScreenSpinner } from "@/components/ui/FullScreenSpinner";
 import logo from "@/assets/img/logo.svg";
 import iconEdit from "@/assets/img/icons/iconos-edit.svg";
 
@@ -69,7 +69,7 @@ function ProfilesView() {
       {/* Perfiles */}
       <div className="flex flex-col items-center">
         {isLoading ? (
-          <Spinner />
+          <FullScreenSpinner />
         ) : isError ? (
           <p className="text-red-500">
             {error instanceof Error

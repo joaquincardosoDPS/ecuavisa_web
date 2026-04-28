@@ -63,7 +63,7 @@ function ProgramView() {
   }, [activeSegment]);
 
   if (isLoading) {
-    return <FullScreenSpinner message="Cargando Programa..." />;
+    return <FullScreenSpinner />;
   }
 
   if (isError || !programDetail) {

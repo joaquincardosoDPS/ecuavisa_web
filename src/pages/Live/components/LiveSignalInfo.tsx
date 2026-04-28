@@ -45,10 +45,6 @@ function LiveSignalInfo({ signal, epg }: LiveSignalInfoProps) {
 		null;
 
 	const title = currentEvent?.title || signal.active_item_data?.title || signal.name_live || null;
-	const subtitle = currentEvent?.episodeTitle || null;
-	const synopsis =
-		currentEvent?.synopsis || signal.active_item_data?.description || null;
-
 
 
 	return (

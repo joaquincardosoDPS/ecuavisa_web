@@ -1,15 +1,18 @@
 import type { Program, Event } from "@/interfaces/catalog.interface";
 import { useNavigate } from "react-router-dom";
+import RankingIcon from "@/assets/img/icons/iconos-ranking.svg"
 
 interface CardVerticalProps {
   program: Program | Event;
   format?: string;
+  index?: number;
 }
 
-function CardVertical({ program, format }: CardVerticalProps) {
+function CardVertical({ program, format, index }: CardVerticalProps) {
   const navigate = useNavigate();
 
   const isEvent = format === "event";
+  const isRanking = format === "ranking";
   const eventData = isEvent ? (program as Event) : null;
   const programData = !isEvent ? (program as Program) : null;
 
@@ -31,6 +34,14 @@ function CardVertical({ program, format }: CardVerticalProps) {
       className="group relative shrink-0 overflow-hidden cursor-pointer transition-all duration-300 hover:z-10 hover:ring-2 hover:ring-(--foc-primary) hover:shadow-[0_0_20px_rgba(255,19,118,0.3)] focus:outline-none focus:z-10 focus:ring-2 focus:ring-(--foc-primary) focus:shadow-[0_0_20px_rgba(255,19,118,0.3)] bg-[#0a0a0a] embla_slide w-[20vh] aspect-2/3 rounded-xl"
       onClick={handleClick}
     >
+      {/* Ranking badge */}
+      {isRanking && index != null && (
+        <div className="absolute top-2 left-0 z-10 w-15 h-15 flex items-center justify-center">
+          <img src={RankingIcon} alt="" className="absolute inset-0 w-full h-full" />
+          <span className="relative text-white font-bold text-lg text-center -mt-3.5">{index + 1}</span>
+        </div>
+      )}
+
       {imageSrc ? (
         <img
           src={imageSrc}

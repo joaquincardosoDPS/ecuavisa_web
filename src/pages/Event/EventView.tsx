@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useEvent } from "@/hooks/useEvent";
 import Banner from "./components/Banner";
@@ -13,9 +13,13 @@ function EventView() {
     const { event, events, isLoading } = useEvent(slug!);
     const [activeTab, setActiveTab] = useState<TabKey>("relacionados");
 
+    useEffect(() => {
+        window.scrollTo(0, 0);
+    }, [slug]);
+
     if (isLoading) return <FullScreenSpinner />;
 
-    console.log(event);
+    console.log(events);
     return (
         <div className="w-full relative">
             <Banner event={event} />

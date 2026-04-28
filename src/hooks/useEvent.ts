@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 
 export const useEvent = (slug?: string) => {
     const eventsQuery = useQuery({
-        queryKey: ['events'],
+        queryKey: ['events', slug],
         queryFn: () => eventService.getAll({ slug_exclude: slug || '' }),
         staleTime: 1000 * 60 * 5,
     });

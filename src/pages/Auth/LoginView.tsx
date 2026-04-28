@@ -164,11 +164,10 @@ function LoginView() {
           {STEPS.map((s, i) => (
             <div
               key={s.id}
-              className={`auth-slide ${getSlideClass(i)} ${
-                i === step && !isAnimating
-                  ? "relative"
-                  : "absolute top-0 left-0"
-              } w-full`}
+              className={`auth-slide ${getSlideClass(i)} ${i === step && !isAnimating
+                ? "relative"
+                : "absolute top-0 left-0"
+                } w-full`}
             >
               {/* Label */}
               <h2 className="text-lg mb-6 font-title text-(--clr-primary-title,#fff)">
@@ -194,11 +193,10 @@ function LoginView() {
                     setFormData((prev) => ({ ...prev, [s.id]: e.target.value }))
                   }
                   onKeyDown={handleKeyDown}
-                  className={`w-full text-base outline-none transition-all duration-300 bg-[#102F40] rounded-md px-5 py-4 text-white placeholder:text-white/30 focus:border-(--foc-primary) focus:shadow-[0_0_0_3px_rgba(255,19,118,0.15)] ${
-                    errors[s.id]
-                      ? "border-2 border-red-500"
-                      : "border-2 border-white/10"
-                  } ${s.id === "password" ? "pr-14" : ""}`}
+                  className={`w-full text-base outline-none transition-all duration-300 bg-[#102F40] rounded-md px-5 py-4 text-white placeholder:text-white/30 focus:border-(--foc-primary) focus:shadow-[0_0_0_3px_rgba(255,19,118,0.15)] ${errors[s.id]
+                    ? "border-2 border-red-500"
+                    : "border-2 border-white/10"
+                    } ${s.id === "password" ? "pr-14" : ""}`}
                   autoComplete={
                     s.type === "password" ? "current-password" : s.id
                   }
@@ -225,9 +223,8 @@ function LoginView() {
 
               {/* Error */}
               <div
-                className={`text-sm mt-2 text-red-500 transition-all duration-200 ${
-                  errors[s.id] ? "opacity-100 h-5" : "opacity-0 h-0"
-                }`}
+                className={`text-sm mt-2 text-red-500 transition-all duration-200 ${errors[s.id] ? "opacity-100 h-5" : "opacity-0 h-0"
+                  }`}
               >
                 {errors[s.id]}
               </div>
@@ -247,7 +244,7 @@ function LoginView() {
           <button
             onClick={goNext}
             disabled={isSubmitting}
-            className="flex-1 py-3 text-base font-bold rounded-md transition-all duration-200 cursor-pointer bg-(--foc-primary) text-white border-none hover:brightness-115 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex-1 py-3 text-base font-bold rounded-md transition-all duration-200 cursor-pointer bg-(--clr-secondary-button) text-(--clr-text-primary-button) border-none hover:brightness-115 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isSubmitting
               ? "Iniciando sesión..."

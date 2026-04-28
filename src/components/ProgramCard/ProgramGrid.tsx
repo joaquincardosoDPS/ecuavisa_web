@@ -1,6 +1,6 @@
 import type { Program } from "@/interfaces/catalog.interface";
 import type { FavoriteItem } from "@/interfaces/favorites.interface";
-import CardHorizontal from "@/components/ProgramCard/CardHorizontal";
+import AlternativeCard from "./AlternativeCard";
 
 type GridItem = Program | FavoriteItem;
 
@@ -46,7 +46,7 @@ function ProgramGrid({
       )}
       <div className={`text-white grid ${gridCols[cols] || "grid-cols-4"} gap-4`}>
         {programs.map((item) => (
-          <CardHorizontal key={item.id} program={toProgram(item)} />
+          <AlternativeCard key={item.id} program={toProgram(item)} />
         ))}
         {isError && (
           <p className="text-red-500 text-xl font-title">{errorText}</p>

@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import ProgramGrid from "@/components/ProgramCard/ProgramGrid";
-import { Spinner } from "@/components/ui/Spinner";
+import { FullScreenSpinner } from "@/components/ui/FullScreenSpinner";
 import { useAuthStore } from "@/features/auth/authStore";
 import { favoritesService } from "@/services/favoritesService";
 import EmptyList from "./components/EmptyList";
@@ -39,15 +39,13 @@ function MyListView() {
 					</p>
 					<button
 						onClick={() => navigate("/auth/login")}
-						className="bg-(--foc-primary) text-(--clr-primary-text,#fff) px-6 py-3 rounded-md font-semibold hover:brightness-110 transition-all duration-200 cursor-pointer"
+						className="bg-(--clr-secondary-button) text-(--clr-text-primary-button) px-6 py-3 rounded-md font-semibold hover:brightness-110 transition-all duration-200 cursor-pointer"
 					>
 						Iniciar sesión
 					</button>
 				</div>
 			) : isLoading ? (
-				<div className="flex justify-center py-20">
-					<Spinner />
-				</div>
+				<FullScreenSpinner />
 			) : isError ? (
 				<p className="text-red-500 text-center py-20">
 					{error instanceof Error

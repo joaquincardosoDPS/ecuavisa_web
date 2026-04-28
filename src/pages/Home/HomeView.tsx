@@ -15,7 +15,7 @@ function HomeView() {
 		isError,
 	} = useHomeData();
 	if (isLoading) {
-		return <FullScreenSpinner message="Cargando Portada..." />;
+		return <FullScreenSpinner />;
 	}
 
 	if (isError || !slider) {
@@ -47,15 +47,17 @@ function HomeView() {
 				)}
 
 				{/* Recomendados */}
-				<div
-					className="px-20 flex flex-col gap-5 mt-5 mb-5 | xs:max-md:px-7.5"
-					style={{ fontFamily: "var(--font-family-category)" }}
-				>
-					<h2 className="text-2xl font-bold text-white line-height-7">
-						Recomendados para ti
-					</h2>
-					<CardCarrousel programs={recommended} orientation="vertical" />
-				</div>
+				{recommended.length > 0 && (
+					<div
+						className="px-20 flex flex-col gap-5 mt-5 mb-5 | xs:max-md:px-7.5"
+						style={{ fontFamily: "var(--font-family-category)" }}
+					>
+						<h2 className="text-2xl font-bold text-white line-height-7">
+							Recomendados para ti
+						</h2>
+						<CardCarrousel programs={recommended} orientation="vertical" />
+					</div>
+				)}
 			</div>
 		</div>
 	);

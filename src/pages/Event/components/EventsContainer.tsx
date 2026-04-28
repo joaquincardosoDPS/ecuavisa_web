@@ -14,7 +14,6 @@ function EventsContainer({ events }: Props) {
             <EventCard
               key={`${event.key}-${index}`}
               event={event}
-              index={index + 1}
             />
           ))}
         </div>

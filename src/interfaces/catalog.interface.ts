@@ -49,6 +49,7 @@ export interface Program {
     segments: Segment[];
     genders?: Gender[];
     actors?: string;
+    name_category?: string;
 }
 
 export interface SliderResponse {
@@ -207,6 +208,7 @@ export interface EPGChannel {
 export interface CategoryEvent {
     key: string;
     name: string;
+    image_logo: ImageSet;
 }
 
 interface ChannelAssociation {
@@ -223,14 +225,14 @@ export interface Event {
     title: string;
     description_short: string;
     description: string;
-    category?: CategoryEvent | CategoryEvent[];
+    category?: CategoryEvent;
     image_logo: ImageSet;
     image_background: ImageSet;
     image_portrait: ImageSet;
     image_landscape: ImageSet;
     program_associated: ChannelAssociation | null;
     live_associated: ChannelAssociation | null;
-    classification: Classification;
+    classification: string;
 }
 
 export interface EventsResponse {

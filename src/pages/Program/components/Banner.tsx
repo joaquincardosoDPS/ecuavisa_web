@@ -1,5 +1,4 @@
 import type { Program } from "@/interfaces/catalog.interface";
-import PlayIcon from "@/assets/img/icons/play.svg";
 import PlusIcon from "@/assets/img/icons/plus.svg";
 import CheckIcon from "@/assets/img/icons/check.svg";
 import { useEffect, useState } from "react";

@@ -4,7 +4,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useAuthStore } from "@/features/auth/authStore";
 import { profileService } from "@/services/profileService";
 import type { AvatarItem } from "@/interfaces/profile.interface";
-import { Spinner } from "@/components/ui/Spinner";
+import { FullScreenSpinner } from "@/components/ui/FullScreenSpinner";
 import Modal from "@/components/ui/Modal";
 import logo from "@/assets/img/logo.svg";
 
@@ -122,6 +122,8 @@ function EditProfileView() {
     }
   };
 
+  if (isLoading) return <FullScreenSpinner />;
+
   return (
     <div className="min-h-screen flex flex-col px-25 py-3.5">
       {/* Header */}
@@ -184,11 +186,7 @@ function EditProfileView() {
 
         {/* Avatares por grupo */}
         <div className="mt-8 col-span-2 max-h-[calc(100vh-8rem)] overflow-y-auto pr-2 scrollbar-subtle">
-          {isLoading ? (
-            <div className="flex justify-center">
-              <Spinner />
-            </div>
-          ) : isError ? (
+          {isError ? (
             <p className="text-red-500 text-center">
               {error instanceof Error
                 ? error.message

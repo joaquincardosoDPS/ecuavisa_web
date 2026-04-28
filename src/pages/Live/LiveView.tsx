@@ -1,24 +1,25 @@
-import { useEffect, useState, useRef } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useLocation } from "react-router-dom";
 import { useLiveData } from "@/hooks/useLiveData";
+import { FullScreenSpinner } from "@/components/ui/FullScreenSpinner";
 import EPGGrid from "./components/EPGGrid";
 import LivePlayerSection from "./components/LivePlayerSection";
 import LiveSignalInfo from "./components/LiveSignalInfo";
 
 function LiveView() {
-  const { epg, playlistPremium } = useLiveData();
-  const [searchParams, setSearchParams] = useSearchParams();
+  const { epg, playlistPremium, isLoading } = useLiveData();
+  const location = useLocation();
 
-  // Estado local para la señal seleccionada (no reactivo a URL changes)
-  const [selectedKeyLive, setSelectedKeyLive] = useState<string | null>(() =>
-    searchParams.get("signal"),
-  );
+  // Leer señal: primero desde state (navigate), luego desde URL (acceso directo)
+  const [selectedKeyLive, setSelectedKeyLive] = useState<string | null>(() => {
+    const fromState = (location.state as { signal?: string })?.signal;
+    if (fromState) return fromState;
+    const params = new URLSearchParams(location.search);
+    return params.get("signal");
+  });
 
   // Expand state local
   const [expanded, setExpanded] = useState(false);
-
-  // Flag para evitar sincronizar la URL en el primer render
-  const didMount = useRef(false);
 
   // Inicializar con la primera señal si no hay selección
   useEffect(() => {
@@ -27,24 +28,6 @@ function LiveView() {
       setSelectedKeyLive(firstKey);
     }
   }, [playlistPremium, selectedKeyLive]);
-
-  // Sincronizar la URL cuando cambia la selección (solo escritura, sin re-render)
-  useEffect(() => {
-    if (!didMount.current) {
-      didMount.current = true;
-      return;
-    }
-    if (selectedKeyLive) {
-      const params = new URLSearchParams(searchParams);
-      params.set("signal", selectedKeyLive);
-      if (expanded) {
-        params.set("expanded", "true");
-      } else {
-        params.delete("expanded");
-      }
-      setSearchParams(params, { replace: true });
-    }
-  }, [selectedKeyLive, expanded]);
 
   // Buscar la señal seleccionada en el array
   const selectedSignal =
@@ -59,6 +42,8 @@ function LiveView() {
   const toggleExpand = () => {
     setExpanded((prev) => !prev);
   };
+
+  if (isLoading) return <FullScreenSpinner />;
 
   return (
     <div className="px-25 py-5 gap-5 flex flex-col h-[calc(100vh-84px)] | xs:max-md:px-7.5 xs:max-md:h-auto xs:max-md:gap-2.5">

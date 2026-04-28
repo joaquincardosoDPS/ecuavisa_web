@@ -43,6 +43,7 @@ export const catalogService = {
         limit_prog?: number;
         type?: 0 | 1;
         show_event?: boolean;
+        show_ranking?: boolean;
     }): Promise<CategoriesResponse> => {
         const { data } = await axios.post<CategoriesResponse>(
             `${RUDO_VOD_CATEGORY}`,

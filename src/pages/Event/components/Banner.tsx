@@ -10,7 +10,7 @@ function Banner({ event }: { event: Event | null }) {
 
     const handlePlay = () => {
         if (event.live_associated?.key) {
-            navigate(`/en-vivo?signal=${event.live_associated.key}`);
+            navigate("/en-vivo", { state: { signal: event.live_associated.key } });
         } else if (event.program_associated?.key) {
             navigate(`/programas/${event.program_associated.key}`);
         }
@@ -36,10 +36,11 @@ function Banner({ event }: { event: Event | null }) {
         event?.image_background?.big ||
         event?.image_landscape.big;
 
-    const logoCat = null;
+    const logoCat = event?.category?.image_logo?.small;
     const logoEvent = event?.image_logo?.small;
+    console.log('logoEvent', event?.category?.image_logo?.small)
     const isLive = event?.live_associated?.key ? true : false;
-    const classification = event?.classification?.name;
+    const classification = event?.classification;
     let categoryName = '';
 
     if (Array.isArray(event.category)) {
@@ -98,8 +99,8 @@ function Banner({ event }: { event: Event | null }) {
                     {logoEvent && (
                         <img
                             src={logoEvent}
-                            // alt={event.title}
-                            className="w-auto max-w-40 2xl:max-w-60 h-full object-contain"
+                            alt={event.title}
+                            className="max-w-80 max-h-30 2xl:max-w-100 2xl:max-h-40 object-contain drop-shadow-xl border border-red-500"
                         />
                     )}
                     <div className="flex flex-row gap-5">
@@ -118,9 +119,9 @@ function Banner({ event }: { event: Event | null }) {
                         </svg>
                         {"Play"}
                     </button>
-                    <div className="h-20 flex flex-row items-center gap-5">
+                    <div className="h-30 flex flex-row items-center gap-5">
                         {logoCat && (
-                            <img src={logoCat} alt="" />
+                            <img src={logoCat} alt="" className="w-auto h-30 object-contain" />
                         )}
                         <span className="text-lg 2xl:text-2xl font-medium">{categoryName}</span>
                     </div>
