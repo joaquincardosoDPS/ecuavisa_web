@@ -4,7 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 export const useEvent = (slug?: string) => {
     const eventsQuery = useQuery({
         queryKey: ['events'],
-        queryFn: () => eventService.getAll(),
+        queryFn: () => eventService.getAll({ slug_exclude: slug || '' }),
         staleTime: 1000 * 60 * 5,
     });
 
@@ -18,9 +18,7 @@ export const useEvent = (slug?: string) => {
     return {
         events: eventsQuery.data?.data ?? [],
         event: eventQuery.data?.data ?? null,
-        isLoadingEvents: eventsQuery.isLoading,
-        isLoadingEvent: eventQuery.isLoading,
-        isErrorEvents: eventsQuery.isError,
-        isErrorEvent: eventQuery.isError,
+        isLoading: eventsQuery.isLoading || eventQuery.isLoading,
+        isError: eventsQuery.isError || eventQuery.isError,
     };
 };

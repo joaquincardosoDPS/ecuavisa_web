@@ -44,10 +44,9 @@ function Card({ program, orientation = "horizontal", format }: CardProps) {
 
   const handleClick = () => {
     if (isEvent && eventData) {
-      const associatedKey =
-        eventData.live_associated?.key ?? eventData.program_associated?.key;
-      if (associatedKey) {
-        navigate(`/event/${associatedKey}`);
+
+      if (eventData.key) {
+        navigate(`/eventos/${eventData.key}`);
       }
     } else {
       navigate(`/programas/${program.key}`);

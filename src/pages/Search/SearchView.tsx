@@ -23,7 +23,7 @@ function SearchView() {
 			<input
 				type="text"
 				placeholder="Ingresa tu búsqueda..."
-				className="block mx-auto w-full max-w-[70vw] bg-[#2C404B] px-9 py-4 text-[#B9B9B9] text-[30px] font-medium focus:outline-none focus:ring-0 mb-10 | xs:max-md:text-[1rem] xs:max-md:px-5 xs:max-md:py-3 xs:max-md:max-w-full"
+				className="block mx-auto w-full max-w-[70vw] bg-[#2C404B] px-9 py-4 text-(clr-secondary-text) text-2xl 2xl:text-3xl font-medium focus:outline-none focus:ring-0 mb-10 | xs:max-md:text-[1rem] xs:max-md:px-5 xs:max-md:py-3 xs:max-md:max-w-full"
 				value={query}
 				onChange={(e) => setQuery(e.target.value)}
 			/>

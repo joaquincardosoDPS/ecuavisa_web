@@ -1,7 +1,7 @@
 import { useParams } from "react-router-dom";
 import { useProgramDetail } from "@/hooks/useProgramDetail";
 import { FullScreenSpinner } from "@/components/ui/FullScreenSpinner";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import type { Segment } from "@/interfaces/catalog.interface";
 import Banner from "./components/Banner";
 import Tabs from "./components/Tabs";
@@ -18,6 +18,27 @@ function ProgramView() {
   const [activeSegment, setActiveSegment] = useState<Segment | null>(null);
   const [activeSeason, setActiveSeason] = useState<number | null>(null);
   const [showDetails, setShowDetails] = useState(false);
+  const tabsRef = useRef<HTMLDivElement>(null);
+  const pendingScroll = useRef(false);
+
+  const scrollToTabs = useCallback(() => {
+    setTimeout(() => {
+      window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" });
+    }, 50);
+  }, []);
+
+  // Marca que el próximo onLoaded debe hacer scroll
+  const requestScroll = useCallback(() => {
+    pendingScroll.current = true;
+  }, []);
+
+  // Solo hace scroll si se pidió desde un clic en tab
+  const handleChaptersLoaded = useCallback(() => {
+    if (pendingScroll.current) {
+      pendingScroll.current = false;
+      scrollToTabs();
+    }
+  }, [scrollToTabs]);
 
   // Inicialización por defecto
   useEffect(() => {
@@ -62,9 +83,12 @@ function ProgramView() {
         setActiveSegment={setActiveSegment}
         showDetails={showDetails}
         setShowDetails={setShowDetails}
+        tabsRef={tabsRef}
+        scrollToTabs={scrollToTabs}
+        requestScroll={requestScroll}
       />
 
-      <div className="mx-25 mt-10 mb-20">
+      <div className="mx-25 mt-5 2xl:mt-10 mb-10 2xl:mb-20">
         {showDetails ? (
           <DetailsProgram programDetail={programDetail} />
         ) : (
@@ -73,6 +97,7 @@ function ProgramView() {
             activeSegment={activeSegment}
             activeSeason={activeSeason}
             setActiveSeason={setActiveSeason}
+            onLoaded={handleChaptersLoaded}
           />
         )}
       </div>
@@ -81,3 +106,4 @@ function ProgramView() {
 }
 
 export default ProgramView;
+

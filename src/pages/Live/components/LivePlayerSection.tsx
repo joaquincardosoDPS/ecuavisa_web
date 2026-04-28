@@ -1,4 +1,4 @@
-import { useRef, useCallback } from "react";
+import { useRef, useCallback, useEffect } from "react";
 import type { LiveSignal } from "@/interfaces/catalog.interface";
 import { RudoPlayer } from "@/components/RudoPlayer";
 import ExpandButton from "@/components/ui/ExpandButton";
@@ -16,7 +16,9 @@ function LivePlayerSection({
 }: LivePlayerSectionProps) {
   const iframeRef = useRef<HTMLIFrameElement>(null);
 
-  // Enviar play + volumeon al iframe cuando carga (fix: cambio de señal quedaba muteado)
+  const rudoKey = signal?.key_live || signal?.key || null;
+
+  // Enviar play + volumeon al iframe cuando carga
   const handleIframeLoad = useCallback(() => {
     const iframe = iframeRef.current;
     if (!iframe?.contentWindow) return;
@@ -28,15 +30,21 @@ function LivePlayerSection({
     post({ event: "volumeon", value: 1 });
   }, []);
 
-  if (!signal) {
+  // Cuando el rudoKey cambia, el iframe se remonta por su key.
+  // Re-asignar la ref después del remount.
+  useEffect(() => {
+    if (iframeRef.current) {
+      handleIframeLoad();
+    }
+  }, [rudoKey, handleIframeLoad]);
+
+  if (!signal || !rudoKey) {
     return (
       <div className="h-full w-full rounded-xl bg-black/50 flex items-center justify-center">
         <span className="text-white/50">Sin señal disponible</span>
       </div>
     );
   }
-
-  const rudoKey = signal.key_live || signal.key;
 
   if (isExpanded) {
     return (
@@ -65,6 +73,7 @@ function LivePlayerSection({
   return (
     <div className="h-full w-auto aspect-video rounded-xl overflow-hidden relative group">
       <iframe
+        key={rudoKey}
         ref={iframeRef}
         id="vrudo"
         src={`https://rudo.video/live/${rudoKey}`}
@@ -81,3 +90,4 @@ function LivePlayerSection({
 }
 
 export default LivePlayerSection;
+

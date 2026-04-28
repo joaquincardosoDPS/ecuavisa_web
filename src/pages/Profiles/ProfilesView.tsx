@@ -54,9 +54,8 @@ function ProfilesView() {
       <div className="flex justify-end">
         <button
           onClick={() => setIsEditing((v) => !v)}
-          className={`py-2 px-6 rounded-md text-white cursor-pointer hover:brightness-110 transition-all duration-200 ${
-            isEditing ? "bg-(--foc-primary)" : "bg-(--clr-secondary)"
-          }`}
+          className={`py-2 px-6 rounded-md text-white cursor-pointer hover:brightness-110 transition-all duration-200 ${isEditing ? "bg-(--foc-primary)" : "bg-(--clr-secondary)"
+            }`}
         >
           {isEditing ? "Listo" : "Editar Perfiles"}
         </button>
@@ -97,7 +96,7 @@ function ProfilesView() {
                           className="w-full h-full object-cover"
                         />
                       ) : (
-                        <span className="text-4xl text-[#b9b9b9]">
+                        <span className="text-4xl text-(--clr-secondary-text)">
                           {profile.name_perfil.charAt(0).toUpperCase()}
                         </span>
                       )}
@@ -125,11 +124,11 @@ function ProfilesView() {
                 className="flex flex-col items-center gap-3 group cursor-pointer py-8 "
               >
                 <div className="w-36 h-36 rounded-full bg-(--clr-secondary) flex items-center justify-center group-hover:border-(--foc-primary) transition-all duration-300 border-3 border-transparent ">
-                  <span className="text-5xl text-[#b9b9b9] group-hover:text-(--foc-primary) transition-colors duration-300">
+                  <span className="text-5xl text-(--clr-secondary-text) group-hover:text-(--foc-primary) transition-colors duration-300">
                     +
                   </span>
                 </div>
-                <span className="text-xl text-[#b9b9b9] group-hover:text-white transition-colors duration-200">
+                <span className="text-xl text-(--clr-secondary-text) group-hover:text-white transition-colors duration-200">
                   Agregar perfil
                 </span>
               </button>

@@ -537,7 +537,7 @@ const VideoPlayerComponent = ({
               <div
                 style={{
                   fontSize: "1rem",
-                  color: "#b9b9b9",
+                  color: "var(--clr-primary-text)",
                   marginBottom: "12px",
                   textTransform: "uppercase",
                   letterSpacing: "2px",
@@ -557,7 +557,7 @@ const VideoPlayerComponent = ({
               <div
                 style={{
                   fontSize: "1.1rem",
-                  color: "#b9b9b9",
+                  color: "var(--clr-primary-text)",
                   marginBottom: "24px",
                 }}
               >
@@ -566,7 +566,7 @@ const VideoPlayerComponent = ({
               <div
                 style={{
                   fontSize: "0.9rem",
-                  color: "#b9b9b9",
+                  color: "var(--clr-primary-text)",
                   marginBottom: "16px",
                 }}
               >

@@ -18,10 +18,10 @@ function ExpandButton({ isExpanded, onClick }: ExpandButtonProps) {
       onClick={onClick}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
-      className="absolute bottom-4 right-4 z-[10000] w-10 h-10 flex items-center justify-center rounded-full cursor-pointer"
+      className="absolute bottom-4 right-4 z-10000 w-10 h-10 flex items-center justify-center rounded-full cursor-pointer"
       style={{
         backgroundColor: hovered ? "var(--foc-primary)" : "rgba(0, 0, 0, 0.6)",
-        color: hovered ? "#fff" : "#b9b9b9",
+        color: hovered ? "#fff" : "var(--clr-text-primary-button)",
         transition: "background-color 0.15s ease, color 0.15s ease, opacity 0.15s ease",
       }}
       title={isExpanded ? "Contraer" : "Expandir"}

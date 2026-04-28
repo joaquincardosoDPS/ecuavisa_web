@@ -4,6 +4,7 @@ import ProgramGrid from "@/components/ProgramCard/ProgramGrid";
 import { Spinner } from "@/components/ui/Spinner";
 import { useAuthStore } from "@/features/auth/authStore";
 import { favoritesService } from "@/services/favoritesService";
+import EmptyList from "./components/EmptyList";
 
 function MyListView() {
 	const navigate = useNavigate();
@@ -54,17 +55,7 @@ function MyListView() {
 						: "Error al cargar favoritos."}
 				</p>
 			) : !favorites || favorites.length === 0 ? (
-				<div className="flex flex-col items-center justify-center py-20 gap-3">
-					<p className="text-white/60 text-lg">
-						Aún no tienes programas en tu lista.
-					</p>
-					<button
-						onClick={() => navigate("/programas")}
-						className="text-(--foc-primary) hover:brightness-110 transition-all duration-200 cursor-pointer font-medium"
-					>
-						Explorar programas
-					</button>
-				</div>
+				<EmptyList />
 			) : (
 				<ProgramGrid programs={favorites} />
 			)}

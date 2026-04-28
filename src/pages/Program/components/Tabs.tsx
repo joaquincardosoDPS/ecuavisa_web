@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import type { RefObject } from "react";
 import type { Program, Segment } from "@/interfaces/catalog.interface";
 
 interface TabsProps {
@@ -7,6 +7,9 @@ interface TabsProps {
   setActiveSegment: (segment: Segment) => void;
   showDetails: boolean;
   setShowDetails: (show: boolean) => void;
+  tabsRef: RefObject<HTMLDivElement | null>;
+  scrollToTabs: () => void;
+  requestScroll: () => void;
 }
 
 function Tabs({
@@ -15,19 +18,14 @@ function Tabs({
   setActiveSegment,
   showDetails,
   setShowDetails,
+  tabsRef,
+  scrollToTabs,
+  requestScroll,
 }: TabsProps) {
-  const tabsRef = useRef<HTMLDivElement>(null);
-
-  const scrollToTabs = () => {
-    requestAnimationFrame(() => {
-      tabsRef.current?.scrollIntoView({ behavior: "smooth" });
-    });
-  };
-
   return (
     <div
       ref={tabsRef}
-      className="mx-25 border-b-2 border-white/25 text-xl font-medium mt-10 scroll-mt-[110px]"
+      className="mx-25 border-b-2 border-white/25 text-xl font-medium mt-10 scroll-mt-[94px]"
     >
       <div className="flex flex-row gap-10">
         {program.segments.map((segment) => {
@@ -38,13 +36,12 @@ function Tabs({
               onClick={() => {
                 setActiveSegment(segment);
                 setShowDetails(false);
-                scrollToTabs();
+                requestScroll();
               }}
-              className={`pb-5 px-2 h-full cursor-pointer border-b-4 -mb-[2px] transition-colors ${
-                isActive
-                  ? "border-white text-white"
-                  : "border-transparent text-[#B9B9B9] hover:text-white hover:border-white"
-              }`}
+              className={`pb-5 px-2 h-full cursor-pointer border-b-4 -mb-[2px] transition-colors ${isActive
+                ? "border-white text-white"
+                : "border-transparent text-(--clr-secondary-text) hover:text-white hover:border-white"
+                }`}
             >
               {segment.name}
             </button>
@@ -55,11 +52,10 @@ function Tabs({
             setShowDetails(true);
             scrollToTabs();
           }}
-          className={`pb-5 px-2 h-full cursor-pointer border-b-4 -mb-[2px] transition-colors ${
-            showDetails
-              ? "border-white text-white"
-              : "border-transparent text-[#B9B9B9] hover:text-white hover:border-white"
-          }`}
+          className={`pb-5 px-2 h-full cursor-pointer border-b-4 -mb-[2px] transition-colors ${showDetails
+            ? "border-white text-white"
+            : "border-transparent text-(--clr-secondary-text) hover:text-white hover:border-white"
+            }`}
         >
           Detalles
         </button>

@@ -40,7 +40,7 @@ const VolumeControlComponent = ({
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          color: isHovered ? "var(--foc-primary)" : "#b9b9b9",
+          color: isHovered ? "var(--foc-primary)" : "var(--clr-text-primary-button)",
           opacity: muted ? 0.5 : 1,
           transition: "color 0.15s ease, opacity 0.15s ease",
         }}

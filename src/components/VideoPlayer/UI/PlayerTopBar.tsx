@@ -32,7 +32,7 @@ const PlayerTopBarComponent = ({
         alignItems: "flex-start",
         justifyContent: "space-between",
         gap: "10px",
-        color: "#b9b9b9",
+        color: "var(--clr-primary-text)",
       }}
     >
       <div
@@ -61,7 +61,7 @@ const PlayerTopBarComponent = ({
             flexShrink: 0,
             background: "none",
             border: "none",
-            color: backHovered ? "var(--foc-primary)" : "#b9b9b9",
+            color: backHovered ? "var(--foc-primary)" : "var(--clr-text-primary-button)",
             transition: "color 0.15s ease",
           }}
         >

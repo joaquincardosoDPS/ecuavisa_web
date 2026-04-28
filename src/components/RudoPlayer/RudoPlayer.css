@@ -65,7 +65,7 @@
   align-items: flex-start;
   justify-content: space-between;
   gap: 10px;
-  color: #b9b9b9;
+  color: var(--clr-primary-text);
   opacity: 0;
   visibility: hidden;
   transition: opacity 0.35s ease, visibility 0.35s ease;
@@ -129,7 +129,7 @@
   font-weight: 500;
   font-size: 1rem;
   opacity: 0.9;
-  color: #b9b9b9;
+  color: var(--clr-primary-text);
 }
 
 /* ---- Bottom Controls (Seekbar) ---- */

@@ -238,7 +238,7 @@ const SeekbarComponent = ({
               alignItems: "center",
               width: "100%",
               marginBottom: "10px",
-              color: "#b9b9b9",
+              color: "var(--clr-primary-text)",
             }}
           >
             {/* Tiempo */}

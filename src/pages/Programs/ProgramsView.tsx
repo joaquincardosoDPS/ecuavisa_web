@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import CarrouselContainer from "@/components/ProgramCard/CarrouselContainer";
 import { useProgramsStore } from "@/features/programs/programsStore";
-import { useState, useEffect } from "react";
 import type { Program } from "@/interfaces/catalog.interface";
+import { useProgramsData } from "@/hooks/useProgramsData";
 
 function ProgramsView() {
 	const { categories } = useProgramsData();
@@ -27,6 +27,8 @@ function ProgramsView() {
 	const [images, setImages] = useState<{ src: string; loaded: boolean }[]>(
 		currentBgImage ? [{ src: currentBgImage, loaded: true }] : [],
 	);
+
+	const logo = activeProgram?.image_logo?.normal || activeProgram?.image_logo?.default;
 
 	// Actualiza la imagen de fondo cuando cambia el programa seleccionado
 	useEffect(() => {
@@ -72,25 +74,21 @@ function ProgramsView() {
 						<div className="absolute inset-x-0 bottom-0 h-20 bg-linear-to-t from-(--clr-primary) to-transparent pointer-events-none"></div>
 
 						{/* Información del Programa  */}
-						<div className="absolute inset-0 p-12 flex flex-col justify-end gap-5 z-10 pointer-events-none | xs:max-md:p-5 xs:max-md:overflow-hidden">
-							{activeProgram?.image_logo?.normal ||
-								activeProgram?.image_logo?.default ? (
+						<div className="absolute inset-0 px-12 py-7 2xl:py-12 flex flex-col justify-end gap-5 z-10 pointer-events-none">
+							{logo ? (
 								<img
-									src={
-										activeProgram.image_logo.normal ||
-										activeProgram.image_logo.default
-									}
+									src={logo}
 									alt={activeProgram.title}
 									className="h-30 w-auto mb-4 object-contain drop-shadow-2xl self-start"
 								/>
 							) : (
-								<h1 className="text-4xl md:text-5xl font-bold text-white mb-4 drop-shadow-lg | xs:max-md:text-shadow-md xs:max-md:mb-0 xs:max-md:text-[28px]">
+								<h1 className="text-2xl 2xl:text-5xl font-bold text-white mb-2 2xl:mb-4 drop-shadow-lg">
 									{activeProgram?.title}
 								</h1>
 							)}
 
 							{activeProgram?.description_short && (
-								<p className="text-white/90 text-xl max-w-4xl drop-shadow-md mb-5 | xs:max-md:text-[16px] xs:max-md:leading-6">
+								<p className="text-white/90 text-base 2xl:text-3xl max-w-4xl drop-shadow-md mb-2 2xl:mb-5">
 									{activeProgram.description_short}
 								</p>
 							)}

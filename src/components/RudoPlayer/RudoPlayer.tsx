@@ -272,7 +272,7 @@ function RudoPlayer({
             onMouseLeave={() => setBackHovered(false)}
             className="rudo-player-back-btn"
             style={{
-              color: backHovered ? "var(--foc-primary)" : "#b9b9b9",
+              color: backHovered ? "var(--foc-primary)" : "var(--clr-text-primary-button)",
             }}
           >
             <span

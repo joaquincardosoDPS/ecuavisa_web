@@ -25,7 +25,7 @@ const FullscreenButtonComponent = ({ onClick }: FullscreenButtonProps) => {
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        color: hovered ? "var(--foc-primary)" : "#b9b9b9",
+        color: hovered ? "var(--foc-primary)" : "var(--clr-text-primary-button)",
         transition: "color 0.15s ease",
       }}
       title="Pantalla completa"

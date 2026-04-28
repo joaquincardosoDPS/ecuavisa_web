@@ -71,7 +71,7 @@ const LiveButton = ({
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        color: hovered ? "var(--foc-primary)" : "#b9b9b9",
+        color: hovered ? "var(--foc-primary)" : "var(--clr-text-primary-button)",
         transition: "color 0.15s ease",
       }}
       title={title}
@@ -88,7 +88,7 @@ const LiveBadge = () => (
       display: "flex",
       alignItems: "center",
       gap: "6px",
-      color: "#b9b9b9",
+      color: "var(--clr-primary-text)",
       fontSize: "0.85rem",
       fontWeight: 600,
       letterSpacing: "0.5px",
@@ -191,7 +191,7 @@ const VolumePopover = ({
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          color: isHovered ? "var(--foc-primary)" : "#b9b9b9",
+          color: isHovered ? "var(--foc-primary)" : "var(--clr-text-primary-button)",
           opacity: muted ? 0.5 : 1,
           transition: "color 0.15s ease, opacity 0.15s ease",
         }}

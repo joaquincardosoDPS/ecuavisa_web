@@ -1,5 +1,5 @@
 import { CLIENT, RUDO_EVENT_ALL, RUDO_EVENT_GET } from "@/config-global";
-import type { EventsResponse } from "@/interfaces/catalog.interface";
+import type { EventResponse, EventsResponse } from "@/interfaces/catalog.interface";
 import axios from "axios";
 import qs from 'qs';
 
@@ -25,8 +25,8 @@ export const eventService = {
             })
         return data
     },
-    getEvent: async (event: string): Promise<EventsResponse> => {
-        const { data } = await axios.post<EventsResponse>(
+    getEvent: async (event: string): Promise<EventResponse> => {
+        const { data } = await axios.post<EventResponse>(
             `${RUDO_EVENT_GET}`,
             qs.stringify({
                 client: CLIENT,

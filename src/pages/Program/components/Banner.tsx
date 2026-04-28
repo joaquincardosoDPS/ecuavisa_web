@@ -67,8 +67,8 @@ function Banner({ program }: { program: Program }) {
           }}
         />
 
-        {/* <div className="absolute inset-y-0 left-0 w-1/3 bg-linear-to-r from-(--clr-primary) via-(--clr-primary)/40 to-transparent"></div> */}
-        <div className="absolute inset-x-0 bottom-0 h-1/3 bg-linear-to-t from-(--clr-primary) via-(--clr-primary)/40 to-transparent"></div>
+        <div className="absolute inset-y-0 left-0 w-2/3 bg-linear-to-r from-(--clr-primary) via-(--clr-primary)/40 to-transparent"></div>
+        <div className="absolute inset-x-0 bottom-0 h-2/3 bg-linear-to-t from-(--clr-primary) via-(--clr-primary)/40 to-transparent"></div>
 
         {/* Capa de sombreado dinámico (Scroll) */}
         <div
@@ -78,7 +78,7 @@ function Banner({ program }: { program: Program }) {
       </div>
       {/* Info del programa */}
       <div className="animate-in fade-in slide-in-from-left-10 duration-1000 mt-25 ml-25">
-        <div className="h-40 flex items-end">
+        <div className="h-40 2xl:h-55 flex items-end">
           {logoImg ? (
             <img
               src={logoImg}
@@ -115,30 +115,30 @@ function Banner({ program }: { program: Program }) {
         <div className="flex flex-row items-center gap-4 pt-4 mb-3">
           <button
             onClick={handlePlay}
-            className="bg-white text-black px-8 py-3 rounded-md hover:bg-white/90 transition-all flex items-center gap-3 group shadow-lg cursor-pointer"
+            className="bg-(--clr-primary-button) text-(--clr-text-primary-button) px-8 py-3 rounded-md hover:bg-white hover:text-black transition-all flex items-center gap-3 group shadow-lg cursor-pointer"
           >
-            <img
-              src={PlayIcon}
-              alt={continueWatchingItem ? "Continuar" : "Play"}
-              className="w-5 h-5 transition-transform group-hover:scale-110"
-            />
+            <svg width="20" height="20" viewBox="0 0 27 28" fill="currentColor" xmlns="http://www.w3.org/2000/svg" className="transition-transform group-hover:scale-110">
+              <path d="M25.8227 12.0936C27.2626 12.8396 27.2626 14.8991 25.8227 15.6452L2.9201 27.5118C1.58881 28.2016 -1.3492e-06 27.2354 -1.28366e-06 25.736L-2.46241e-07 2.00273C-1.80702e-07 0.503353 1.58881 -0.462842 2.9201 0.226944L25.8227 12.0936Z" />
+            </svg>
             {continueWatchingItem ? "Reanudar" : "Play"}
           </button>
-          <button
-            onClick={toggleFavorite}
-            disabled={isToggling || !isEnabled}
-            className={`w-10 h-10 flex items-center justify-center rounded-full border-2 transition-all shadow-lg cursor-pointer group disabled:opacity-50 disabled:cursor-not-allowed ${
-              isFavorited
+          {!isEnabled && (
+            <button
+              onClick={toggleFavorite}
+              disabled={isToggling}
+              className={`w-10 h-10 flex items-center justify-center rounded-full border-2 transition-all shadow-lg cursor-pointer group disabled:opacity-50 disabled:cursor-not-allowed ${isFavorited
                 ? "bg-white border-white text-black hover:bg-white/80"
                 : "bg-black/40 border-white text-white hover:bg-(--foc-primary) hover:text-black hover:border-white"
-            }`}
-          >
-            <img
-              src={isFavorited ? CheckIcon : PlusIcon}
-              alt={isFavorited ? "Quitar de Mi Lista" : "Agregar a Mi Lista"}
-              className="w-6 h-6"
-            />
-          </button>
+                }`}
+            >
+              <img
+                src={isFavorited ? CheckIcon : PlusIcon}
+                alt={isFavorited ? "Quitar de Mi Lista" : "Agregar a Mi Lista"}
+                className="w-6 h-6"
+              />
+            </button>
+
+          )}
         </div>
 
         {/* Barra de progreso "Seguir viendo" */}

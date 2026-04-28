@@ -212,11 +212,10 @@ function EditProfileView() {
                         className="group cursor-pointer p-1 rounded-xl transition-all duration-200"
                       >
                         <div
-                          className={`w-24 h-24 rounded-full overflow-hidden bg-white/10 flex items-center justify-center border-3 transition-all duration-300 ${
-                            isSelected
+                          className={`w-24 h-24 rounded-full overflow-hidden bg-white/10 flex items-center justify-center border-3 transition-all duration-300 ${isSelected
                               ? "border-(--foc-primary) scale-110"
                               : "border-transparent group-hover:border-(--foc-primary)"
-                          }`}
+                            }`}
                         >
                           {avatarUrl ? (
                             <img
@@ -225,7 +224,7 @@ function EditProfileView() {
                               className="w-full h-full object-cover"
                             />
                           ) : (
-                            <span className="text-2xl text-[#b9b9b9]">?</span>
+                            <span className="text-2xl text-(--clr-secondary-text)">?</span>
                           )}
                         </div>
                       </button>

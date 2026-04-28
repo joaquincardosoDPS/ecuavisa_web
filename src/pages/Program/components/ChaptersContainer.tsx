@@ -1,18 +1,21 @@
 import type { Segment } from "@/interfaces/catalog.interface";
-import Card from "@/components/ChapterCard/Card";
 import { useChapters } from "@/hooks/useChapters";
+import { useEffect } from "react";
+import ChapterCard from "@/pages/Event/components/ChapterCard";
 
 interface Props {
   slug: string;
   activeSegment: Segment | null;
   activeSeason: number | null;
   setActiveSeason: (season: number) => void;
+  onLoaded?: () => void;
 }
 function ChaptersContainer({
   slug,
   activeSegment,
   activeSeason,
   setActiveSeason,
+  onLoaded,
 }: Props) {
   const {
     chapters: chaptersData,
@@ -25,21 +28,25 @@ function ChaptersContainer({
   const chapters =
     chaptersData?.pages?.flatMap((page) => page?.data || []) || [];
 
-  console.log("chapters", chapters);
+  useEffect(() => {
+    if (!isLoadingChapters && chapters.length > 0 && onLoaded) {
+      onLoaded();
+    }
+  }, [isLoadingChapters]);
+
   return (
-    <div className="flex flex-col gap-10 animate-in fade-in duration-500">
-      <div className="grid grid-cols-6 gap-5">
+    <div className="flex flex-col gap-5 2xl:gap-10 animate-in fade-in duration-500 min-h-[calc(100vh-281px)]">
+      <div className="grid grid-cols-5 2xl:grid-cols-8 gap-5">
         {activeSegment?.all_temp.map((temp) => {
           const isSeasonActive = activeSeason === temp;
           return (
             <div
               key={temp}
               onClick={() => setActiveSeason(temp)}
-              className={`shrink-0 font-bold text-base transition-colors cursor-pointer ${
-                isSeasonActive
-                  ? "text-white"
-                  : "text-[#B9B9B9] hover:text-white"
-              }`}
+              className={`shrink-0 font-bold text-base transition-colors cursor-pointer ${isSeasonActive
+                ? "text-white"
+                : "text-(--clr-secondary-text) hover:text-white"
+                }`}
             >
               Temporada {temp}
             </div>
@@ -51,9 +58,9 @@ function ChaptersContainer({
         <p className="text-white">Cargando capítulos...</p>
       ) : chapters && chapters.length > 0 ? (
         <>
-          <div className="grid grid-cols-5 gap-x-6 gap-y-15">
+          <div className="grid grid-cols-5 gap-x-6 gap-y-10">
             {chapters.map((chapter, index) => (
-              <Card
+              <ChapterCard
                 key={`${chapter.key}-${index}`}
                 chapter={chapter}
                 index={index + 1}
@@ -61,7 +68,7 @@ function ChaptersContainer({
             ))}
           </div>
           {hasNextPage && (
-            <div className="flex justify-center mt-15">
+            <div className="flex justify-center">
               <button
                 onClick={() => fetchNextPage()}
                 disabled={isFetchingNextPage}

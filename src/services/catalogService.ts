@@ -128,7 +128,7 @@ export const catalogService = {
                 client: CLIENT,
                 program: slug,
                 page,
-                limit: 20,
+                limit: 10,
                 season: season,
                 segment: segmentSlug
             }),

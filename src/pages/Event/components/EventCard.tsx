@@ -1,17 +1,17 @@
 import { useNavigate } from 'react-router-dom';
-import type { Chapter } from "@/interfaces/catalog.interface";
+import type { Event } from "@/interfaces/catalog.interface";
 
 interface CardProps {
-    chapter: Chapter;
+    event: Event;
     index: number;
 }
 
-function Card({ chapter, index }: CardProps) {
+function EventCard({ event, index }: CardProps) {
     const navigate = useNavigate();
-    const imageSrc = chapter.image_land.default;
+    const imageSrc = event.image_landscape.default;
 
     const handleClick = () => {
-        navigate(`/play/${chapter.key_segment}/${chapter.season}/${chapter.chapter}`);
+        navigate(`/eventos/${event.key}`);
     };
 
     return (
@@ -22,17 +22,13 @@ function Card({ chapter, index }: CardProps) {
             >
                 <img
                     src={imageSrc}
-                    alt={chapter.title}
+                    alt={event.title}
                     className='w-full h-full object-cover rounded-[inherit]'
                     loading='lazy'
                 />
-            </div>
-            <div className="text-xl text-white">
-                <h1 className="">Capítulo {index}</h1>
-                <h2 className="text-[#B9B9B9] text-base">{chapter.title}</h2>
             </div>
         </div>
     )
 }
 
-export default Card
+export default EventCard

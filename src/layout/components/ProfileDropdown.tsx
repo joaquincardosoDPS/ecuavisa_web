@@ -61,7 +61,7 @@ function ProfileDropdown() {
   };
 
   return (
-    <div className="relative pr-25 pt-3.5" ref={dropdownRef}>
+    <div className="relative pr-10 xl:pr-25 pt-3.5" ref={dropdownRef}>
       {/* Trigger */}
       <button
         onClick={() => setIsOpen(!isOpen)}
@@ -103,7 +103,7 @@ function ProfileDropdown() {
                 onClick={() => navigateTo("/perfiles/nuevo")}
                 className="flex items-center gap-3 px-5 py-2.5 cursor-pointer hover:bg-white/10 transition-all duration-150"
               >
-                <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center flex-shrink-0">
+                <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center shrink-0">
                   <span className="text-xl text-white/50">+</span>
                 </div>
                 <span className=" text-sm">Agregar perfil</span>

@@ -32,7 +32,7 @@ const PlayPauseButtonComponent = ({
         justifyContent: "center",
         width: "40px",
         height: "40px",
-        color: hovered ? "var(--foc-primary)" : "#b9b9b9",
+        color: hovered ? "var(--foc-primary)" : "var(--clr-text-primary-button)",
         transition: "color 0.15s ease",
       }}
       title={playing ? "Pausar" : "Reproducir"}

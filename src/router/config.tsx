@@ -35,7 +35,7 @@ export const APP_ROUTES: RouteObject[] = [
       { path: "programas", element: <ProgramsView /> },
       { path: "programas/:slug", element: <ProgramView /> },
       { path: "categoria/:slug", element: <CategoryView /> },
-      { path: "event/:slug", element: <EventView /> },
+      { path: "eventos/:slug", element: <EventView /> },
       { path: "en-vivo", element: <LiveView /> },
       { path: "mi-lista", element: <MyListView /> },
       { path: "*", element: <NotFoundView /> },

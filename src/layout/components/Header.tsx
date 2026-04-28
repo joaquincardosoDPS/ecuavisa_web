@@ -42,26 +42,26 @@ function Header({ isTransparent }: Props) {
 
 	const bgStyle = isTransparent
 		? {
-				backgroundColor: `color-mix(in srgb, var(--clr-secondary) ${Math.round(scrollOpacity * 100)}%, transparent)`,
-			}
+			backgroundColor: `color-mix(in srgb, var(--clr-secondary) ${Math.round(scrollOpacity * 100)}%, transparent)`,
+		}
 		: {};
 
 	return (
 		<header
 			className={twMerge(
-				"fixed top-0 left-0 w-full z-50 pl-25 pb-3.5 flex flex-row justify-between items-center h-[84px] transition-colors duration-300 | xs:max-sm:gap-7.5 sm:max-lg:gap-7.5 xs:max-sm:pl-5 sm:max-xl:pl-7.5",
+				"fixed top-0 left-0 w-full z-50 pb-3.5 flex flex-row justify-between items-center h-[84px] transition-colors duration-300 pl-10 xl:pl-25",
 				!isTransparent && "bg-brand-secondary",
 			)}
 			style={bgStyle}
 		>
 			<button
 				onClick={() => navigate("/home")}
-				className="cursor-pointer pt-3.5 flex-shrink-0"
+				className="cursor-pointer pt-3.5 shrink-0"
 			>
 				<img src={logo} alt="Logo" className="h-14 w-auto" />
 			</button>
 
-			<nav className="flex flex-row items-center gap-15 pt-3.5 font-title text-white text-base | xs:max-xl:gap-5 | xs:max-md:overflow-x-auto xs:max-md:mask-[var(--mask-right)]">
+			<nav className="flex flex-row items-center gap-15 pt-3.5 font-title text-white text-base | xs:max-xl:gap-5 | xs:max-md:overflow-x-auto">
 				<NavLink to="/home" className={navLinkClasses}>
 					Portada
 				</NavLink>
@@ -84,7 +84,7 @@ function Header({ isTransparent }: Props) {
 			) : (
 				<button
 					onClick={() => navigate("/auth/login")}
-					className="bg-(--foc-primary) text-(--clr-primary-text,#fff) px-6 py-2.5 mt-3.5 rounded-md font-semibold text-sm hover:brightness-110 transition-all duration-200 cursor-pointer uppercase mr-25 | xs:max-sm:mr-5 sm:max-xl:mr-7.5 flex-shrink-0"
+					className="bg-(--foc-primary) text-(--clr-primary-text,#fff) px-6 py-2.5 mt-3.5 rounded-md font-semibold text-sm hover:brightness-110 transition-all duration-200 cursor-pointer uppercase mr-10 xl:mr-25 shrink-0"
 				>
 					Login
 				</button>
