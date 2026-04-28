@@ -1,5 +1,5 @@
 import type { Category } from "@/interfaces/catalog.interface";
-import CardCarrousel from "./CardCarrousel";
+import CardCarrousel from "../../../components/ProgramCard/CardCarrousel";
 
 interface CarrouselContainerProps {
 	category: Category;
@@ -25,7 +25,7 @@ function CarrouselContainer({ category, orientation }: CarrouselContainerProps) 
 
 	return (
 		<div
-			className={`px-20 relative flex flex-col gap-5 mt-5 mb-5 | xs:max-md:pl-7.5 xs:max-md:pr-0 ${hasBgImage ? "py-8 px-8 rounded-2xl" : ""}`}
+			className={`px-20 relative flex flex-col gap-5 mt-5 mb-5 | xs:max-md:pl-7.5 xs:max-md:pr-0 ${hasBgImage ? "py-8 px-8" : ""}`}
 			style={{
 				fontFamily: "var(--font-family-category)",
 				...(hasBgImage

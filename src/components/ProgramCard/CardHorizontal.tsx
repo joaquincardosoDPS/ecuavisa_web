@@ -3,16 +3,14 @@ import { useProgramsStore } from "@/features/programs/programsStore";
 import { useRef } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
-interface CardProps {
+interface CardHorizontalProps {
   program: Program | Event;
-  orientation?: "horizontal" | "vertical";
   format?: string;
 }
 
-function Card({ program, orientation = "horizontal", format }: CardProps) {
+function CardHorizontal({ program, format }: CardHorizontalProps) {
   const navigate = useNavigate();
   const { pathname } = useLocation();
-  const isVertical = orientation === "vertical";
   const isProgramsView = pathname === "/programas";
 
   const isEvent = format === "event";
@@ -20,8 +18,8 @@ function Card({ program, orientation = "horizontal", format }: CardProps) {
   const programData = !isEvent ? (program as Program) : null;
 
   const imageSrc = isEvent
-    ? (isVertical ? eventData?.image_portrait?.small : eventData?.image_landscape?.medium)
-    : (isVertical ? programData?.image_port?.small : programData?.image_land?.medium);
+    ? eventData?.image_landscape?.medium
+    : programData?.image_land?.medium;
 
   const setActiveProgram = useProgramsStore((state) => state.setActiveProgram);
   const hoverTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -29,7 +27,6 @@ function Card({ program, orientation = "horizontal", format }: CardProps) {
 
   const handleFocusEnter = () => {
     if (!isProgramsView || isEvent) return;
-
     hoverTimeout.current = setTimeout(() => {
       setActiveProgram(program as Program);
     }, FOCUS_DELAY_MS);
@@ -44,10 +41,7 @@ function Card({ program, orientation = "horizontal", format }: CardProps) {
 
   const handleClick = () => {
     if (isEvent && eventData) {
-
-      if (eventData.key) {
-        navigate(`/eventos/${eventData.key}`);
-      }
+      if (eventData.key) navigate(`/eventos/${eventData.key}`);
     } else {
       navigate(`/programas/${program.key}`);
     }
@@ -56,7 +50,7 @@ function Card({ program, orientation = "horizontal", format }: CardProps) {
   return (
     <div
       tabIndex={0}
-      className={`group relative shrink-0 overflow-hidden cursor-pointer transition-all duration-300 hover:z-10 hover:ring-2 hover:ring-(--foc-primary) hover:shadow-[0_0_20px_rgba(255,19,118,0.3)] focus:outline-none focus:z-10 focus:ring-2 focus:ring-(--foc-primary) focus:shadow-[0_0_20px_rgba(255,19,118,0.3)] bg-[#0a0a0a] embla_slide ${isVertical ? "w-[20vh] aspect-2/3 rounded-xl" : "w-[32vh] aspect-video rounded-lg"}`}
+      className="group relative shrink-0 overflow-hidden cursor-pointer transition-all duration-300 hover:z-10 hover:ring-2 hover:ring-(--foc-primary) hover:shadow-[0_0_20px_rgba(255,19,118,0.3)] focus:outline-none focus:z-10 focus:ring-2 focus:ring-(--foc-primary) focus:shadow-[0_0_20px_rgba(255,19,118,0.3)] bg-[#0a0a0a] embla_slide w-[32vh] aspect-video rounded-lg"
       onMouseEnter={handleFocusEnter}
       onMouseLeave={handleFocusLeave}
       onFocus={handleFocusEnter}
@@ -81,4 +75,4 @@ function Card({ program, orientation = "horizontal", format }: CardProps) {
   );
 }
 
-export default Card;
+export default CardHorizontal;

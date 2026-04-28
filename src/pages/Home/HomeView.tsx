@@ -1,6 +1,6 @@
 import CardCarrousel from "@/components/ProgramCard/CardCarrousel";
-import CarrouselContainerHome from "@/components/ProgramCard/CarrouselContainerHome";
-import ContinueWatchingCarousel from "@/components/ProgramCard/ContinueWatchingCarousel";
+import CarrouselContainerHome from "@/pages/Home/components/CarrouselContainerHome";
+import ContinueWatchingCarousel from "@/pages/Home/components/ContinueWatchingCarousel";
 import { FullScreenSpinner } from "@/components/ui/FullScreenSpinner";
 import { useHomeData } from "@/hooks/useHomeData";
 import Banner from "./components/Banner";
