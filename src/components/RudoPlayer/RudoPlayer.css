@@ -14,6 +14,12 @@
   width: 100%;
   height: 100%;
   z-index: 1;
+  overflow: hidden;
+  scrollbar-width: none;
+}
+
+.rudo-player-container iframe::-webkit-scrollbar {
+  display: none;
 }
 
 /* ---- Unmute Overlay ---- */

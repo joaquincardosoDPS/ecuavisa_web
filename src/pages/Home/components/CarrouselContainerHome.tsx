@@ -3,10 +3,9 @@ import CardCarrousel from "../../../components/ProgramCard/CardCarrousel";
 
 interface CarrouselContainerProps {
 	category: Category;
-	orientation?: "horizontal" | "vertical" | "";
 }
 
-function CarrouselContainer({ category, orientation }: CarrouselContainerProps) {
+function CarrouselContainer({ category }: CarrouselContainerProps) {
 
 	const bgImage = category.image_background_category?.default;
 	const IconImage = category.image_logo_category?.medium;
@@ -14,12 +13,7 @@ function CarrouselContainer({ category, orientation }: CarrouselContainerProps) 
 	const hasIconImage = Boolean(IconImage && IconImage !== "");
 	const format = category.format;
 
-	const finalOrientation =
-		orientation === "horizontal" || orientation === "vertical"
-			? orientation
-			: hasBgImage
-				? "vertical"
-				: "horizontal";
+	const finalOrientation = format === "ranking" ? "vertical" : (hasBgImage && hasIconImage) ? "vertical" : "horizontal";
 
 	if (category.programs.length === 0) return null;
 

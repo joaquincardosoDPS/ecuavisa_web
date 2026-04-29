@@ -48,7 +48,7 @@ function CardCarrousel({
     };
   }, [emblaApi, onSelect]);
 
-  const isVertical = orientation === "vertical" || format === "ranking";
+  const isVertical = orientation === "vertical";
 
   return (
     <div className="group/carousel relative">

@@ -1,20 +1,18 @@
-import { useParams } from "react-router-dom";
-import { useProgramDetail } from "@/hooks/useProgramDetail";
-import { FullScreenSpinner } from "@/components/ui/FullScreenSpinner";
 import { useState, useEffect, useRef, useCallback } from "react";
-import type { Segment } from "@/interfaces/catalog.interface";
+import type { Program, Segment } from "@/interfaces/catalog.interface";
 import Banner from "./components/Banner";
 import Tabs from "./components/Tabs";
 import DetailsProgram from "./components/DetailsProgram";
 import ChaptersContainer from "./components/ChaptersContainer";
 
-function ProgramView() {
-  const { slug } = useParams<{ slug: string }>();
-  const {
-    data: programDetail,
-    isLoading,
-    isError,
-  } = useProgramDetail(slug || "");
+interface ProgramViewProps {
+  program: Program;
+  slug: string;
+  setIsLoading: (loading: boolean) => void;
+}
+
+function ProgramView({ program: programDetail, slug, setIsLoading }: ProgramViewProps) {
+
   const [activeSegment, setActiveSegment] = useState<Segment | null>(null);
   const [activeSeason, setActiveSeason] = useState<number | null>(null);
   const [showDetails, setShowDetails] = useState(false);
@@ -34,11 +32,12 @@ function ProgramView() {
 
   // Solo hace scroll si se pidió desde un clic en tab
   const handleChaptersLoaded = useCallback(() => {
+    setIsLoading(false);
     if (pendingScroll.current) {
       pendingScroll.current = false;
       scrollToTabs();
     }
-  }, [scrollToTabs]);
+  }, [scrollToTabs, setIsLoading]);
 
   // Inicialización por defecto
   useEffect(() => {
@@ -62,17 +61,6 @@ function ProgramView() {
     }
   }, [activeSegment]);
 
-  if (isLoading) {
-    return <FullScreenSpinner />;
-  }
-
-  if (isError || !programDetail) {
-    return (
-      <div className="flex items-center justify-center min-h-screen text-red-500">
-        Error al cargar el programa
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen w-full relative">

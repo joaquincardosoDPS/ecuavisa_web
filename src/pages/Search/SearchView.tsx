@@ -14,7 +14,7 @@ function SearchView() {
 		isError,
 	} = useQuery({
 		queryKey: ["search", debouncedQuery],
-		queryFn: () => catalogService.searchPrograms(debouncedQuery),
+		queryFn: () => catalogService.searchPrograms({ search: debouncedQuery }),
 		enabled: debouncedQuery.trim().length > 0,
 	});
 

@@ -4,7 +4,7 @@ import ProtectedRoute from "@/router/ProtectedRoute";
 import HomeView from "@/pages/Home/HomeView";
 import SearchView from "@/pages/Search/SearchView";
 import ProgramsView from "@/pages/Programs/ProgramsView";
-import ProgramView from "@/pages/Program/ProgramView";
+import ProgramPage from "@/pages/Program/index";
 import PlayerView from "@/pages/Player/PlayerView";
 import LoginView from "@/pages/Auth/LoginView";
 import RegisterView from "@/pages/Auth/RegisterView";
@@ -33,7 +33,7 @@ export const APP_ROUTES: RouteObject[] = [
       { path: "home", element: <HomeView /> },
       { path: "buscar", element: <SearchView /> },
       { path: "programas", element: <ProgramsView /> },
-      { path: "programas/:slug", element: <ProgramView /> },
+      { path: "programas/:slug", element: <ProgramPage /> },
       { path: "categoria/:slug", element: <CategoryView /> },
       { path: "eventos/:slug", element: <EventView /> },
       { path: "en-vivo", element: <LiveView /> },

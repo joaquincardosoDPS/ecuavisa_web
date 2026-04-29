@@ -9,6 +9,7 @@ function Banner({ event }: { event: Event | null }) {
     const [scrollOpacity, setScrollOpacity] = useState(0);
 
     const handlePlay = () => {
+        console.log(event)
         if (event.live_associated?.key) {
             navigate("/en-vivo", { state: { signal: event.live_associated.key } });
         } else if (event.program_associated?.key) {
@@ -34,11 +35,11 @@ function Banner({ event }: { event: Event | null }) {
 
     const bgImg =
         event?.image_background?.big ||
-        event?.image_landscape.big;
+        event?.image_land.big;
 
     const logoCat = event?.category?.image_logo?.small;
     const logoEvent = event?.image_logo?.small;
-    console.log('logoEvent', event?.category?.image_logo?.small)
+
     const isLive = event?.live_associated?.key ? true : false;
     const classification = event?.classification;
     let categoryName = '';

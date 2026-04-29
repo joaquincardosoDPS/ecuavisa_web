@@ -1,6 +1,5 @@
 import { useRef, useCallback, useEffect } from "react";
 import type { LiveSignal } from "@/interfaces/catalog.interface";
-import { RudoPlayer } from "@/components/RudoPlayer";
 import ExpandButton from "@/components/ui/ExpandButton";
 
 interface LivePlayerSectionProps {
@@ -43,32 +42,23 @@ function LivePlayerSection({
     );
   }
 
-  if (isExpanded) {
-    return (
-      <div
-        style={{
-          position: "fixed",
-          top: 0,
-          left: 0,
-          width: "100vw",
-          height: "100vh",
-          zIndex: 9999,
-          backgroundColor: "#000",
-        }}
-      >
-        <RudoPlayer
-          rudoKey={rudoKey}
-          mode="live"
-          title={signal.name_live || "Canal en vivo"}
-          onBack={onToggleExpand}
-        />
-        <ExpandButton isExpanded onClick={onToggleExpand} />
-      </div>
-    );
-  }
-
   return (
-    <div className="h-full w-auto aspect-video rounded-xl overflow-hidden relative group">
+    <div
+      style={
+        isExpanded
+          ? {
+              position: "fixed",
+              top: 0,
+              left: 0,
+              width: "100vw",
+              height: "100vh",
+              zIndex: 9999,
+              backgroundColor: "#000",
+            }
+          : {}
+      }
+      className={isExpanded ? "" : "h-full w-auto aspect-video rounded-xl overflow-hidden relative group"}
+    >
       <iframe
         key={rudoKey}
         ref={iframeRef}
@@ -81,10 +71,9 @@ function LivePlayerSection({
         onLoad={handleIframeLoad}
         style={{ border: "none", overflow: "hidden" }}
       />
-      <ExpandButton isExpanded={false} onClick={onToggleExpand} />
+      <ExpandButton isExpanded={isExpanded} onClick={onToggleExpand} />
     </div>
   );
 }
 
 export default LivePlayerSection;
-

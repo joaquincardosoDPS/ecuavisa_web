@@ -1,6 +1,7 @@
 import type { Program, Event } from "@/interfaces/catalog.interface";
 import { useNavigate } from "react-router-dom";
 import RankingIcon from "@/assets/img/icons/iconos-ranking.svg"
+import { getEventStatus } from "@/utils/eventStatus";
 
 interface CardVerticalProps {
   program: Program | Event;
@@ -17,10 +18,13 @@ function CardVertical({ program, format, index }: CardVerticalProps) {
   const programData = !isEvent ? (program as Program) : null;
 
   const imageSrc = isEvent
-    ? eventData?.image_portrait?.small
+    ? eventData?.image_port?.small
     : programData?.image_port?.small;
 
+  const eventStatus = isEvent && eventData ? getEventStatus(eventData) : null;
+
   const handleClick = () => {
+    // console.log(format)
     if (isEvent && eventData) {
       if (eventData.key) navigate(`/eventos/${eventData.key}`);
     } else {
@@ -40,6 +44,16 @@ function CardVertical({ program, format, index }: CardVerticalProps) {
           <img src={RankingIcon} alt="" className="absolute inset-0 w-full h-full" />
           <span className="relative text-white font-bold text-lg text-center -mt-3.5">{index + 1}</span>
         </div>
+      )}
+
+      {/* Event status badge */}
+      {eventStatus && (
+        <span
+          className="absolute top-0 left-0 z-10 px-2 py-0.5 rounded text-[0.7rem] uppercase tracking-wide text-black"
+          style={{ backgroundColor: `var(${eventStatus.colorVar})` }}
+        >
+          {eventStatus.label}
+        </span>
       )}
 
       {imageSrc ? (

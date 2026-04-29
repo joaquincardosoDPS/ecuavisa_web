@@ -13,7 +13,8 @@ export interface RudoPlayerProps {
   userToken?: string;
   userProfile?: string;
   vodSlug?: string;
-  onTimeUpdate?: (currentTime: number) => void;
+  onTimeUpdate?: (currentTime: number, duration: number) => void;
+  hideOverlay?: boolean;
 }
 
 const resizeSvg = (raw: string, size: number) =>
@@ -29,12 +30,14 @@ function RudoPlayer({
   onBack,
   initialSeconds,
   onTimeUpdate,
+  hideOverlay,
   userToken,
   userProfile,
   vodSlug,
 }: RudoPlayerProps) {
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const currentTimeRef = useRef<number>(0);
+  const durationRef = useRef<number>(0);
   const [iframeLoaded, setIframeLoaded] = useState(false);
 
   const [isUIVisible, setIsUIVisible] = useState(true);
@@ -45,6 +48,7 @@ function RudoPlayer({
   const [duration, setDuration] = useState(0);
   const [isPlaying, setIsPlaying] = useState(true);
   const [volume, setVolume] = useState(1);
+  const [isMuted, setIsMuted] = useState(false);
 
   const iframeSrc = mode === "vod"
     ? `https://rudo.video/vod/${rudoKey}/autostart/true`
@@ -55,6 +59,8 @@ function RudoPlayer({
     setCurrentTime(0);
     setDuration(0);
     setIsPlaying(true);
+    currentTimeRef.current = 0;
+    durationRef.current = 0;
   }, [rudoKey]);
 
   // ---- Watch History ("Seguir viendo") ----
@@ -99,6 +105,7 @@ function RudoPlayer({
     (seconds: number) => {
       postToIframe({ event: "seek", current: seconds });
       setCurrentTime(seconds);
+      currentTimeRef.current = seconds;
     },
     [postToIframe],
   );
@@ -122,16 +129,22 @@ function RudoPlayer({
           if (typeof data.current === "number") {
             currentTimeRef.current = data.current;
             setCurrentTime(data.current);
-            onTimeUpdate?.(data.current);
           }
           if (typeof data.duration === "number" && data.duration > 0) {
+            durationRef.current = data.duration;
             setDuration(data.duration);
           }
+          // Notify parent with current time and duration
+          onTimeUpdate?.(
+            currentTimeRef.current,
+            durationRef.current,
+          );
         } else if (data.event === "play") {
           setIsPlaying(true);
         } else if (data.event === "pause") {
           setIsPlaying(false);
         } else if (data.event === "durationchange" && typeof data.duration === "number") {
+          durationRef.current = data.duration;
           setDuration(data.duration);
         } else if (
           data.event === "mousemove" ||
@@ -151,7 +164,6 @@ function RudoPlayer({
   }, [onTimeUpdate]);
 
   // ---- On iframe load: seek resume (VOD) ----
-  // Autoplay se maneja via /autostart/true en la URL de Rudo
   useEffect(() => {
     if (!iframeLoaded) return;
 
@@ -160,7 +172,6 @@ function RudoPlayer({
       !isNaN(initialSeconds) &&
       initialSeconds > 0
     ) {
-      // Delay para que Rudo inicie antes de buscar posición
       const seekTimer = setTimeout(() => enviarSeek(initialSeconds), 1500);
       return () => clearTimeout(seekTimer);
     }
@@ -206,7 +217,7 @@ function RudoPlayer({
         return;
       }
 
-      // Arrow Left / Right → Skip ±10s
+      // Arrow Left / Right → Skip ±10s (VOD only)
       if (e.key === "ArrowLeft" && mode === "vod") {
         e.preventDefault();
         const newTime = Math.max(0, currentTimeRef.current - 10);
@@ -216,17 +227,19 @@ function RudoPlayer({
       }
       if (e.key === "ArrowRight" && mode === "vod") {
         e.preventDefault();
-        const newTime = Math.min(duration, currentTimeRef.current + 10);
+        const maxTime = durationRef.current || Infinity;
+        const newTime = Math.min(maxTime, currentTimeRef.current + 10);
         enviarSeek(newTime);
         resetUIVisibility();
         return;
       }
 
-      // Arrow Up / Down → Volume
+      // Arrow Up / Down → Volume ±10%
       if (e.key === "ArrowUp") {
         e.preventDefault();
         const newVol = Math.min(1, volume + 0.1);
         enviarVolume(newVol);
+        setIsMuted(false);
         resetUIVisibility();
         return;
       }
@@ -234,6 +247,21 @@ function RudoPlayer({
         e.preventDefault();
         const newVol = Math.max(0, volume - 0.1);
         enviarVolume(newVol);
+        if (newVol === 0) setIsMuted(true);
+        resetUIVisibility();
+        return;
+      }
+
+      // M → Mute/Unmute
+      if (e.key === "m" || e.key === "M") {
+        e.preventDefault();
+        if (isMuted) {
+          enviarVolume(volume > 0 ? volume : 1);
+          setIsMuted(false);
+        } else {
+          enviarVolume(0);
+          setIsMuted(true);
+        }
         resetUIVisibility();
         return;
       }
@@ -243,7 +271,7 @@ function RudoPlayer({
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [onBack, isPlaying, enviarPlay, enviarPause, enviarSeek, enviarVolume, volume, duration, mode, resetUIVisibility]);
+  }, [onBack, isPlaying, enviarPlay, enviarPause, enviarSeek, enviarVolume, volume, isMuted, mode, resetUIVisibility]);
 
   return (
     <div className="rudo-player-container">
@@ -261,67 +289,39 @@ function RudoPlayer({
       />
 
       {/* ---- Top Bar Overlay ---- */}
-      <div
-        className={`rudo-player-topbar ${isUIVisible ? "rudo-player-topbar--visible" : ""}`}
-      >
-        <div className="rudo-player-topbar__left">
-          {/* Botón Volver */}
-          <button
-            onClick={onBack}
-            onMouseEnter={() => setBackHovered(true)}
-            onMouseLeave={() => setBackHovered(false)}
-            className="rudo-player-back-btn"
-            style={{
-              color: backHovered ? "var(--foc-primary)" : "var(--clr-text-primary-button)",
-            }}
-          >
-            <span
-              className="rudo-player-back-icon"
-              dangerouslySetInnerHTML={{
-                __html: resizeSvg(iconoVolverRaw, 20),
+      {!hideOverlay && (
+        <div
+          className={`rudo-player-topbar ${isUIVisible ? "rudo-player-topbar--visible" : ""}`}
+        >
+          <div className="rudo-player-topbar__left">
+            {/* Botón Volver */}
+            <button
+              onClick={onBack}
+              onMouseEnter={() => setBackHovered(true)}
+              onMouseLeave={() => setBackHovered(false)}
+              className="rudo-player-back-btn"
+              style={{
+                color: backHovered ? "var(--foc-primary)" : "var(--clr-text-primary-button)",
               }}
-            />
-          </button>
+            >
+              <span
+                className="rudo-player-back-icon"
+                dangerouslySetInnerHTML={{
+                  __html: resizeSvg(iconoVolverRaw, 20),
+                }}
+              />
+            </button>
 
-          {/* Título y descripción */}
-          <div className="rudo-player-topbar__text">
-            <h1 className="rudo-player-title">{title}</h1>
-            {description && (
-              <h2 className="rudo-player-description">{description}</h2>
-            )}
+            {/* Título y descripción */}
+            <div className="rudo-player-topbar__text">
+              <h1 className="rudo-player-title">{title}</h1>
+              {description && (
+                <h2 className="rudo-player-description">{description}</h2>
+              )}
+            </div>
           </div>
         </div>
-      </div>
-
-      {/* ---- Bottom Controls (Seekbar + Buttons) ---- */}
-      {/* <div
-        className={`rudo-player-controls ${isUIVisible ? "rudo-player-controls--visible" : ""}`}
-      >
-        <div className="rudo-player-controls__inner">
-          <Seekbar
-            seekTime={currentTime}
-            duration={duration}
-            isLive={mode === "live"}
-            playing={isPlaying}
-            volume={volume}
-            muted={muted}
-            onSeek={handleSeek}
-            onPlayPause={handlePlayPause}
-            onSkip={handleSkip}
-            onVolumeChange={handleVolumeChange}
-            onMuteToggle={handleMuteToggle}
-            onFullscreen={handleFullscreen}
-          />
-        </div>
-      </div> */}
-
-      {/* ---- Gradient overlays (top & bottom) for readability ---- */}
-      {/* <div
-        className={`rudo-player-gradient rudo-player-gradient--top ${isUIVisible ? "rudo-player-gradient--visible" : ""}`}
-      />
-      <div
-        className={`rudo-player-gradient rudo-player-gradient--bottom ${isUIVisible ? "rudo-player-gradient--visible" : ""}`}
-      /> */}
+      )}
     </div>
   );
 }

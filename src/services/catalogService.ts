@@ -83,23 +83,16 @@ export const catalogService = {
         return data;
     },
 
-    searchPrograms: async (query: string): Promise<RecommendedProgramsResponse> => {
+    searchPrograms: async (options: {
+        search?: string;
+        category?: string;
+        genders?: string;
+        slug_exclude?: string;
+        page?: number;
+    } = {}): Promise<RecommendedProgramsResponse> => {
         const { data } = await axios.post<RecommendedProgramsResponse>(
             `${RUDO_VOD_SEARCH}`,
-            qs.stringify({ client: CLIENT, search: query }),
-            {
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                }
-            }
-        );
-        return data;
-    },
-
-    getProgramsByCategory: async (categorySlug: string, page = 1, limit = 20): Promise<RecommendedProgramsResponse> => {
-        const { data } = await axios.post<RecommendedProgramsResponse>(
-            `${RUDO_VOD_SEARCH}`,
-            qs.stringify({ client: CLIENT, category: categorySlug, page, limit }),
+            qs.stringify({ client: CLIENT, ...options }),
             {
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
@@ -122,16 +115,19 @@ export const catalogService = {
         return data;
     },
 
-    getChapters: async (slug: string, season: number, segmentSlug: string, page: number = 1): Promise<ChaptersResponse> => {
+    getChapters: async (options: {
+        program: string;
+        limit?: number;
+        season?: number;
+        segment?: string;
+        page?: number;
+        no_segments?: boolean;
+    }): Promise<ChaptersResponse> => {
         const { data } = await axios.post<ChaptersResponse>(
             `${RUDO_VOD_CHAPTERS}`,
             qs.stringify({
                 client: CLIENT,
-                program: slug,
-                page,
-                limit: 10,
-                season: season,
-                segment: segmentSlug
+                ...options,
             }),
             {
                 headers: {
@@ -158,4 +154,5 @@ export const catalogService = {
         );
         return data;
     },
+
 };

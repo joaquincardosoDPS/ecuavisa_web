@@ -46,10 +46,13 @@ export interface Program {
     classification?: string;
     anio_production?: string;
     "max-cap": MaxCap | null;
+    single_episode: boolean;
+    active_number: boolean;
+    recommendations_genders: boolean;
     segments: Segment[];
     genders?: Gender[];
     actors?: string;
-    name_category?: string;
+    category?: { slug: string, name: string };
 }
 
 export interface SliderResponse {
@@ -154,8 +157,10 @@ export interface Chapter {
     image: string;
     image_land: ImageSet;
     key: string;
+    key_program: string;
     key_segment: string;
     m3u8: string;
+    "max-cap": number;
     name_program: string;
     name_segment: string;
     restriction: string;
@@ -228,8 +233,8 @@ export interface Event {
     category?: CategoryEvent;
     image_logo: ImageSet;
     image_background: ImageSet;
-    image_portrait: ImageSet;
-    image_landscape: ImageSet;
+    image_port: ImageSet;
+    image_land: ImageSet;
     program_associated: ChannelAssociation | null;
     live_associated: ChannelAssociation | null;
     classification: string;

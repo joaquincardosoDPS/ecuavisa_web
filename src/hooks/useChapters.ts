@@ -4,7 +4,12 @@ import { catalogService } from '@/services/catalogService';
 export const useChapters = (slug: string, season: number | null, segmentSlug: string | null) => {
     const chaptersQuery = useInfiniteQuery({
         queryKey: ['chapters', slug, season, segmentSlug],
-        queryFn: ({ pageParam = 1 }) => catalogService.getChapters(slug, season!, segmentSlug!, pageParam),
+        queryFn: ({ pageParam = 1 }) => catalogService.getChapters({
+            program: slug,
+            season: season!,
+            segment: segmentSlug!,
+            page: pageParam,
+        }),
         initialPageParam: 1,
         getNextPageParam: (lastPage, allPages) => {
             if (!lastPage || !allPages) return undefined;
@@ -14,6 +19,7 @@ export const useChapters = (slug: string, season: number | null, segmentSlug: st
         enabled: !!slug && season !== null && !!segmentSlug,
         staleTime: 1000 * 60 * 5, // 5 minutes
     });
+
 
     return {
         chapters: chaptersQuery.data,

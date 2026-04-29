@@ -21,16 +21,15 @@ function CategoryView() {
   } = useInfiniteQuery({
     queryKey: ["category-programs", slug],
     queryFn: async ({ pageParam }) => {
-      const response = await catalogService.getProgramsByCategory(
-        slug!,
-        pageParam,
-        ITEMS_PER_PAGE,
-      );
+      const response = await catalogService.searchPrograms({
+        category: slug!,
+        page: pageParam,
+      });
       console.log(response);
 
       // Extraer nombre de categoría del primer programa si no lo tenemos
       if (!categoryTitle && response.data?.length > 0) {
-        setCategoryTitle(response.data[0].name_category || slug!);
+        setCategoryTitle(response.data[0].category?.name || slug!);
       }
 
       return response;

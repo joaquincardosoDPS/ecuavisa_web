@@ -37,7 +37,7 @@ export function BannerInfo({ program }: BannerInfoProps) {
 				</button>
 			</div>
 
-			<p className="text-lg font-text line-clamp-3 drop-shadow-md leading-11 h-[150px] max-w-4xl | xs:max-md:h-auto xs:max-md:leading-8 2xl:text-2xl">
+			<p className="text-lg font-text line-clamp-3 drop-shadow-md leading-8 h-[150px] max-w-4xl | xs:max-md:h-auto xs:max-md:leading-8 2xl:text-2xl">
 				{program.description_short}
 			</p>
 		</div>

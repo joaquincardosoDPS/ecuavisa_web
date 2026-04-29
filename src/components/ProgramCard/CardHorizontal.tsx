@@ -2,6 +2,7 @@ import type { Program, Event } from "@/interfaces/catalog.interface";
 import { useProgramsStore } from "@/features/programs/programsStore";
 import { useRef } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import { getEventStatus } from "@/utils/eventStatus";
 
 interface CardHorizontalProps {
   program: Program | Event;
@@ -18,8 +19,10 @@ function CardHorizontal({ program, format }: CardHorizontalProps) {
   const programData = !isEvent ? (program as Program) : null;
 
   const imageSrc = isEvent
-    ? eventData?.image_landscape?.medium
+    ? eventData?.image_land?.medium
     : programData?.image_land?.medium;
+
+  const eventStatus = isEvent && eventData ? getEventStatus(eventData) : null;
 
   const setActiveProgram = useProgramsStore((state) => state.setActiveProgram);
   const hoverTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -57,6 +60,15 @@ function CardHorizontal({ program, format }: CardHorizontalProps) {
       onBlur={handleFocusLeave}
       onClick={handleClick}
     >
+      {/* Event status badge */}
+      {eventStatus && (
+        <span
+          className="absolute top-2 left-2 z-10 px-2 py-0.5 rounded text-xs font-semibold uppercase tracking-wide text-white"
+          style={{ backgroundColor: `var(${eventStatus.colorVar})` }}
+        >
+          {eventStatus.label}
+        </span>
+      )}
       {imageSrc ? (
         <img
           src={imageSrc}
