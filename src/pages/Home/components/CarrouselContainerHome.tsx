@@ -13,7 +13,7 @@ function CarrouselContainer({ category }: CarrouselContainerProps) {
 	const hasIconImage = Boolean(IconImage && IconImage !== "");
 	const format = category.format;
 
-	const finalOrientation = format === "ranking" ? "vertical" : (hasBgImage && hasIconImage) ? "vertical" : "horizontal";
+	const finalOrientation = format === "ranking" ? "vertical" : category.image_orientation === "portrait" ? "vertical" : "horizontal";
 
 	if (category.programs.length === 0) return null;
 
@@ -22,7 +22,7 @@ function CarrouselContainer({ category }: CarrouselContainerProps) {
 			className={`px-20 relative flex flex-col gap-5 mt-5 mb-5 | xs:max-md:pl-7.5 xs:max-md:pr-0 ${hasBgImage ? "py-8 px-8" : ""}`}
 			style={{
 				fontFamily: "var(--font-family-category)",
-				...(hasBgImage
+				...((bgImage && finalOrientation === "vertical")
 					? {
 						backgroundImage: `linear-gradient(to bottom, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.2) 100%), url(${bgImage})`,
 						backgroundSize: "cover",
@@ -32,14 +32,14 @@ function CarrouselContainer({ category }: CarrouselContainerProps) {
 					: {}),
 			}}
 		>
-			{!hasIconImage && (
+			{(!hasIconImage || finalOrientation === "horizontal") && (
 				<h2 className="relative z-10 text-2xl font-bold text-white line-height-7">
 					{category.title}
 				</h2>
 			)}
 
 			<div className="relative z-10 flex flex-row items-center gap-8">
-				{hasIconImage && (
+				{(hasIconImage && finalOrientation === "vertical") && (
 					<div className="shrink-0 flex items-center justify-center mx-20 gap-5 w-80">
 						<img
 							src={category.image_logo_category.medium}

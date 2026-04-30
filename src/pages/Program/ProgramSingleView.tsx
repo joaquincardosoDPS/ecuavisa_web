@@ -50,7 +50,7 @@ function ProgramSingleView({ program: programDetail, setIsLoading }: ProgramSing
 
     return (
         <div className="min-h-screen w-full relative">
-            <Banner program={programDetail} isSingle={true} chapter={chapter} />
+            <Banner program={programDetail} isSingle={true} chapter={chapter ?? undefined} />
             <TabsSingle
                 showDetails={showDetails}
                 setShowDetails={setShowDetails}

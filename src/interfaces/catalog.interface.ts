@@ -52,6 +52,7 @@ export interface Program {
     segments: Segment[];
     genders?: Gender[];
     actors?: string;
+    skip_view?: boolean;
     category?: { slug: string, name: string };
 }
 
@@ -67,6 +68,7 @@ export interface SliderResponse {
 export interface Category {
     key: string;
     format: 'default' | 'event' | 'ranking';
+    image_orientation: 'landscape' | 'portrait';
     title: string;
     image_logo_category: ImageSet;
     image_background_category: ImageSet;
@@ -211,7 +213,7 @@ export interface EPGChannel {
 }
 
 export interface CategoryEvent {
-    key: string;
+    slug: string;
     name: string;
     image_logo: ImageSet;
 }
@@ -238,6 +240,7 @@ export interface Event {
     program_associated: ChannelAssociation | null;
     live_associated: ChannelAssociation | null;
     classification: string;
+    skip_view?: boolean;
 }
 
 export interface EventsResponse {

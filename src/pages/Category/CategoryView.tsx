@@ -5,8 +5,6 @@ import { catalogService } from "@/services/catalogService";
 import { FullScreenSpinner } from "@/components/ui/FullScreenSpinner";
 import ProgramGrid from "@/components/ProgramCard/ProgramGrid";
 
-const ITEMS_PER_PAGE = 20;
-
 function CategoryView() {
   const { slug } = useParams<{ slug: string }>();
   const [categoryTitle, setCategoryTitle] = useState("");
@@ -25,7 +23,6 @@ function CategoryView() {
         category: slug!,
         page: pageParam,
       });
-      console.log(response);
 
       // Extraer nombre de categoría del primer programa si no lo tenemos
       if (!categoryTitle && response.data?.length > 0) {

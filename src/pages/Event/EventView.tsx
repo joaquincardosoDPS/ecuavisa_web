@@ -10,7 +10,7 @@ import DetailEvent from "./components/DetailEvent";
 
 function EventView() {
     const { slug } = useParams<{ slug: string }>();
-    const { event, events, isLoading } = useEvent(slug!);
+    const { event, events, isLoading } = useEvent(slug);
     const [activeTab, setActiveTab] = useState<TabKey>("relacionados");
 
     useEffect(() => {
@@ -19,7 +19,6 @@ function EventView() {
 
     if (isLoading) return <FullScreenSpinner />;
 
-    console.log(events);
     return (
         <div className="w-full relative">
             <Banner event={event} />

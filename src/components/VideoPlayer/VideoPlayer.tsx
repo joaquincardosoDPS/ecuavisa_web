@@ -82,7 +82,7 @@ const VideoPlayerComponent = ({
   // Activar ads al inicio si corresponde
   useEffect(() => {
     if (evaluated && shouldPlayAds && effectiveVastUrl) {
-      console.log("[VideoPlayer] Ads detectados, activando playingAds");
+      // console.log("[VideoPlayer] Ads detectados, activando playingAds");
       setPlayingAds(true);
     }
   }, [evaluated, shouldPlayAds, effectiveVastUrl]);
@@ -209,7 +209,7 @@ const VideoPlayerComponent = ({
     const ep = nextEpisodeRef.current;
     if (ep && onEpisodeSelect) {
       autoNavFiredRef.current = true;
-      console.log("[VideoPlayer] Auto-playing next episode:", ep.title);
+      // console.log("[VideoPlayer] Auto-playing next episode:", ep.title);
       onEpisodeSelect(ep);
     }
   }, [onEpisodeSelect]);
@@ -279,7 +279,7 @@ const VideoPlayerComponent = ({
 
   // Callbacks de VAST
   const handleAdsPlaying = useCallback(() => {
-    console.log("[VideoPlayer] Ads reproduciendo");
+    // console.log("[VideoPlayer] Ads reproduciendo");
     setPlayingAds(true);
     pause();
     analytics.onAdStarted();
@@ -287,7 +287,7 @@ const VideoPlayerComponent = ({
   }, [pause, analytics, onAdsPlaying]);
 
   const handleAdsFinished = useCallback(() => {
-    console.log("[VideoPlayer] Ads finalizados");
+    // console.log("[VideoPlayer] Ads finalizados");
     setPlayingAds(false);
     if (videoRef.current) {
       videoRef.current.muted = false;

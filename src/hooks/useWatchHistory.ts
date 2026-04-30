@@ -69,7 +69,7 @@ export function useWatchHistory({
             if (end === undefined && Math.abs(time - lastSavedTimeRef.current) < 2) return;
 
             lastSavedTimeRef.current = time;
-            console.log(`[WatchHistory] Saving progress: vod=${vodSlug}, time=${Math.floor(time)}s${end !== undefined ? `, end=${end}` : ''}`);
+            // console.log(`[WatchHistory] Saving progress: vod=${vodSlug}, time=${Math.floor(time)}s${end !== undefined ? `, end=${end}` : ''}`);
 
             historyService.saveProgress({
                 token,
@@ -94,7 +94,7 @@ export function useWatchHistory({
         }
 
         const intervalMs = getSaveInterval(duration) * 1000;
-        console.log(`[WatchHistory] Starting periodic save every ${intervalMs / 1000}s (duration: ${Math.floor(duration)}s)`);
+        // console.log(`[WatchHistory] Starting periodic save every ${intervalMs / 1000}s (duration: ${Math.floor(duration)}s)`);
 
         intervalRef.current = setInterval(() => {
             saveProgress();

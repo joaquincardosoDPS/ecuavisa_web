@@ -9,7 +9,6 @@ function Banner({ event }: { event: Event | null }) {
     const [scrollOpacity, setScrollOpacity] = useState(0);
 
     const handlePlay = () => {
-        console.log(event)
         if (event.live_associated?.key) {
             navigate("/en-vivo", { state: { signal: event.live_associated.key } });
         } else if (event.program_associated?.key) {
@@ -37,8 +36,8 @@ function Banner({ event }: { event: Event | null }) {
         event?.image_background?.big ||
         event?.image_land.big;
 
-    const logoCat = event?.category?.image_logo?.small;
-    const logoEvent = event?.image_logo?.small;
+    const logoCat = event?.category?.image_logo?.default;
+    const logoEvent = event?.image_logo?.default;
 
     const isLive = event?.live_associated?.key ? true : false;
     const classification = event?.classification;
@@ -122,7 +121,7 @@ function Banner({ event }: { event: Event | null }) {
                     </button>
                     <div className="h-30 flex flex-row items-center gap-5">
                         {logoCat && (
-                            <img src={logoCat} alt="" className="w-auto h-30 object-contain" />
+                            <img src={logoCat} alt="" className="w-auto h-20 object-contain" />
                         )}
                         <span className="text-lg 2xl:text-2xl font-medium">{categoryName}</span>
                     </div>

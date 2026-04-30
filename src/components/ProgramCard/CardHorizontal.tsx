@@ -19,8 +19,8 @@ function CardHorizontal({ program, format }: CardHorizontalProps) {
   const programData = !isEvent ? (program as Program) : null;
 
   const imageSrc = isEvent
-    ? eventData?.image_land?.medium
-    : programData?.image_land?.medium;
+    ? eventData?.image_land?.normal
+    : programData?.image_land?.normal;
 
   const eventStatus = isEvent && eventData ? getEventStatus(eventData) : null;
 
@@ -44,7 +44,11 @@ function CardHorizontal({ program, format }: CardHorizontalProps) {
 
   const handleClick = () => {
     if (isEvent && eventData) {
-      if (eventData.key) navigate(`/eventos/${eventData.key}`);
+      if (eventData.skip_view && eventData.program_associated?.key) {
+        navigate(`/programas/${eventData.program_associated.key}`);
+      } else {
+        navigate(`/eventos/${eventData.key}`);
+      }
     } else {
       navigate(`/programas/${program.key}`);
     }
@@ -63,7 +67,7 @@ function CardHorizontal({ program, format }: CardHorizontalProps) {
       {/* Event status badge */}
       {eventStatus && (
         <span
-          className="absolute top-2 left-2 z-10 px-2 py-0.5 rounded text-xs font-semibold uppercase tracking-wide text-white"
+          className="absolute top-0 left-0 z-10 px-2 py-0.5 rounded text-xs font-semibold uppercase tracking-wide text-black"
           style={{ backgroundColor: `var(${eventStatus.colorVar})` }}
         >
           {eventStatus.label}

@@ -115,7 +115,7 @@ function RegisterView() {
         return;
       }
 
-      console.log("[Register] Success:", response);
+      // console.log("[Register] Success:", response);
       const token = response.user!.token;
       useAuthStore.getState().login(token, response.user);
 
@@ -181,11 +181,10 @@ function RegisterView() {
           {STEPS.map((s, i) => (
             <div
               key={s.id}
-              className={`register-slide ${getSlideClass(i)} ${
-                i === step && !isAnimating
+              className={`register-slide ${getSlideClass(i)} ${i === step && !isAnimating
                   ? "relative"
                   : "absolute top-0 left-0"
-              } w-full`}
+                } w-full`}
             >
               {/* Label */}
               <h2 className="text-lg mb-6 font-title text-(--clr-primary-title,#fff)">
@@ -211,11 +210,10 @@ function RegisterView() {
                     setFormData((prev) => ({ ...prev, [s.id]: e.target.value }))
                   }
                   onKeyDown={handleKeyDown}
-                  className={`w-full text-base outline-none transition-all duration-300 bg-[#102F40] rounded-md px-5 py-4 text-white placeholder:text-white/30 focus:border-(--foc-primary) focus:shadow-[0_0_0_3px_rgba(255,19,118,0.15)] ${
-                    errors[s.id]
+                  className={`w-full text-base outline-none transition-all duration-300 bg-[#102F40] rounded-md px-5 py-4 text-white placeholder:text-white/30 focus:border-(--foc-primary) focus:shadow-[0_0_0_3px_rgba(255,19,118,0.15)] ${errors[s.id]
                       ? "border-2 border-red-500"
                       : "border-2 border-white/10"
-                  } ${s.id === "password" ? "pr-14" : ""}`}
+                    } ${s.id === "password" ? "pr-14" : ""}`}
                   autoComplete={s.type === "password" ? "new-password" : s.id}
                 />
                 {s.id === "password" && (
@@ -240,9 +238,8 @@ function RegisterView() {
 
               {/* Error */}
               <div
-                className={`text-sm mt-2  text-red-500 transition-all duration-200 ${
-                  errors[s.id] ? "opacity-100 h-5" : "opacity-0 h-0"
-                }`}
+                className={`text-sm mt-2  text-red-500 transition-all duration-200 ${errors[s.id] ? "opacity-100 h-5" : "opacity-0 h-0"
+                  }`}
               >
                 {errors[s.id]}
               </div>

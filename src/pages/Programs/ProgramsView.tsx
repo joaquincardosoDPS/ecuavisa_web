@@ -54,8 +54,8 @@ function ProgramsView() {
 
 	return (
 		<div className="relative min-h-screen | xs:max-md:pt-5">
-			<div className="fixed top-0 left-0 w-full h-[60vh] z-20 bg-(--clr-primary) overflow-hidden">
-				<div className="absolute inset-0 w-full h-full px-20 pt-25 | xs:max-md:px-5 xs:max-md:pt-27">
+			<div className="fixed top-0 left-0 w-full h-[50vh] z-20 bg-(--clr-primary) overflow-hidden">
+				<div className="absolute inset-0 w-full h-full">
 					{/* Imagen de fondo  */}
 					<div className="relative w-full h-full">
 						{images.map((img) => (
@@ -70,11 +70,12 @@ function ProgramsView() {
 										),
 									);
 								}}
-								className={`absolute inset-0 w-full h-full object-cover transition-all duration-200 ease-in-out rounded-t-2xl ${img.loaded ? "opacity-100" : "opacity-0"}`}
+								className={`absolute inset-0 w-full h-full object-cover transition-all duration-200 ease-in-out ${img.loaded ? "opacity-100" : "opacity-0"}`}
 								style={{ backgroundColor: "var(--clr-primary)" }}
 							/>
 						))}
-						<div className="absolute inset-x-0 bottom-0 h-20 bg-linear-to-t from-(--clr-primary) to-transparent pointer-events-none"></div>
+						<div className="absolute inset-y-0 left-0 w-1/2 bg-linear-to-r from-(--clr-primary) via-(--clr-primary)/40 to-transparent pointer-events-none"></div>
+						<div className="absolute inset-x-0 bottom-0 h-1/2 bg-linear-to-t from-(--clr-primary) via-(--clr-primary)/40 to-transparent pointer-events-none"></div>
 
 						{/* Información del Programa  */}
 						<div className="absolute inset-0 px-12 py-7 2xl:py-12 flex flex-col justify-end gap-5 z-10 pointer-events-none">
@@ -91,7 +92,7 @@ function ProgramsView() {
 							)}
 
 							{activeProgram?.description_short && (
-								<p className="text-white/90 text-base 2xl:text-3xl max-w-4xl drop-shadow-md mb-2 2xl:mb-5">
+								<p className="text-white/90 text-lg 2xl:text-2xl max-w-4xl drop-shadow-md mb-2 2xl:mb-5">
 									{activeProgram.description_short}
 								</p>
 							)}

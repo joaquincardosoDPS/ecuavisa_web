@@ -35,7 +35,7 @@ function PlayerView() {
   }
 
   return (
-    <div style={{ position: "fixed", inset: 0, overflow: "hidden", zIndex: 0 }}>
+    <div className="fixed inset-0 overflow-hidden z-0">
       {isShrunk && chapterImage && (
         <ShrunkBackdrop
           chapterImage={chapterImage}
@@ -48,39 +48,16 @@ function PlayerView() {
       )}
 
       <div
-        style={{
-          position: "fixed",
-          transition: "all 0.6s cubic-bezier(0.4, 0, 0.2, 1)",
-          zIndex: isShrunk ? 50 : 0,
-          borderRadius: isShrunk ? "12px" : "0",
-          overflow: "hidden",
-          boxShadow: isShrunk ? "0 8px 32px rgba(0,0,0,0.6)" : "none",
-          ...(isShrunk
-            ? {
-              bottom: "10rem",
-              right: "5rem",
-              width: "28vw",
-              height: "16vw",
-            }
-            : {
-              top: 0,
-              left: 0,
-              width: "100vw",
-              height: "100vh",
-            }),
-          backgroundColor: "#000",
-        }}
+        className={
+          isShrunk
+            ? "fixed bottom-40 right-20 w-[28vw] aspect-video rounded-xl overflow-hidden z-50 shadow-[0_8px_32px_rgba(0,0,0,0.6)] bg-black transition-all duration-600 ease-in-out"
+            : "fixed inset-0 w-screen h-screen overflow-hidden bg-black transition-all duration-600 ease-in-out"
+        }
       >
         {isShrunk && (
           <div
             onClick={expandPlayer}
-            style={{
-              position: "absolute",
-              inset: 0,
-              zIndex: 55,
-              cursor: "pointer",
-              overflow: "hidden"
-            }}
+            className="absolute inset-0 z-55 cursor-pointer overflow-hidden"
           />
         )}
 

@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import iconoVolverRaw from "@/assets/img/icons/iconos-volver.svg?raw";
 import { useWatchHistory } from "@/hooks/useWatchHistory";
+import { getStoredVolume, setStoredVolume } from "@/utils/volumeStorage";
 import "./RudoPlayer.css";
 
 export interface RudoPlayerProps {
@@ -16,6 +17,8 @@ export interface RudoPlayerProps {
   onTimeUpdate?: (currentTime: number, duration: number) => void;
   hideOverlay?: boolean;
 }
+
+
 
 const resizeSvg = (raw: string, size: number) =>
   raw
@@ -47,7 +50,7 @@ function RudoPlayer({
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [isPlaying, setIsPlaying] = useState(true);
-  const [volume, setVolume] = useState(1);
+  const [volume, setVolume] = useState(() => getStoredVolume());
   const [isMuted, setIsMuted] = useState(false);
 
   const iframeSrc = mode === "vod"
@@ -114,6 +117,7 @@ function RudoPlayer({
     (vol: number) => {
       postToIframe({ event: "volumeon", value: vol });
       setVolume(vol);
+      setStoredVolume(vol);
     },
     [postToIframe],
   );
@@ -163,19 +167,30 @@ function RudoPlayer({
     return () => window.removeEventListener("message", handleMessage);
   }, [onTimeUpdate]);
 
-  // ---- On iframe load: seek resume (VOD) ----
+  // ---- On iframe load: restore volume + seek resume ----
   useEffect(() => {
     if (!iframeLoaded) return;
 
+    // Restore user's preferred volume for both live and VOD
+    const storedVol = getStoredVolume();
+    const volTimer = setTimeout(() => enviarVolume(storedVol), 800);
+
+    // Seek resume (VOD only)
     if (
+      mode === "vod" &&
       typeof initialSeconds === "number" &&
       !isNaN(initialSeconds) &&
       initialSeconds > 0
     ) {
       const seekTimer = setTimeout(() => enviarSeek(initialSeconds), 1500);
-      return () => clearTimeout(seekTimer);
+      return () => {
+        clearTimeout(volTimer);
+        clearTimeout(seekTimer);
+      };
     }
-  }, [iframeLoaded, initialSeconds, enviarSeek]);
+
+    return () => clearTimeout(volTimer);
+  }, [iframeLoaded, initialSeconds, enviarSeek, enviarVolume, mode]);
 
   // ---- UI visibility (auto-hide after 3s) ----
   const resetUIVisibility = useCallback(() => {

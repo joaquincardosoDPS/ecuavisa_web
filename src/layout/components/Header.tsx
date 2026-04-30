@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { twMerge } from "tailwind-merge";
 import logo from "@/assets/img/logo.svg";
@@ -9,7 +9,6 @@ interface Props {
 	isTransparent: boolean;
 }
 
-const SCROLL_THRESHOLD = 150;
 
 function Header({ isTransparent }: Props) {
 	const navigate = useNavigate();
@@ -17,22 +16,32 @@ function Header({ isTransparent }: Props) {
 	const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
 	const activeProfile = useAuthStore((s) => s.activeProfile);
 
-	const handleScroll = useCallback(() => {
-		if (!isTransparent) return;
-		const scrollY = window.scrollY || document.documentElement.scrollTop;
-		const opacity = Math.min(1, scrollY / SCROLL_THRESHOLD);
-		setScrollOpacity(opacity);
-	}, [isTransparent]);
+	const lastScrollYRef = useRef(0);
 
 	useEffect(() => {
 		if (!isTransparent) {
 			setScrollOpacity(0);
 			return;
 		}
+
+		const handleScroll = () => {
+			const currentY = window.scrollY;
+			const isScrollingUp = currentY < lastScrollYRef.current;
+			lastScrollYRef.current = currentY;
+
+			// At the very top → always transparent
+			if (currentY <= 10) {
+				setScrollOpacity(0);
+				return;
+			}
+
+			// Scrolling up → visible, scrolling down → transparent
+			setScrollOpacity(isScrollingUp ? 1 : 0);
+		};
+
 		window.addEventListener("scroll", handleScroll, { passive: true });
-		handleScroll();
 		return () => window.removeEventListener("scroll", handleScroll);
-	}, [isTransparent, handleScroll]);
+	}, [isTransparent]);
 
 	const navLinkClasses = ({ isActive }: { isActive: boolean }) =>
 		twMerge(
@@ -43,6 +52,7 @@ function Header({ isTransparent }: Props) {
 	const bgStyle = isTransparent
 		? {
 			backgroundColor: `color-mix(in srgb, var(--clr-secondary) ${Math.round(scrollOpacity * 100)}%, transparent)`,
+			transition: `background-color ${scrollOpacity === 1 ? "150ms" : "300ms"} ease`,
 		}
 		: {};
 

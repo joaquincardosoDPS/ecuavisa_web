@@ -6,7 +6,10 @@ import { useNavigate } from 'react-router-dom';
 import { formatDuration } from '@/utils/formatDuration';
 import ProgressBar from '@/components/ui/ProgressBar';
 
-function InfoBannerSingle({ program, chapter }: { program: Program, chapter: Chapter }) {
+function InfoBannerSingle({ program, chapter }: {
+    program: Program,
+    chapter?: Chapter
+}) {
     const navigate = useNavigate();
     const { isFavorited, isToggling, isEnabled, toggleFavorite } = useFavorite(
         program.key,
@@ -40,8 +43,6 @@ function InfoBannerSingle({ program, chapter }: { program: Program, chapter: Cha
     const logoImg = program?.image_logo?.big;
     // const maxSeasons = program.segments[0].max_temp;
     const genderNames = program.genders?.map((gender) => gender.name).join(", ");
-    console.log(chapter)
-
 
     return (
         <div className="animate-in fade-in slide-in-from-left-10 duration-1000 mt-25 ml-25">

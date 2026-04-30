@@ -1,6 +1,7 @@
 import { useRef, useCallback, useEffect } from "react";
 import type { LiveSignal } from "@/interfaces/catalog.interface";
 import ExpandButton from "@/components/ui/ExpandButton";
+import { getStoredVolume } from "@/utils/volumeStorage";
 
 interface LivePlayerSectionProps {
   signal: LiveSignal | null;
@@ -25,7 +26,7 @@ function LivePlayerSection({
       iframe.contentWindow!.postMessage({ message: payload }, "*");
 
     post({ event: "play" });
-    post({ event: "volumeon", value: 1 });
+    post({ event: "volumeon", value: getStoredVolume() });
   }, []);
 
   useEffect(() => {
@@ -44,20 +45,11 @@ function LivePlayerSection({
 
   return (
     <div
-      style={
+      className={
         isExpanded
-          ? {
-              position: "fixed",
-              top: 0,
-              left: 0,
-              width: "100vw",
-              height: "100vh",
-              zIndex: 9999,
-              backgroundColor: "#000",
-            }
-          : {}
+          ? "fixed inset-0 w-screen h-screen z-9999 bg-black"
+          : "h-full w-auto aspect-video rounded-xl overflow-hidden relative group"
       }
-      className={isExpanded ? "" : "h-full w-auto aspect-video rounded-xl overflow-hidden relative group"}
     >
       <iframe
         key={rudoKey}

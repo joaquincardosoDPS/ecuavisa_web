@@ -103,7 +103,7 @@ function LoginView() {
         return;
       }
 
-      console.log("[Login] Success:", response);
+      // console.log("[Login] Success:", response);
       const token = response.user!.token;
       useAuthStore.getState().login(token, response.user);
 

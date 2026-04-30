@@ -85,7 +85,7 @@ export const useAuthStore = create<AuthState>((set, get) => {
                 const user = { ...response.user, token: response.user?.token || token } as AuthUser;
                 localStorage.setItem('auth_user', JSON.stringify(user));
                 set({ user, token: user.token, isAuthenticated: true });
-                console.log('[Auth] Session validated');
+                // console.log('[Auth] Session validated');
             } catch (error) {
                 console.warn('[Auth] Session validation failed, logging out', error);
                 get().logout();

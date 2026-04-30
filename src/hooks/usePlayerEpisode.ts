@@ -130,8 +130,6 @@ export function usePlayerEpisode() {
           setChapterImage(chapterData.image_land?.big || "");
           setProgramKey(chapterData.key_program || "");
 
-          console.log('chapterData', chapterData)
-
           let resolvedInitialSeconds: number | undefined;
           if (token && activeProfile) {
             try {

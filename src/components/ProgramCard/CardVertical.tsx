@@ -18,15 +18,18 @@ function CardVertical({ program, format, index }: CardVerticalProps) {
   const programData = !isEvent ? (program as Program) : null;
 
   const imageSrc = isEvent
-    ? eventData?.image_port?.small
-    : programData?.image_port?.small;
+    ? eventData?.image_port?.normal
+    : programData?.image_port?.normal;
 
   const eventStatus = isEvent && eventData ? getEventStatus(eventData) : null;
 
   const handleClick = () => {
-    // console.log(format)
     if (isEvent && eventData) {
-      if (eventData.key) navigate(`/eventos/${eventData.key}`);
+      if (eventData.skip_view && eventData.program_associated?.key) {
+        navigate(`/programas/${eventData.program_associated.key}`);
+      } else {
+        navigate(`/eventos/${eventData.key}`);
+      }
     } else {
       navigate(`/programas/${program.key}`);
     }
@@ -35,7 +38,7 @@ function CardVertical({ program, format, index }: CardVerticalProps) {
   return (
     <div
       tabIndex={0}
-      className="group relative shrink-0 overflow-hidden cursor-pointer transition-all duration-300 hover:z-10 hover:ring-2 hover:ring-(--foc-primary) hover:shadow-[0_0_20px_rgba(255,19,118,0.3)] focus:outline-none focus:z-10 focus:ring-2 focus:ring-(--foc-primary) focus:shadow-[0_0_20px_rgba(255,19,118,0.3)] bg-[#0a0a0a] embla_slide w-[20vh] aspect-2/3 rounded-xl"
+      className="group relative shrink-0 overflow-hidden cursor-pointer transition-all duration-300 hover:z-10 hover:ring-2 hover:ring-(--foc-primary) hover:shadow-[0_0_20px_rgba(255,19,118,0.3)] focus:outline-none focus:z-10 focus:ring-2 focus:ring-(--foc-primary) focus:shadow-[0_0_20px_rgba(255,19,118,0.3)] bg-[#0a0a0a] embla_slide w-[20vh] aspect-9/16 rounded-xl"
       onClick={handleClick}
     >
       {/* Ranking badge */}

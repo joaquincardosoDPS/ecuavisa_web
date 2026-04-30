@@ -32,6 +32,18 @@ function HomeView() {
 			<Banner slider={slider} />
 
 			<div className="flex flex-col pb-20 gap-5 | xs:max-md:pb-10 xs:max-md:gap-2.5">
+				{/* Recomendados */}
+				{recommended.length > 0 && (
+					<div
+						className="px-20 flex flex-col gap-5 mt-5 mb-5 | xs:max-md:px-7.5"
+						style={{ fontFamily: "var(--font-family-category)" }}
+					>
+						<h2 className="text-2xl font-bold text-white line-height-7">
+							Recomendados para ti
+						</h2>
+						<CardCarrousel programs={recommended} orientation="vertical" />
+					</div>
+				)}
 				{/* Seguir Viendo */}
 				{continueWatching.length > 0 && (
 					<ContinueWatchingCarousel items={continueWatching} />
@@ -46,18 +58,6 @@ function HomeView() {
 						),
 				)}
 
-				{/* Recomendados */}
-				{recommended.length > 0 && (
-					<div
-						className="px-20 flex flex-col gap-5 mt-5 mb-5 | xs:max-md:px-7.5"
-						style={{ fontFamily: "var(--font-family-category)" }}
-					>
-						<h2 className="text-2xl font-bold text-white line-height-7">
-							Recomendados para ti
-						</h2>
-						<CardCarrousel programs={recommended} orientation="vertical" />
-					</div>
-				)}
 			</div>
 		</div>
 	);
