@@ -101,7 +101,7 @@ function Banner({ event }: { event: Event | null }) {
                         <img
                             src={logoEvent}
                             alt={event.title}
-                            className="max-w-80 max-h-30 2xl:max-w-100 2xl:max-h-40 object-contain drop-shadow-xl border border-red-500"
+                            className="max-w-80 max-h-30 2xl:max-w-100 2xl:max-h-40 object-contain drop-shadow-xl"
                         />
                     )}
                     <div className="flex flex-row gap-5">
