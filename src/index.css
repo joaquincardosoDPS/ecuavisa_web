@@ -161,3 +161,9 @@ body {
 .scrollbar-subtle::-webkit-scrollbar-thumb:hover {
 	background: rgba(255, 255, 255, 0.3);
 }
+
+.bg-header-gradient {
+	background-image: linear-gradient(to bottom,
+			hsl(from var(--clr-primary) h s l / 0.8),
+			hsl(from var(--clr-primary) h s l / 0));
+}

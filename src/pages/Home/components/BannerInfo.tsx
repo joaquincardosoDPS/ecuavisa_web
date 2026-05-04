@@ -27,6 +27,7 @@ export function BannerInfo({ program }: BannerInfoProps) {
 
 			<div className="flex items-center gap-4 pt-4">
 				<button
+					type="button"
 					onClick={() => navigate(`/programas/${program.key}`)}
 					className="bg-(--clr-primary-button) text-(--clr-text-primary-button)  px-10 py-4 rounded-md font-bold hover:bg-white hover:text-black transition-all flex items-center gap-3 group shadow-lg | xs:max-md:px-5 xs:max-md:py-3 cursor-pointer"
 				>

@@ -25,7 +25,7 @@ function ProgramsView() {
 
 	// Carga la imagen de fondo
 	const currentBgImage =
-		activeProgram?.image_slider?.big || activeProgram?.image_background?.big || "";
+		activeProgram?.image_slider?.big || activeProgram?.image_background?.big || activeProgram?.image_land?.big || "";
 	const [images, setImages] = useState<{ src: string; loaded: boolean }[]>(
 		currentBgImage ? [{ src: currentBgImage, loaded: true }] : [],
 	);

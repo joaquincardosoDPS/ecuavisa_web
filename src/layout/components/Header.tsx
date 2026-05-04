@@ -13,6 +13,7 @@ interface Props {
 function Header({ isTransparent }: Props) {
 	const navigate = useNavigate();
 	const [scrollOpacity, setScrollOpacity] = useState(0);
+	const [hidden, setHidden] = useState(false);
 	const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
 	const activeProfile = useAuthStore((s) => s.activeProfile);
 
@@ -21,21 +22,30 @@ function Header({ isTransparent }: Props) {
 	useEffect(() => {
 		if (!isTransparent) {
 			setScrollOpacity(0);
+			setHidden(false);
 			return;
 		}
+
+		const SCROLL_THRESHOLD = 84; // header height
 
 		const handleScroll = () => {
 			const currentY = window.scrollY;
 			const isScrollingUp = currentY < lastScrollYRef.current;
 			lastScrollYRef.current = currentY;
 
-			// At the very top → always transparent
+			// At the very top → always visible and transparent
 			if (currentY <= 10) {
 				setScrollOpacity(0);
+				setHidden(false);
 				return;
 			}
 
-			// Scrolling up → visible, scrolling down → transparent
+			// Show/hide based on direction
+			if (currentY > SCROLL_THRESHOLD) {
+				setHidden(!isScrollingUp);
+			}
+
+			// Background: visible when scrolling up, transparent when down
 			setScrollOpacity(isScrollingUp ? 1 : 0);
 		};
 
@@ -52,15 +62,19 @@ function Header({ isTransparent }: Props) {
 	const bgStyle = isTransparent
 		? {
 			backgroundColor: `color-mix(in srgb, var(--clr-secondary) ${Math.round(scrollOpacity * 100)}%, transparent)`,
-			transition: `background-color ${scrollOpacity === 1 ? "150ms" : "300ms"} ease`,
+			transition: `background-color ${scrollOpacity === 1 ? "150ms" : "300ms"} ease, translate 300ms ease-in-out`,
 		}
-		: {};
+		: {
+			transition: "translate 300ms ease-in-out",
+		};
 
 	return (
 		<header
 			className={twMerge(
-				"fixed top-0 left-0 w-full z-50 pb-3.5 flex flex-row justify-between items-center h-[84px] transition-colors duration-300 pl-10 xl:pl-25",
+				"fixed top-0 left-0 w-full z-50 pb-3.5 flex flex-row justify-between items-center h-[84px] pl-10 xl:pl-25",
 				!isTransparent && "bg-brand-secondary",
+				scrollOpacity === 0 && "bg-header-gradient",
+				hidden && "-translate-y-full",
 			)}
 			style={bgStyle}
 		>
@@ -71,7 +85,7 @@ function Header({ isTransparent }: Props) {
 				<img src={logo} alt="Logo" className="h-14 w-auto" />
 			</button>
 
-			<nav className="flex flex-row items-center gap-15 pt-3.5 font-title text-white text-base | xs:max-xl:gap-5 | xs:max-md:overflow-x-auto">
+			<nav className="flex flex-row items-center gap-15 pt-3.5 font-title text-white text-base | xs:max-xl:gap-5 | xs:max-md:overflow-x-auto text-shadow-md/3">
 				<NavLink to="/home" className={navLinkClasses}>
 					Portada
 				</NavLink>
