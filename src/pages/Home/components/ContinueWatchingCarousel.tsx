@@ -41,7 +41,8 @@ function ContinueWatchingCarousel({ items }: ContinueWatchingCarouselProps) {
 										{ state: { resumeTime: item.time } },
 									)
 								}
-								className="group relative shrink-0 overflow-hidden cursor-pointer transition-all duration-300 hover:z-10 hover:ring-2 hover:ring-(--foc-primary) hover:shadow-[0_0_20px_rgba(255,19,118,0.3)] focus:outline-none focus:z-10 focus:ring-2 focus:ring-(--foc-primary) bg-[#0a0a0a] w-72 rounded-lg"
+								className="group relative shrink-0 overflow-hidden cursor-pointer transition-all duration-300 hover:z-10 hover:ring-2 hover:ring-(--foc-primary) hover:shadow-[0_0_20px_rgba(255,19,118,0.3)] focus:outline-none focus:z-10 focus:ring-2 focus:ring-(--foc-primary) bg-[#0a0a0a] rounded-lg"
+							style={{ width: "var(--card-w-horizontal)" }}
 							>
 								{/* Imagen */}
 								<div className="aspect-video overflow-hidden">

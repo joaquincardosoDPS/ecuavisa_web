@@ -70,10 +70,13 @@ export const catalogService = {
         return data;
     },
 
-    getRecommendedPrograms: async (): Promise<RecommendedProgramsResponse> => {
+    getRecommendedPrograms: async (options?: {
+        page?: number;
+        limit?: number;
+    }): Promise<RecommendedProgramsResponse> => {
         const { data } = await axios.post<RecommendedProgramsResponse>(
             `${RUDO_VOD_FEATURED}`,
-            qs.stringify({ client: CLIENT }),
+            qs.stringify({ client: CLIENT, ...options }),
             {
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',

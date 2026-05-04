@@ -1,8 +1,9 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import CarrouselContainer from "@/components/ProgramCard/CarrouselContainer";
 import { useProgramsStore } from "@/features/programs/programsStore";
 import type { Program } from "@/interfaces/catalog.interface";
 import { useProgramsData } from "@/hooks/useProgramsData";
+import { useImagePreloader } from "@/hooks/useImagePreloader";
 import { FullScreenSpinner } from "@/components/ui/FullScreenSpinner";
 
 function ProgramsView() {
@@ -24,12 +25,31 @@ function ProgramsView() {
 
 	// Carga la imagen de fondo
 	const currentBgImage =
-		activeProgram?.image_slider?.big || activeProgram?.image_land?.big || "";
+		activeProgram?.image_slider?.big || activeProgram?.image_background?.big || "";
 	const [images, setImages] = useState<{ src: string; loaded: boolean }[]>(
 		currentBgImage ? [{ src: currentBgImage, loaded: true }] : [],
 	);
 
 	const logo = activeProgram?.image_logo?.normal || activeProgram?.image_logo?.default;
+
+	// Preload initial above-the-fold images before revealing the view
+	const criticalImages = useMemo(() => {
+		if (!categories || categories.length === 0) return [];
+		const urls: string[] = [];
+		const firstCategory = categories.find(
+			(c) => c.format === "default" && c.programs && c.programs.length > 0,
+		);
+		if (firstCategory) {
+			const firstProg = firstCategory.programs[0] as Program;
+			const bg = firstProg.image_slider?.big || firstProg.image_land?.big;
+			if (bg) urls.push(bg);
+			const progLogo = firstProg.image_logo?.normal || firstProg.image_logo?.default;
+			if (progLogo) urls.push(progLogo);
+		}
+		return urls;
+	}, [categories]);
+
+	const imagesReady = useImagePreloader(criticalImages, !isLoading && categories.length > 0);
 
 	// Actualiza la imagen de fondo cuando cambia el programa seleccionado
 	useEffect(() => {
@@ -50,7 +70,7 @@ function ProgramsView() {
 		});
 	}, [currentBgImage]);
 
-	if (isLoading) return <FullScreenSpinner />;
+	if (isLoading || !imagesReady) return <FullScreenSpinner />;
 
 	return (
 		<div className="relative min-h-screen | xs:max-md:pt-5">

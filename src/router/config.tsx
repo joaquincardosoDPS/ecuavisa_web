@@ -1,28 +1,35 @@
 import { Navigate, type RouteObject } from "react-router-dom";
+import { lazy, Suspense } from "react";
 import MainLayout from "@/layout/MainLayout";
 import ProtectedRoute from "@/router/ProtectedRoute";
-import HomeView from "@/pages/Home/HomeView";
-import SearchView from "@/pages/Search/SearchView";
-import ProgramsView from "@/pages/Programs/ProgramsView";
-import ProgramPage from "@/pages/Program/index";
-import PlayerView from "@/pages/Player/PlayerView";
-import LoginView from "@/pages/Auth/LoginView";
-import RegisterView from "@/pages/Auth/RegisterView";
-import ProfilesView from "@/pages/Profiles/ProfilesView";
-import EditProfileView from "@/pages/Profiles/EditProfileView";
-import MyListView from "@/pages/MyList/MyListView";
-import CategoryView from "@/pages/Category/CategoryView";
-import MyAccountView from "@/pages/MyAccount/MyAccountView";
-import LiveView from "@/pages/Live/LiveView";
-import EventView from "@/pages/Event/EventView";
-import NotFoundView from "@/pages/Error/NotFoundView";
+import { FullScreenSpinner } from "@/components/ui/FullScreenSpinner";
+
+const HomeView = lazy(() => import("@/pages/Home/HomeView"));
+const SearchView = lazy(() => import("@/pages/Search/SearchView"));
+const ProgramsView = lazy(() => import("@/pages/Programs/ProgramsView"));
+const ProgramPage = lazy(() => import("@/pages/Program/index"));
+const PlayerView = lazy(() => import("@/pages/Player/PlayerView"));
+const LoginView = lazy(() => import("@/pages/Auth/LoginView"));
+const RegisterView = lazy(() => import("@/pages/Auth/RegisterView"));
+const ProfilesView = lazy(() => import("@/pages/Profiles/ProfilesView"));
+const EditProfileView = lazy(() => import("@/pages/Profiles/EditProfileView"));
+const MyListView = lazy(() => import("@/pages/MyList/MyListView"));
+const CategoryView = lazy(() => import("@/pages/Category/CategoryView"));
+const MyAccountView = lazy(() => import("@/pages/MyAccount/MyAccountView"));
+const LiveView = lazy(() => import("@/pages/Live/LiveView"));
+const EventView = lazy(() => import("@/pages/Event/EventView"));
+const NotFoundView = lazy(() => import("@/pages/Error/NotFoundView"));
+
+const Lazy = ({ children }: { children: React.ReactNode }) => (
+  <Suspense fallback={<FullScreenSpinner />}>{children}</Suspense>
+);
 
 export const APP_ROUTES: RouteObject[] = [
   {
     path: "auth",
     children: [
-      { path: "login", element: <LoginView /> },
-      { path: "registro", element: <RegisterView /> },
+      { path: "login", element: <Lazy><LoginView /></Lazy> },
+      { path: "registro", element: <Lazy><RegisterView /></Lazy> },
     ],
   },
   {
@@ -30,32 +37,27 @@ export const APP_ROUTES: RouteObject[] = [
     element: <MainLayout />,
     children: [
       { index: true, element: <Navigate to="/home" replace /> },
-      { path: "home", element: <HomeView /> },
-      { path: "buscar", element: <SearchView /> },
-      { path: "programas", element: <ProgramsView /> },
-      { path: "programas/:slug", element: <ProgramPage /> },
-      { path: "categoria/:slug", element: <CategoryView /> },
-      { path: "eventos/:slug", element: <EventView /> },
-      { path: "en-vivo", element: <LiveView /> },
-      { path: "mi-lista", element: <MyListView /> },
-      { path: "*", element: <NotFoundView /> },
+      { path: "home", element: <Lazy><HomeView /></Lazy> },
+      { path: "buscar", element: <Lazy><SearchView /></Lazy> },
+      { path: "programas", element: <Lazy><ProgramsView /></Lazy> },
+      { path: "programas/:slug", element: <Lazy><ProgramPage /></Lazy> },
+      { path: "categoria/:slug", element: <Lazy><CategoryView /></Lazy> },
+      { path: "eventos/:slug", element: <Lazy><EventView /></Lazy> },
+      { path: "en-vivo", element: <Lazy><LiveView /></Lazy> },
+      { path: "mi-lista", element: <Lazy><MyListView /></Lazy> },
+      { path: "*", element: <Lazy><NotFoundView /></Lazy> },
     ],
   },
   {
     path: "play/:segment/:season/:chapter",
-    element: <PlayerView />,
+    element: <Lazy><PlayerView /></Lazy>,
   },
   {
     element: <ProtectedRoute />,
     children: [
-      { path: "cuenta", element: <MyAccountView /> },
-      { path: "perfiles", element: <ProfilesView /> },
-      { path: "perfiles/:id", element: <EditProfileView /> },
+      { path: "cuenta", element: <Lazy><MyAccountView /></Lazy> },
+      { path: "perfiles", element: <Lazy><ProfilesView /></Lazy> },
+      { path: "perfiles/:id", element: <Lazy><EditProfileView /></Lazy> },
     ],
-  },
-  {
-    path: "*",
-    element: <MainLayout />,
-    children: [{ path: "*", element: <NotFoundView /> }],
   },
 ];

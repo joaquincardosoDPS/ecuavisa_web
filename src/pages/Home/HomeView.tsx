@@ -3,7 +3,9 @@ import CarrouselContainerHome from "@/pages/Home/components/CarrouselContainerHo
 import ContinueWatchingCarousel from "@/pages/Home/components/ContinueWatchingCarousel";
 import { FullScreenSpinner } from "@/components/ui/FullScreenSpinner";
 import { useHomeData } from "@/hooks/useHomeData";
+import { useImagePreloader } from "@/hooks/useImagePreloader";
 import Banner from "./components/Banner";
+import { useMemo } from "react";
 
 function HomeView() {
 	const {
@@ -14,7 +16,28 @@ function HomeView() {
 		isLoading,
 		isError,
 	} = useHomeData();
-	if (isLoading) {
+
+	// Extract critical above-the-fold image URLs for preloading
+	const criticalImages = useMemo(() => {
+		if (!slider || slider.length === 0) return [];
+		const urls: string[] = [];
+		// Banner background (most important)
+		const main = slider[0];
+		const bannerSrc = main.image_slider.big || main.image_land.default;
+		if (bannerSrc) urls.push(bannerSrc);
+		// Banner logo
+		if (main.image_logo?.medium) urls.push(main.image_logo.medium);
+		// Featured cards (rest of slider)
+		slider.slice(1, 5).forEach((p) => {
+			const src = p.image_land?.medium || p.image_land?.default;
+			if (src) urls.push(src);
+		});
+		return urls;
+	}, [slider]);
+
+	const imagesReady = useImagePreloader(criticalImages, !isLoading && slider.length > 0);
+
+	if (isLoading || !imagesReady) {
 		return <FullScreenSpinner />;
 	}
 
@@ -41,7 +64,7 @@ function HomeView() {
 						<h2 className="text-2xl font-bold text-white line-height-7">
 							Recomendados para ti
 						</h2>
-						<CardCarrousel programs={recommended} orientation="vertical" />
+						<CardCarrousel programs={recommended} />
 					</div>
 				)}
 				{/* Seguir Viendo */}

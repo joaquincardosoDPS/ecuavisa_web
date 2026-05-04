@@ -4,7 +4,7 @@ import { catalogService } from '@/services/catalogService';
 export const useProgramsData = () => {
     const categoriesQuery = useQuery({
         queryKey: ['programs', 'categories'],
-        queryFn: () => catalogService.getCategories(),
+        queryFn: () => catalogService.getCategories({ limit: 50 }),
         staleTime: 1000 * 60 * 5,
     });
 

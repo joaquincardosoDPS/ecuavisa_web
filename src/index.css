@@ -80,6 +80,10 @@
 	--tam-quaternary-container-width: 15vw;
 	--tam-quaternary-container-height: 15vh;
 
+	/* Cards */
+	--card-w-vertical: 20vh;
+	--card-w-horizontal: 32vh;
+
 	/* Avatar */
 	--avatar-size: 200px;
 	--avatar-border-radius: 50%;
@@ -111,11 +115,13 @@
 }
 
 html {
-	scrollbar-width: none; /* Firefox */
+	scrollbar-width: none;
+	/* Firefox */
 }
 
 html::-webkit-scrollbar {
-	display: none; /* Chrome, Edge, Safari */
+	display: none;
+	/* Chrome, Edge, Safari */
 }
 
 html,

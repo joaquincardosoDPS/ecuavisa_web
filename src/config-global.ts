@@ -6,7 +6,7 @@ export const RUDO_BASE_USER = 'https://consumers.rudo.video/users'
  * Detección del cliente multi-fuente (orden de prioridad):
  * 1. Query param en la URL principal:  ?client=latina
  * 2. Query param dentro del hash:      #/home?client=latina
- * 3. Sub-carpeta en el pathname:       /chvweb/latina/  → segmento [2]
+ * 3. Sub-carpeta en el pathname:       /web/latina/  → segmento [2]
  * 4. Fallback:                         'chv'
  */
 function resolveClient(): string {
@@ -21,8 +21,8 @@ function resolveClient(): string {
     if (fromHash) return fromHash;
   }
 
-  // 3. Segmento del pathname (ej. /chvweb/latina/ → 'latina')
-  if (location.protocol !== 'file:') {
+  // 3. Segmento del pathname solo bajo /web/ (ej. /web/latina/ → 'latina')
+  if (window.location.pathname.startsWith('/web/')) {
     const pathSegment = window.location.pathname.split('/')[2];
     if (pathSegment && pathSegment !== '#') return pathSegment;
   }
@@ -32,7 +32,7 @@ function resolveClient(): string {
 }
 
 export const CLIENT = resolveClient();
-export const BASENAME = window.location.pathname.startsWith('/web/') ? `/web/${CLIENT}` : '/';
+export const BASENAME = import.meta.env.BASE_URL.replace(/\/+$/, '') || '/';
 
 export const ADS_FALLBACK_DOMAIN = 'https://www.chv.cl';
 

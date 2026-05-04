@@ -90,8 +90,11 @@ function CardCarrousel({
           {programs.length === 10 && categorySlug && (
             <div
               onClick={() => navigate(`/categoria/${categorySlug}`)}
-              className={`flex items-center justify-center shrink-0 overflow-hidden cursor-pointer group transition-all duration-300 hover:z-10 hover:ring-2 hover:ring-(--foc-primary) hover:shadow-[0_0_20px_rgba(255,19,118,0.3)] ${isVertical ? "w-[20vh] aspect-2/3 rounded-xl" : "w-[32vh] aspect-video rounded-lg"}`}
-              style={{ backgroundColor: "var(--clr-secondary)" }}
+              className={`flex items-center justify-center shrink-0 overflow-hidden cursor-pointer group transition-all duration-300 hover:z-10 hover:ring-2 hover:ring-(--foc-primary) hover:shadow-[0_0_20px_rgba(255,19,118,0.3)] ${isVertical ? "aspect-2/3 rounded-xl" : "aspect-video rounded-lg"}`}
+              style={{
+                width: isVertical ? "var(--card-w-vertical)" : "var(--card-w-horizontal)",
+                backgroundColor: "var(--clr-secondary)",
+              }}
             >
               <span className="text-2xl font-medium text-white">Ver Más </span>
             </div>

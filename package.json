@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build && node -e \"const f='dist/index.html';let h=require('fs').readFileSync(f,'utf8');h=h.replace('window.__vite_is_modern_browser=true','if(location.protocol!=\\\"file:\\\"){window.__vite_is_modern_browser=true}');require('fs').writeFileSync(f,h)\"",
+    "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview"
   },
@@ -36,14 +36,12 @@
     "@types/qs": "^6.15.0",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
-    "@vitejs/plugin-legacy": "^8.0.1",
     "@vitejs/plugin-react": "^6.0.1",
     "babel-plugin-react-compiler": "^1.0.0",
     "eslint": "^9.39.4",
     "eslint-plugin-react-hooks": "^7.1.1",
     "eslint-plugin-react-refresh": "^0.5.2",
     "globals": "^17.5.0",
-    "terser": "^5.46.2",
     "typescript": "~6.0.2",
     "typescript-eslint": "^8.58.2",
     "vite": "^8.0.9"
