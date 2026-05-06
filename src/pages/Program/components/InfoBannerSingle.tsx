@@ -20,14 +20,14 @@ function InfoBannerSingle({ program, chapter }: {
     const handlePlay = () => {
         if (continueWatchingItem) {
             navigate(
-                `/play/${continueWatchingItem.key_segment}/${continueWatchingItem.season}/${continueWatchingItem.chapter}`,
+                `/play/${program.key}/${continueWatchingItem.key_segment}/${continueWatchingItem.season}/${continueWatchingItem.chapter}`,
                 { state: { resumeTime: continueWatchingItem.time } },
             );
         } else {
             const firstSegment = program.segments?.[0];
             if (firstSegment) {
                 const firstSeason = firstSegment.all_temp?.[0] ?? 1;
-                navigate(`/play/${firstSegment.key}/${firstSeason}/1`);
+                navigate(`/play/${program.key}/${firstSegment.key}/${firstSeason}/1`);
             }
         }
     }

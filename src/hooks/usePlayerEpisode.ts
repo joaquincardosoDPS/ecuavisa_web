@@ -9,7 +9,8 @@ import type { Chapter } from "@/interfaces/catalog.interface";
 const SHRINK_THRESHOLD_SECONDS = 30;
 
 export function usePlayerEpisode() {
-  const { segment, season, chapter } = useParams<{
+  const { program, segment, season, chapter } = useParams<{
+    program: string;
     segment: string;
     season: string;
     chapter: string;
@@ -60,7 +61,7 @@ export function usePlayerEpisode() {
         // Auto-play next chapter when countdown ends
         if (secs <= 1 && !autoPlayCancelledRef.current && segment) {
           autoPlayCancelledRef.current = true;
-          navigate(`/play/${segment}/${nextChapterRef.current.season}/${nextChapterRef.current.chapter}`);
+          navigate(`/play/${program}/${segment}/${nextChapterRef.current.season}/${nextChapterRef.current.chapter}`);
         }
       }
     }
@@ -74,8 +75,8 @@ export function usePlayerEpisode() {
   };
 
   const playNext = () => {
-    if (nextChapter && segment) {
-      navigate(`/play/${segment}/${nextChapter.season}/${nextChapter.chapter}`);
+    if (nextChapter && segment && program) {
+      navigate(`/play/${program}/${segment}/${nextChapter.season}/${nextChapter.chapter}`);
     }
   };
 
@@ -106,13 +107,32 @@ export function usePlayerEpisode() {
         const seasonNum = parseInt(season, 10);
         const chapterNum = parseInt(chapter, 10);
 
+        // Obtener detalle del programa para saber si es single_episode
+        const programDetail = program
+          ? (await catalogService.getProgramDetail(program))?.data
+          : null;
+        const isNoSegments = programDetail?.single_episode === true;
+
         // Cargar capítulo actual
-        const response = await catalogService.getChapterBySlug({
-          segment,
-          season: seasonNum,
-          chapter: chapterNum,
-        });
-        const chapterData = response?.data;
+        let chapterData: import("@/interfaces/catalog.interface").Chapter | undefined;
+
+        if (isNoSegments) {
+          // Programa single_episode: obtener capítulos sin segmento
+          const response = await catalogService.getChapters({
+            program: program!,
+            no_segments: true,
+          });
+          chapterData = response?.data?.[0];
+        } else {
+          // Programa con segmentos: obtener capítulo específico
+          const response = await catalogService.getChapterBySlug({
+            program,
+            segment,
+            season: seasonNum,
+            chapter: chapterNum,
+          });
+          chapterData = response?.data;
+        }
 
         if (!chapterData?.key) {
           if (!cancelled) {
@@ -151,19 +171,24 @@ export function usePlayerEpisode() {
           }
           setInitialSeconds(resolvedInitialSeconds);
 
-          // Intentar cargar el siguiente capítulo
-          try {
-            const nextRes = await catalogService.getChapterBySlug({
-              segment,
-              season: seasonNum,
-              chapter: chapterNum + 1,
-            });
-            if (!cancelled && nextRes?.data?.key) {
-              setNextChapter(nextRes.data);
-            } else if (!cancelled) {
-              setNextChapter(null);
+          // Intentar cargar el siguiente capítulo (solo si tiene segmentos)
+          if (!isNoSegments) {
+            try {
+              const nextRes = await catalogService.getChapterBySlug({
+                program,
+                segment,
+                season: seasonNum,
+                chapter: chapterNum + 1,
+              });
+              if (!cancelled && nextRes?.data?.key) {
+                setNextChapter(nextRes.data);
+              } else if (!cancelled) {
+                setNextChapter(null);
+              }
+            } catch {
+              if (!cancelled) setNextChapter(null);
             }
-          } catch {
+          } else {
             if (!cancelled) setNextChapter(null);
           }
 

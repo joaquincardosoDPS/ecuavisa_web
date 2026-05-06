@@ -4,14 +4,15 @@ import type { Chapter } from "@/interfaces/catalog.interface";
 interface ChapterCardProps {
     chapter: Chapter;
     index: number;
+    programKey: string;
 }
 
-function ChapterCard({ chapter, index }: ChapterCardProps) {
+function ChapterCard({ chapter, index, programKey }: ChapterCardProps) {
     const navigate = useNavigate();
     const imageSrc = chapter.image_land.default;
 
     const handleClick = () => {
-        navigate(`/play/${chapter.key_segment}/${chapter.season}/${chapter.chapter}`);
+        navigate(`/play/${programKey}/${chapter.key_segment}/${chapter.season}/${chapter.chapter}`);
     };
 
     return (

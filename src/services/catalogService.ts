@@ -63,6 +63,7 @@ export const catalogService = {
         genders?: string;
         slug_exclude?: string;
         page?: number;
+        limit?: number;
     } = {}): Promise<RecommendedProgramsResponse> => {
         const { data } = await api.post<RecommendedProgramsResponse>(RUDO_VOD_SEARCH, { ...options });
         return data;
@@ -90,7 +91,7 @@ export const catalogService = {
      * Incluye m3u8, key, título, etc.
      */
     getChapterBySlug: async (options: {
-        segment: string;
+        segment?: string;
         season: number;
         chapter: number;
         program?: string;

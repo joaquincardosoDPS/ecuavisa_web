@@ -17,24 +17,24 @@ function InfoBanner({ program }: InfoBannerProps) {
     );
     const { item: continueWatchingItem } = useContinueWatching(program.key);
 
-
+    console.log(program)
     const handlePlay = () => {
         if (continueWatchingItem) {
             navigate(
-                `/play/${continueWatchingItem.key_segment}/${continueWatchingItem.season}/${continueWatchingItem.chapter}`,
+                `/play/${program.key}/${continueWatchingItem.key_segment}/${continueWatchingItem.season}/${continueWatchingItem.chapter}`,
                 { state: { resumeTime: continueWatchingItem.time } },
             );
         } else {
             const firstSegment = program.segments?.[0];
             if (firstSegment) {
                 const firstSeason = firstSegment.all_temp?.[0] ?? 1;
-                navigate(`/play/${firstSegment.key}/${firstSeason}/1`);
+                navigate(`/play/${program.key}/${firstSegment.key}/${firstSeason}/1`);
             }
         }
     };
 
     const logoImg = program?.image_logo?.big;
-    const maxSeasons = program.segments[0].max_temp;
+    const maxSeasons = program.segments?.[0]?.max_temp || 0;
     const genderNames = program.genders?.map((gender) => gender.name).join(", ");
     return (
         <div className="animate-in fade-in slide-in-from-left-10 duration-1000 mt-25 ml-25">

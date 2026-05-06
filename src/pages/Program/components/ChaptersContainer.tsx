@@ -5,6 +5,7 @@ import ChapterCard from "@/pages/Event/components/ChapterCard";
 
 interface Props {
   slug: string;
+  programKey: string;
   activeSegment: Segment | null;
   activeSeason: number | null;
   setActiveSeason: (season: number) => void;
@@ -12,6 +13,7 @@ interface Props {
 }
 function ChaptersContainer({
   slug,
+  programKey,
   activeSegment,
   activeSeason,
   setActiveSeason,
@@ -29,7 +31,7 @@ function ChaptersContainer({
     chaptersData?.pages?.flatMap((page) => page?.data || []) || [];
 
   useEffect(() => {
-    if (!isLoadingChapters && chapters.length > 0 && onLoaded) {
+    if (!isLoadingChapters && onLoaded) {
       onLoaded();
     }
   }, [isLoadingChapters]);
@@ -64,6 +66,7 @@ function ChaptersContainer({
                 key={`${chapter.key}-${index}`}
                 chapter={chapter}
                 index={index + 1}
+                programKey={programKey}
               />
             ))}
           </div>

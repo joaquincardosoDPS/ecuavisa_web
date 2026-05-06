@@ -7,18 +7,10 @@ interface EventStatusResult {
 
 export function getEventStatus(event: Event): EventStatusResult | null {
   const isLive = !!event.live_associated?.key;
-  if (!event.is_unlocked) return null;
+  if (!event.is_unlocked) return { label: "Próximamente", colorVar: "--foc-primary" };
 
-  const eventDate = new Date(event.gmt0_unlocked?.replace(" ", "T") + "Z");
-  const now = new Date();
+  if (isLive) return { label: "En vivo", colorVar: "--foc-tertiary" }
 
-  if (now < eventDate) {
-    return { label: "Próximamente", colorVar: "--foc-primary" };
-  }
+  return null
 
-  if (isLive) {
-    return { label: "En vivo", colorVar: "--foc-tertiary" };
-  }
-
-  return null;
 }

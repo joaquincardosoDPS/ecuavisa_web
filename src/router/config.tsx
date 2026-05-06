@@ -50,7 +50,7 @@ export const APP_ROUTES: RouteObject[] = [
     ],
   },
   {
-    path: "play/:segment/:season/:chapter",
+    path: "play/:program/:segment/:season/:chapter",
     element: <Lazy><PlayerView /></Lazy>,
   },
   {

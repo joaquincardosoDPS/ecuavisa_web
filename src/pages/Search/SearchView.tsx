@@ -1,22 +1,43 @@
-import { useQuery } from "@tanstack/react-query";
+import { useInfiniteQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import ProgramGrid from "@/components/ProgramCard/ProgramGrid";
 import { useDebounce } from "@/hooks/useDebounce";
 import { catalogService } from "@/services/catalogService";
+
+const SEARCH_LIMIT = 12;
 
 function SearchView() {
 	const [query, setQuery] = useState("");
 	const debouncedQuery = useDebounce(query, 500);
 
 	const {
-		data: searchResults,
+		data,
 		isLoading,
 		isError,
-	} = useQuery({
+		fetchNextPage,
+		hasNextPage,
+		isFetchingNextPage,
+	} = useInfiniteQuery({
 		queryKey: ["search", debouncedQuery],
-		queryFn: () => catalogService.searchPrograms({ search: debouncedQuery }),
-		enabled: debouncedQuery.trim().length > 0,
+		queryFn: ({ pageParam }) =>
+			catalogService.searchPrograms({
+				search: debouncedQuery,
+				limit: SEARCH_LIMIT,
+				page: pageParam,
+			}),
+		initialPageParam: 1,
+		getNextPageParam: (lastPage, _allPages, lastPageParam) => {
+			if (lastPageParam < lastPage.last_page) {
+				return lastPageParam + 1;
+			}
+			return undefined;
+		},
+		enabled:
+			debouncedQuery.trim().length === 0 ||
+			debouncedQuery.trim().length >= 3,
 	});
+
+	const programs = data?.pages.flatMap((page) => page.data) ?? [];
 
 	return (
 		<div className="px-25 pt-16 | xs:max-md:px-7.5 xs:max-md:pt-10">
@@ -29,12 +50,24 @@ function SearchView() {
 			/>
 
 			<ProgramGrid
-				programs={searchResults?.data || []}
+				programs={programs}
 				isLoading={isLoading}
 				isError={isError}
 				loadingText="Buscando..."
 				errorText="Error al buscar"
 			/>
+
+			{hasNextPage && (
+				<div className="flex justify-center my-10">
+					<button
+						onClick={() => fetchNextPage()}
+						disabled={isFetchingNextPage}
+						className="cursor-pointer px-12 py-3 border-2 border-white/30 text-white rounded-full font-bold hover:bg-white hover:text-black transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+					>
+						{isFetchingNextPage ? "Cargando..." : "Ver más"}
+					</button>
+				</div>
+			)}
 		</div>
 	);
 }

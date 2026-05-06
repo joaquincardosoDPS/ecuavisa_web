@@ -1,45 +1,72 @@
 import type { RefObject } from "react";
+import type { Segment } from "@/interfaces/catalog.interface";
+
+type ActiveTab = "related" | "details" | Segment;
 
 interface TabsSingleProps {
-    showDetails: boolean;
-    setShowDetails: (show: boolean) => void;
+    segments: Segment[];
+    activeTab: ActiveTab;
+    setActiveTab: (tab: ActiveTab) => void;
     tabsRef: RefObject<HTMLDivElement | null>;
     scrollToTabs: () => void;
 }
 
 function TabsSingle({
-    showDetails,
-    setShowDetails,
+    segments,
+    activeTab,
+    setActiveTab,
     tabsRef,
     scrollToTabs,
 }: TabsSingleProps) {
+    const tabClass = (isActive: boolean) =>
+        `pb-5 px-2 h-full cursor-pointer border-b-4 -mb-[2px] transition-colors ${
+            isActive
+                ? "border-white text-white"
+                : "border-transparent text-(--clr-secondary-text) hover:text-white hover:border-white"
+        }`;
+
     return (
         <div
             ref={tabsRef}
             className="mx-25 border-b-2 border-white/25 text-xl font-medium mt-10 scroll-mt-[94px]"
         >
             <div className="flex flex-row gap-10">
+                {/* Tabs de segmentos (si existen) */}
+                {segments.map((segment) => {
+                    const isActive =
+                        typeof activeTab === "object" && activeTab.id === segment.id;
+                    return (
+                        <button
+                            key={segment.key}
+                            onClick={() => {
+                                setActiveTab(segment);
+                                scrollToTabs();
+                            }}
+                            className={tabClass(isActive)}
+                        >
+                            {segment.name}
+                        </button>
+                    );
+                })}
+
+                {/* Tab Relacionados */}
                 <button
                     onClick={() => {
-                        setShowDetails(false);
+                        setActiveTab("related");
                         scrollToTabs();
                     }}
-                    className={`pb-5 px-2 h-full cursor-pointer border-b-4 -mb-[2px] transition-colors ${!showDetails
-                        ? "border-white text-white"
-                        : "border-transparent text-(--clr-secondary-text) hover:text-white hover:border-white"
-                        }`}
+                    className={tabClass(activeTab === "related")}
                 >
                     Relacionados
                 </button>
+
+                {/* Tab Detalles */}
                 <button
                     onClick={() => {
-                        setShowDetails(true);
+                        setActiveTab("details");
                         scrollToTabs();
                     }}
-                    className={`pb-5 px-2 h-full cursor-pointer border-b-4 -mb-[2px] transition-colors ${showDetails
-                        ? "border-white text-white"
-                        : "border-transparent text-(--clr-secondary-text) hover:text-white hover:border-white"
-                        }`}
+                    className={tabClass(activeTab === "details")}
                 >
                     Detalles
                 </button>
@@ -49,3 +76,4 @@ function TabsSingle({
 }
 
 export default TabsSingle;
+export type { ActiveTab };

@@ -5,6 +5,7 @@ export interface HistoryItem {
     slug: string;
     title: string;
     key_segment: string;
+    key_program: string;
     description: string;
     season: number;
     chapter: number;
