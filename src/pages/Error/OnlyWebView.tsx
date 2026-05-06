@@ -1,15 +1,18 @@
-function OnlyWebView() {
-  const handlePlayStore = () => {
-    console.log("Ir a Play Store");
-  };
+import { useConfigStore } from "@/features/config/useConfigStore";
+import fallbackLogo from "@/assets/img/logo.svg";
 
-  const handleAppStore = () => {
-    console.log("Ir a App Store");
-  };
+function OnlyWebView() {
+  const config = useConfigStore((s) => s.config);
+  const logo = config?.logo || fallbackLogo;
+  const androidLink = config?.["android-link"];
+  const iosLink = config?.["ios-link"];
 
   return (
     <div className="min-h-screen w-full flex flex-col items-center justify-center bg-(--clr-primary) px-5">
       <div className="w-full max-w-[400px] rounded-xl border border-(--clr-secondary) bg-(--clr-primary) p-8 text-center shadow-lg">
+        {/* Logo */}
+        <img src={logo} alt="Logo" className="mx-auto mb-6 h-16 w-auto" />
+
         <svg
           className="mx-auto mb-5 text-(--clr-icon)"
           width="48"
@@ -30,19 +33,27 @@ function OnlyWebView() {
         </p>
 
         <div className="flex flex-col gap-3">
-          <button
-            onClick={handlePlayStore}
-            className="w-full py-3 px-6 rounded-lg font-semibold text-base cursor-pointer bg-(--foc-primary) text-(--clr-text-primary-button) transition-all duration-200 hover:opacity-90 hover:scale-[1.02] active:scale-[0.98]"
-          >
-            Ir a Play Store
-          </button>
+          {androidLink && (
+            <a
+              href={androidLink}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-full py-3 px-6 rounded-lg font-semibold text-base cursor-pointer bg-(--foc-primary) text-(--clr-text-primary-button) transition-all duration-200 hover:opacity-90 hover:scale-[1.02] active:scale-[0.98] text-center inline-block"
+            >
+              Ir a Play Store
+            </a>
+          )}
 
-          <button
-            onClick={handleAppStore}
-            className="w-full py-3 px-6 rounded-lg font-semibold text-base cursor-pointer bg-(--foc-primary) text-(--clr-text-primary-button) transition-all duration-200 hover:opacity-90 hover:scale-[1.02] active:scale-[0.98]"
-          >
-            Ir a App Store
-          </button>
+          {iosLink && (
+            <a
+              href={iosLink}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-full py-3 px-6 rounded-lg font-semibold text-base cursor-pointer bg-(--foc-primary) text-(--clr-text-primary-button) transition-all duration-200 hover:opacity-90 hover:scale-[1.02] active:scale-[0.98] text-center inline-block"
+            >
+              Ir a App Store
+            </a>
+          )}
         </div>
       </div>
     </div>

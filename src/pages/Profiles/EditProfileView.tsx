@@ -6,11 +6,13 @@ import { profileService } from "@/services/profileService";
 import type { AvatarItem } from "@/interfaces/profile.interface";
 import { FullScreenSpinner } from "@/components/ui/FullScreenSpinner";
 import Modal from "@/components/ui/Modal";
-import logo from "@/assets/img/logo.svg";
+import { useConfigStore } from "@/features/config/useConfigStore";
+import fallbackLogo from "@/assets/img/logo.svg";
 
 function EditProfileView() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const logo = useConfigStore((s) => s.config?.logo) || fallbackLogo;
   const queryClient = useQueryClient();
   const token = useAuthStore((s) => s.token);
   const profiles = queryClient.getQueryData<

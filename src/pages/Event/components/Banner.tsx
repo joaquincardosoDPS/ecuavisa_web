@@ -52,7 +52,7 @@ function Banner({ event }: { event: Event | null }) {
     const eventDate = new Date(event?.gmt0_unlocked?.replace(" ", "T") + "Z");
     const now = new Date();
     const eventStatus = now < eventDate
-        ? "Próximamente"
+        ? `Próximamente · ${eventDate.toLocaleDateString("es-CL", { day: "2-digit", month: "2-digit", year: "numeric" })}, ${eventDate.toLocaleTimeString("es-CL", { hour: "2-digit", minute: "2-digit", hour12: false })}`
         : isLive
             ? "En vivo ahora"
             : null;

@@ -5,11 +5,13 @@ import { useAuthStore } from "@/features/auth/authStore";
 import { profileService } from "@/services/profileService";
 import type { Profile } from "@/interfaces/profile.interface";
 import { FullScreenSpinner } from "@/components/ui/FullScreenSpinner";
-import logo from "@/assets/img/logo.svg";
+import { useConfigStore } from "@/features/config/useConfigStore";
+import fallbackLogo from "@/assets/img/logo.svg";
 import iconEdit from "@/assets/img/icons/iconos-edit.svg";
 
 function ProfilesView() {
   const navigate = useNavigate();
+  const logo = useConfigStore((s) => s.config?.logo) || fallbackLogo;
   const token = useAuthStore((s) => s.token);
   const [isEditing, setIsEditing] = useState(false);
 

@@ -52,6 +52,8 @@ function RudoPlayer({
   const [isPlaying, setIsPlaying] = useState(true);
   const [volume, setVolume] = useState(() => getStoredVolume());
   const [isMuted, setIsMuted] = useState(false);
+  const isPlayingRef = useRef(true);
+  const pauseDetectionRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const iframeSrc = mode === "vod"
     ? `https://rudo.video/vod/${rudoKey}/autostart/true`
@@ -143,20 +145,44 @@ function RudoPlayer({
             currentTimeRef.current,
             durationRef.current,
           );
+
+          // Detectar play/pause por flujo de timeupdate
+          if (!isPlayingRef.current) {
+            // timeupdate llegó → el video está corriendo de nuevo
+            isPlayingRef.current = true;
+            setIsPlaying(true);
+            // Iniciar auto-hide ya que el video volvió a reproducirse
+            resetUIVisibility();
+          }
+          // Resetear timer: si no llega otro timeupdate en 1.5s → pausado
+          if (pauseDetectionRef.current) clearTimeout(pauseDetectionRef.current);
+          pauseDetectionRef.current = setTimeout(() => {
+            isPlayingRef.current = false;
+            setIsPlaying(false);
+            // Mostrar UI al detectar pausa
+            if (hideTimeoutRef.current) clearTimeout(hideTimeoutRef.current);
+            setIsUIVisible(true);
+          }, 1500);
         } else if (data.event === "play") {
           setIsPlaying(true);
+          isPlayingRef.current = true;
         } else if (data.event === "pause") {
           setIsPlaying(false);
+          isPlayingRef.current = false;
+          if (hideTimeoutRef.current) clearTimeout(hideTimeoutRef.current);
+          setIsUIVisible(true);
         } else if (data.event === "durationchange" && typeof data.duration === "number") {
           durationRef.current = data.duration;
           setDuration(data.duration);
-        } else if (
-          data.event === "mousemove" ||
-          data.event === "show-controls"
-        ) {
-          resetUIVisibility();
+        } else if (data.event === "show-controls") {
+          if (hideTimeoutRef.current) clearTimeout(hideTimeoutRef.current);
+          setIsUIVisible(true);
         } else if (data.event === "hide-controls") {
+          if (!isPlayingRef.current) return;
+          if (hideTimeoutRef.current) clearTimeout(hideTimeoutRef.current);
           setIsUIVisible(false);
+        } else if (data.event === "mousemove") {
+          resetUIVisibility();
         }
       } catch {
         // Silently ignore cross-origin messages
@@ -192,10 +218,12 @@ function RudoPlayer({
     return () => clearTimeout(volTimer);
   }, [iframeLoaded, initialSeconds, enviarSeek, enviarVolume, mode]);
 
-  // ---- UI visibility (auto-hide after 3s) ----
+  // ---- UI visibility (auto-hide after 3s, never when paused) ----
   const resetUIVisibility = useCallback(() => {
     setIsUIVisible(true);
     if (hideTimeoutRef.current) clearTimeout(hideTimeoutRef.current);
+    // No auto-hide si el video está pausado
+    if (!isPlayingRef.current) return;
     hideTimeoutRef.current = setTimeout(() => {
       setIsUIVisible(false);
     }, 3000);
@@ -302,6 +330,20 @@ function RudoPlayer({
         onLoad={() => setIframeLoaded(true)}
         style={{ border: "none", overflow: "hidden" }}
       />
+
+      {/* Capa invisible para detectar mouse cuando los controles están ocultos */}
+      {!hideOverlay && (
+        <div
+          onMouseMove={resetUIVisibility}
+          style={{
+            position: "absolute",
+            inset: 0,
+            zIndex: 2,
+            pointerEvents: isUIVisible ? "none" : "auto",
+            cursor: "default",
+          }}
+        />
+      )}
 
       {/* ---- Top Bar Overlay ---- */}
       {!hideOverlay && (

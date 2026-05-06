@@ -18,6 +18,7 @@ const CategoryView = lazy(() => import("@/pages/Category/CategoryView"));
 const MyAccountView = lazy(() => import("@/pages/MyAccount/MyAccountView"));
 const LiveView = lazy(() => import("@/pages/Live/LiveView"));
 const EventView = lazy(() => import("@/pages/Event/EventView"));
+const TVPairView = lazy(() => import("@/pages/TV/TVPairView"));
 const NotFoundView = lazy(() => import("@/pages/Error/NotFoundView"));
 
 const Lazy = ({ children }: { children: React.ReactNode }) => (
@@ -58,6 +59,7 @@ export const APP_ROUTES: RouteObject[] = [
       { path: "cuenta", element: <Lazy><MyAccountView /></Lazy> },
       { path: "perfiles", element: <Lazy><ProfilesView /></Lazy> },
       { path: "perfiles/:id", element: <Lazy><EditProfileView /></Lazy> },
+      { path: "tv", element: <Lazy><TVPairView /></Lazy> },
     ],
   },
 ];

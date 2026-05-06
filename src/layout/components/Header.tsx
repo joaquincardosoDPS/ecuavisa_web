@@ -1,8 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { twMerge } from "tailwind-merge";
-import logo from "@/assets/img/logo.svg";
+import fallbackLogo from "@/assets/img/logo.svg";
 import { useAuthStore } from "@/features/auth/authStore";
+import { useConfigStore } from "@/features/config/useConfigStore";
 import ProfileDropdown from "./ProfileDropdown";
 
 interface Props {
@@ -14,6 +15,7 @@ function Header({ isTransparent }: Props) {
 	const navigate = useNavigate();
 	const [scrollOpacity, setScrollOpacity] = useState(0);
 	const [hidden, setHidden] = useState(false);
+	const logo = useConfigStore((s) => s.config?.logo) || fallbackLogo;
 	const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
 	const activeProfile = useAuthStore((s) => s.activeProfile);
 

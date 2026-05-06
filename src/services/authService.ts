@@ -1,6 +1,5 @@
-import axios from 'axios';
-import qs from 'qs';
-import { RUDO_REGISTER, RUDO_LOGIN, RUDO_SESSION, CLIENT } from '@/config-global';
+import api from './api';
+import { RUDO_REGISTER, RUDO_LOGIN, RUDO_SESSION } from '@/config-global';
 
 interface RegisterParams {
     name: string;
@@ -32,67 +31,37 @@ interface AuthResponse {
 export const authService = {
     /**
      * Registra un nuevo usuario.
-     * POST application/x-www-form-urlencoded
      */
     register: async (params: RegisterParams): Promise<AuthResponse> => {
-        const { data } = await axios.post<AuthResponse>(
-            RUDO_REGISTER,
-            qs.stringify({
-                client: CLIENT,
-                device: 'web',
-                name: params.name,
-                email: params.email,
-                password: params.password,
-            }),
-            {
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                },
-            }
-        );
+        const { data } = await api.post<AuthResponse>(RUDO_REGISTER, {
+            device: 'web',
+            name: params.name,
+            email: params.email,
+            password: params.password,
+        });
         return data;
     },
 
     /**
      * Inicia sesión de un usuario existente.
-     * POST application/x-www-form-urlencoded
      */
     login: async (params: LoginParams): Promise<AuthResponse> => {
-        const { data } = await axios.post<AuthResponse>(
-            RUDO_LOGIN,
-            qs.stringify({
-                client: CLIENT,
-                device: 'web',
-                email: params.email,
-                password: params.password,
-            }),
-            {
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                },
-            }
-        );
+        const { data } = await api.post<AuthResponse>(RUDO_LOGIN, {
+            device: 'web',
+            email: params.email,
+            password: params.password,
+        });
         return data;
     },
 
     /**
      * Valida la sesión activa del usuario.
-     * POST application/x-www-form-urlencoded
      */
     validateSession: async (token: string): Promise<AuthResponse> => {
-        const { data } = await axios.post<AuthResponse>(
-            RUDO_SESSION,
-            qs.stringify({
-                client: CLIENT,
-                device: 'web',
-                token,
-            }),
-            {
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                },
-            }
-        );
+        const { data } = await api.post<AuthResponse>(RUDO_SESSION, {
+            device: 'web',
+            token,
+        });
         return data;
     },
 };

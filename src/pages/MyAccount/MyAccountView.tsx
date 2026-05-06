@@ -1,9 +1,11 @@
 import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "@/features/auth/authStore";
-import logo from "@/assets/img/logo.svg";
+import { useConfigStore } from "@/features/config/useConfigStore";
+import fallbackLogo from "@/assets/img/logo.svg";
 
 function MyAccountView() {
   const navigate = useNavigate();
+  const logo = useConfigStore((s) => s.config?.logo) || fallbackLogo;
   const user = useAuthStore((s) => s.user);
   const activeProfile = useAuthStore((s) => s.activeProfile);
   const logout = useAuthStore((s) => s.logout);

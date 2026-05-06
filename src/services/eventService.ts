@@ -1,7 +1,6 @@
-import { CLIENT, RUDO_EVENT_ALL, RUDO_EVENT_GET } from "@/config-global";
+import api from './api';
+import { RUDO_EVENT_ALL, RUDO_EVENT_GET } from "@/config-global";
 import type { EventResponse, EventsResponse } from "@/interfaces/catalog.interface";
-import axios from "axios";
-import qs from 'qs';
 
 export const eventService = {
     getAll: async (options?: {
@@ -12,31 +11,12 @@ export const eventService = {
         search?: string;
         slug_exclude?: string;
     }): Promise<EventsResponse> => {
-        const { data } = await axios.post<EventsResponse>(
-            `${RUDO_EVENT_ALL}`,
-            qs.stringify({
-                client: CLIENT,
-                ...options
-            }),
-            {
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                }
-            })
-        return data
+        const { data } = await api.post<EventsResponse>(RUDO_EVENT_ALL, { ...options });
+        return data;
     },
+
     getEvent: async (event: string): Promise<EventResponse> => {
-        const { data } = await axios.post<EventResponse>(
-            `${RUDO_EVENT_GET}`,
-            qs.stringify({
-                client: CLIENT,
-                event
-            }),
-            {
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                }
-            })
-        return data
-    }
-}
+        const { data } = await api.post<EventResponse>(RUDO_EVENT_GET, { event });
+        return data;
+    },
+};

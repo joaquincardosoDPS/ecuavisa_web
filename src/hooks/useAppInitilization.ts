@@ -17,8 +17,15 @@ export const useAppInitialization = () => {
 
     useEffect(() => {
         if (query.data?.data) {
+            console.log(query.data.data)
             const configData = query.data.data;
             setConfig(configData);
+
+            // Título del sitio
+            if (configData.name) {
+                document.title = configData.name;
+            }
+
 
             // Injecta variables CSS dinámicamente
             const root = document.documentElement;

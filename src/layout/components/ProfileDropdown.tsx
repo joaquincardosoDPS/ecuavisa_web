@@ -119,6 +119,9 @@ function ProfileDropdown() {
             <DropdownLink onClick={() => navigateTo("/cuenta")}>
               Cuenta
             </DropdownLink>
+            <DropdownLink onClick={() => navigateTo("/tv")}>
+              Vincular TV
+            </DropdownLink>
             <DropdownLink onClick={handleLogout}>Desconectarse</DropdownLink>
           </div>
         </div>

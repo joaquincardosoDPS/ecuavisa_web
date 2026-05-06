@@ -107,17 +107,16 @@ export function usePlayerEpisode() {
         const chapterNum = parseInt(chapter, 10);
 
         // Cargar capítulo actual
-        const response = await catalogService.getChapterBySlug(
+        const response = await catalogService.getChapterBySlug({
           segment,
-          seasonNum,
-          chapterNum,
-        );
+          season: seasonNum,
+          chapter: chapterNum,
+        });
         const chapterData = response?.data;
 
         if (!chapterData?.key) {
           if (!cancelled) {
-            setError("Capítulo no encontrado o sin stream disponible");
-            setLoading(false);
+            navigate("/404", { replace: true });
           }
           return;
         }
@@ -154,11 +153,11 @@ export function usePlayerEpisode() {
 
           // Intentar cargar el siguiente capítulo
           try {
-            const nextRes = await catalogService.getChapterBySlug(
+            const nextRes = await catalogService.getChapterBySlug({
               segment,
-              seasonNum,
-              chapterNum + 1,
-            );
+              season: seasonNum,
+              chapter: chapterNum + 1,
+            });
             if (!cancelled && nextRes?.data?.key) {
               setNextChapter(nextRes.data);
             } else if (!cancelled) {

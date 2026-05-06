@@ -181,6 +181,12 @@ export interface ChaptersResponse {
     data: Chapter[];
 }
 
+export interface ChapterDetailResponse {
+    status: string;
+    code: number;
+    data: Chapter;
+}
+
 
 export interface EPGPictures {
     photo: string;

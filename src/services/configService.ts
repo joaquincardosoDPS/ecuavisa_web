@@ -1,18 +1,8 @@
-import { CLIENT, RUDO_CONFIG } from "@/config-global";
+import api from './api';
 import type { ApiConfigResponse } from "@/interfaces/config.interface";
+import { RUDO_CONFIG } from "@/config-global";
 
 export const fetchAppConfig = async (): Promise<ApiConfigResponse> => {
-    const formData = new URLSearchParams();
-    formData.append('client', CLIENT);
-    const response = await fetch(RUDO_CONFIG, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: formData,
-    });
-    if (!response.ok) {
-        throw new Error('Error al cargar la configuración desde Rudo');
-    }
-    return response.json();
+    const { data } = await api.post<ApiConfigResponse>(RUDO_CONFIG, {});
+    return data;
 };

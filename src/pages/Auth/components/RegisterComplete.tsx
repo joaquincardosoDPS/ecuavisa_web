@@ -1,8 +1,10 @@
 import bgPrograms from "@/assets/img/bgPrograms.png";
-import logo from "@/assets/img/logo.svg";
+import fallbackLogo from "@/assets/img/logo.svg";
 import { Spinner } from "@/components/ui/Spinner";
+import { useConfigStore } from "@/features/config/useConfigStore";
 
 function RegisterComplete() {
+  const logo = useConfigStore((s) => s.config?.logo) || fallbackLogo;
   return (
     <div className="min-h-screen flex relative overflow-hidden bg-(--clr-primary)">
       {/* Fondo a la derecha */}

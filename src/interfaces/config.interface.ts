@@ -36,5 +36,7 @@ export interface AppConfig {
     timezone_name: string;
     "politicas-privacidad": string;
     "terminos-condiciones": string;
+    "android-link"?: string;
+    "ios-link"?: string;
 }
 
