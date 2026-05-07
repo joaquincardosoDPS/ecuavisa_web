@@ -1,4 +1,5 @@
 import type { Chapter } from "@/interfaces/catalog.interface";
+import Button from "@/components/ui/Button";
 
 interface ShrunkBackdropProps {
   chapterImage: string;
@@ -51,26 +52,17 @@ export function ShrunkBackdrop({
           <p className="text-white max-w-[50%]">{nextChapter.description}</p>}
         <div className="flex flex-row gap-5 mt-5">
           {nextChapter && (
-            <button
-              onClick={onPlayNext}
-              className="flex items-center gap-3 py-3.5 px-6 rounded-lg border-none cursor-pointer text-[0.95rem] bg-(--clr-primary-button) text-(--clr-text-primary-button) transition-transform duration-200 ease-out hover:bg-white hover:text-black"
-            >
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M8 5v14l11-7z" />
-              </svg>
-              <span>Siguiente episodio en <span className="inline-block min-w-[2ch] text-center tabular-nums">{remainingSeconds}</span>s</span>
-            </button>
+            <Button variant="primary" showArrow onClick={onPlayNext}>
+              Siguiente episodio en <span className="inline-block min-w-[2ch] text-center tabular-nums">{remainingSeconds}</span>s
+            </Button>
           )}
 
-          <button
-            onClick={onGoToEpisodes}
-            className="flex items-center gap-3 py-3.5 px-6 rounded-lg border border-white cursor-pointer text-[0.95rem] bg-transparent text-white transition-all duration-200 ease-out hover:bg-white hover:text-black"
-          >
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+          <Button variant="tertiary" onClick={onGoToEpisodes}>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" className="mr-2">
               <path d="M4 6h16v2H4zm0 5h16v2H4zm0 5h16v2H4z" />
             </svg>
-            <span>Listado de episodios</span>
-          </button>
+            Listado de episodios
+          </Button>
         </div>
       </div>
     </div>

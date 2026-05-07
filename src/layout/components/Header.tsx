@@ -5,6 +5,7 @@ import fallbackLogo from "@/assets/img/logo.svg";
 import { useAuthStore } from "@/features/auth/authStore";
 import { useConfigStore } from "@/features/config/useConfigStore";
 import ProfileDropdown from "./ProfileDropdown";
+import Button from "@/components/ui/Button";
 
 interface Props {
 	isTransparent: boolean;
@@ -108,12 +109,13 @@ function Header({ isTransparent }: Props) {
 			{isAuthenticated && activeProfile ? (
 				<ProfileDropdown />
 			) : (
-				<button
+				<Button
+					variant="secondary"
 					onClick={() => navigate("/auth/login")}
-					className="bg-(--clr-secondary-button) text-(--clr-text-primary-button) px-6 py-2.5 mt-3.5 rounded-md font-semibold text-sm hover:brightness-110 transition-all duration-200 cursor-pointer uppercase mr-10 xl:mr-25 shrink-0"
+					className="mt-3.5 px-6 py-2.5 text-sm uppercase mr-10 xl:mr-25 shrink-0"
 				>
 					Login
-				</button>
+				</Button>
 			)}
 		</header>
 	);

@@ -8,6 +8,7 @@ import { FullScreenSpinner } from "@/components/ui/FullScreenSpinner";
 import { useConfigStore } from "@/features/config/useConfigStore";
 import fallbackLogo from "@/assets/img/logo.svg";
 import iconEdit from "@/assets/img/icons/iconos-edit.svg";
+import Button from "@/components/ui/Button";
 
 function ProfilesView() {
   const navigate = useNavigate();
@@ -54,13 +55,12 @@ function ProfilesView() {
         <img src={logo} alt="Logo" className="h-14 w-auto" />
       </div>
       <div className="flex justify-end">
-        <button
+        <Button
+          variant="secondary"
           onClick={() => setIsEditing((v) => !v)}
-          className={`py-2 px-6 rounded-md text-white cursor-pointer hover:brightness-110 transition-all duration-200 ${isEditing ? "bg-(--foc-primary)" : "bg-(--clr-secondary)"
-            }`}
         >
           {isEditing ? "Listo" : "Editar Perfiles"}
-        </button>
+        </Button>
       </div>
 
       {/* Titulo */}

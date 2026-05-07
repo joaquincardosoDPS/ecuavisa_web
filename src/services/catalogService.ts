@@ -80,6 +80,7 @@ export const catalogService = {
         season?: number;
         segment?: string;
         page?: number;
+        order_type?: "asc" | "desc";
         no_segments?: boolean;
     }): Promise<ChaptersResponse> => {
         const { data } = await api.post<ChaptersResponse>(RUDO_VOD_CHAPTERS, { ...options });

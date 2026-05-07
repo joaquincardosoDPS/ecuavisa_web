@@ -7,7 +7,7 @@ interface CardProps {
 
 function EventCard({ event }: CardProps) {
     const navigate = useNavigate();
-    const imageSrc = event.image_land.default;
+    const imageSrc = event.image_land.small;
 
     const handleClick = () => {
         navigate(`/eventos/${event.key}`);

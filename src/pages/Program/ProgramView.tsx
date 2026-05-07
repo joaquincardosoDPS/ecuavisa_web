@@ -63,34 +63,37 @@ function ProgramView({ program: programDetail, slug, setIsLoading }: ProgramView
 
 
   return (
-    <div className="min-h-screen w-full relative">
+    <>
       <Banner program={programDetail} />
-      <Tabs
-        program={programDetail}
-        activeSegment={activeSegment}
-        setActiveSegment={setActiveSegment}
-        showDetails={showDetails}
-        setShowDetails={setShowDetails}
-        tabsRef={tabsRef}
-        scrollToTabs={scrollToTabs}
-        requestScroll={requestScroll}
-      />
+      <div className="h-[calc(100vh-20px)]">
+        <Tabs
+          program={programDetail}
+          activeSegment={activeSegment}
+          setActiveSegment={setActiveSegment}
+          showDetails={showDetails}
+          setShowDetails={setShowDetails}
+          tabsRef={tabsRef}
+          scrollToTabs={scrollToTabs}
+          requestScroll={requestScroll}
+        />
 
-      <div className="mx-25 mt-5 2xl:mt-10 mb-10 2xl:mb-20">
-        {showDetails ? (
-          <DetailsProgram programDetail={programDetail} />
-        ) : (
-          <ChaptersContainer
-            slug={slug || ""}
-            programKey={programDetail.key}
-            activeSegment={activeSegment}
-            activeSeason={activeSeason}
-            setActiveSeason={setActiveSeason}
-            onLoaded={handleChaptersLoaded}
-          />
-        )}
+        <div className="mx-25 mt-5 2xl:mt-10 mb-10 2xl:mb-20">
+          {showDetails ? (
+            <DetailsProgram programDetail={programDetail} />
+          ) : (
+            <ChaptersContainer
+              slug={slug || ""}
+              programKey={programDetail.key}
+              activeSegment={activeSegment}
+              activeSeason={activeSeason}
+              setActiveSeason={setActiveSeason}
+              onLoaded={handleChaptersLoaded}
+              showChapter={programDetail.active_number}
+            />
+          )}
+        </div>
       </div>
-    </div>
+    </>
   );
 }
 

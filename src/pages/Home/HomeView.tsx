@@ -6,6 +6,7 @@ import { useHomeData } from "@/hooks/useHomeData";
 import { useImagePreloader } from "@/hooks/useImagePreloader";
 import Banner from "./components/Banner";
 import { useMemo } from "react";
+import { useAppInitialization } from "@/hooks/useAppInitilization";
 
 function HomeView() {
 	const {
@@ -16,6 +17,8 @@ function HomeView() {
 		isLoading,
 		isError,
 	} = useHomeData();
+
+	const { data } = useAppInitialization()
 
 	// Extract critical above-the-fold image URLs for preloading
 	const criticalImages = useMemo(() => {
@@ -54,7 +57,7 @@ function HomeView() {
 		<div className="relative min-h-screen overflow-x-hidden">
 			<Banner slider={slider} />
 
-			<div className="flex flex-col pb-20 gap-5 | xs:max-md:pb-10 xs:max-md:gap-2.5">
+			<div className="flex flex-col pb-20 pt-10 gap-5 | xs:max-md:pb-10 xs:max-md:gap-2.5">
 				{/* Recomendados */}
 				{recommended.length > 0 && (
 					<div
@@ -62,7 +65,7 @@ function HomeView() {
 						style={{ fontFamily: "var(--font-family-category)" }}
 					>
 						<h2 className="text-2xl font-bold text-white line-height-7">
-							Recomendados para ti
+							{data?.data?.nombre_recomendados || "Recomendados para ti"}
 						</h2>
 						<CardCarrousel programs={recommended} />
 					</div>

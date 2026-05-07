@@ -27,7 +27,7 @@ function ProgramSingleView({ program: programDetail, setIsLoading }: ProgramSing
 
     const { data: relatedProgramsData, isLoading: isLoadingRelatedPrograms } = useQuery({
         queryKey: ['relatedPrograms', programDetail.key],
-        queryFn: () => catalogService.searchPrograms({ slug_exclude: programDetail.key, category: programDetail.category?.slug }),
+        queryFn: () => catalogService.searchPrograms({ slug_exclude: programDetail.key, category: programDetail.name_category }),
         enabled: !!programDetail.key,
     });
 

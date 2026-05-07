@@ -2,6 +2,7 @@ import type { Segment } from "@/interfaces/catalog.interface";
 import { useChapters } from "@/hooks/useChapters";
 import { useEffect } from "react";
 import ChapterCard from "@/pages/Event/components/ChapterCard";
+import Button from "@/components/ui/Button";
 
 interface Props {
   slug: string;
@@ -10,6 +11,7 @@ interface Props {
   activeSeason: number | null;
   setActiveSeason: (season: number) => void;
   onLoaded?: () => void;
+  showChapter?: boolean;
 }
 function ChaptersContainer({
   slug,
@@ -18,6 +20,7 @@ function ChaptersContainer({
   activeSeason,
   setActiveSeason,
   onLoaded,
+  showChapter = true,
 }: Props) {
   const {
     chapters: chaptersData,
@@ -67,18 +70,20 @@ function ChaptersContainer({
                 chapter={chapter}
                 index={index + 1}
                 programKey={programKey}
+                showChapter={showChapter}
               />
             ))}
           </div>
           {hasNextPage && (
             <div className="flex justify-center">
-              <button
+              <Button
+                variant="tertiary"
                 onClick={() => fetchNextPage()}
                 disabled={isFetchingNextPage}
-                className="cursor-pointer px-12 py-3 border-2 border-white/30 text-white rounded-full font-bold hover:bg-white hover:text-black transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="rounded-full"
               >
                 {isFetchingNextPage ? "Cargando..." : "Ver más"}
-              </button>
+              </Button>
             </div>
           )}
         </>

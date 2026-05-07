@@ -87,7 +87,7 @@ function CardCarrousel({
               <CardHorizontal key={program.id} program={program} format={format} />
             )
           )}
-          {programs.length === 10 && categorySlug && (
+          {programs.length === 10 && categorySlug && format !== "ranking" && (
             <div
               onClick={() => navigate(`/categoria/${categorySlug}`)}
               className={`flex items-center justify-center shrink-0 overflow-hidden cursor-pointer group transition-all duration-300 hover:z-10 hover:ring-2 hover:ring-(--foc-primary) hover:shadow-[0_0_20px_rgba(255,19,118,0.3)] ${isVertical ? "aspect-2/3 rounded-xl" : "aspect-video rounded-lg"}`}

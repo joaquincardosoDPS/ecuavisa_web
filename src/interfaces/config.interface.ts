@@ -38,5 +38,8 @@ export interface AppConfig {
     "terminos-condiciones": string;
     "android-link"?: string;
     "ios-link"?: string;
+    nombre_recomendados?: string;
+    nombre_slider?: string;
+    "ranking-name"?: string;
 }
 

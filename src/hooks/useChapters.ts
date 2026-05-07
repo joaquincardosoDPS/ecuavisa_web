@@ -9,6 +9,7 @@ export const useChapters = (slug: string, season: number | null, segmentSlug: st
             season: season!,
             segment: segmentSlug!,
             page: pageParam,
+            // order_type: "desc",
         }),
         initialPageParam: 1,
         getNextPageParam: (lastPage, allPages) => {

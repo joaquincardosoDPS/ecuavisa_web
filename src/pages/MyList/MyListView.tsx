@@ -5,6 +5,7 @@ import { FullScreenSpinner } from "@/components/ui/FullScreenSpinner";
 import { useAuthStore } from "@/features/auth/authStore";
 import { favoritesService } from "@/services/favoritesService";
 import EmptyList from "./components/EmptyList";
+import Button from "@/components/ui/Button";
 
 function MyListView() {
 	const navigate = useNavigate();
@@ -37,12 +38,9 @@ function MyListView() {
 					<p className="text-white/60 text-lg">
 						Inicia sesión para ver tu lista de favoritos.
 					</p>
-					<button
-						onClick={() => navigate("/auth/login")}
-						className="bg-(--clr-secondary-button) text-(--clr-text-primary-button) px-6 py-3 rounded-md font-semibold hover:brightness-110 transition-all duration-200 cursor-pointer"
-					>
+					<Button variant="secondary" onClick={() => navigate("/auth/login")}>
 						Iniciar sesión
-					</button>
+					</Button>
 				</div>
 			) : isLoading ? (
 				<FullScreenSpinner />

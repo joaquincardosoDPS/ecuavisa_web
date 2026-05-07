@@ -4,6 +4,7 @@ import { useInfiniteQuery } from "@tanstack/react-query";
 import { catalogService } from "@/services/catalogService";
 import { FullScreenSpinner } from "@/components/ui/FullScreenSpinner";
 import ProgramGrid from "@/components/ProgramCard/ProgramGrid";
+import Button from "@/components/ui/Button";
 
 function CategoryView() {
   const { slug } = useParams<{ slug: string }>();
@@ -24,9 +25,11 @@ function CategoryView() {
         page: pageParam,
       });
 
+      console.log(response.data)
+
       // Extraer nombre de categoría del primer programa si no lo tenemos
       if (!categoryTitle && response.data?.length > 0) {
-        setCategoryTitle(response.data[0].category?.name || slug!);
+        setCategoryTitle(response.data[0].name_category || slug!);
       }
 
       return response;
@@ -71,13 +74,13 @@ function CategoryView() {
 
           {hasNextPage && (
             <div className="flex justify-center py-10">
-              <button
+              <Button
+                variant="secondary"
                 onClick={() => fetchNextPage()}
                 disabled={isFetchingNextPage}
-                className="bg-(--foc-primary) text-white px-8 py-3 rounded-md font-semibold hover:brightness-110 transition-all duration-200 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isFetchingNextPage ? "Cargando..." : "Cargar más"}
-              </button>
+              </Button>
             </div>
           )}
         </>

@@ -53,7 +53,8 @@ export interface Program {
     genders?: Gender[];
     actors?: string;
     skip_view?: boolean;
-    category?: { slug: string, name: string };
+    name_category: string;
+
 }
 
 export interface SliderResponse {

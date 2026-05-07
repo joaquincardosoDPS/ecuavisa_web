@@ -5,9 +5,10 @@ interface ChapterCardProps {
     chapter: Chapter;
     index: number;
     programKey: string;
+    showChapter?: boolean
 }
 
-function ChapterCard({ chapter, index, programKey }: ChapterCardProps) {
+function ChapterCard({ chapter, programKey, showChapter = true }: ChapterCardProps) {
     const navigate = useNavigate();
     const imageSrc = chapter.image_land.default;
 
@@ -28,9 +29,13 @@ function ChapterCard({ chapter, index, programKey }: ChapterCardProps) {
                     loading='lazy'
                 />
             </div>
-            <div className="text-xl text-white">
-                <h1 className="">Capítulo {index}</h1>
-                <h2 className="text-(--clr-text-primary-button) line-clamp-2 2xl:line-clamp-3 text-sm 2xl:text-base">{chapter.title}</h2>
+            <div className="text-lg text-white">
+                {showChapter ?
+                    <>
+                        <h1 className="">Capítulo {chapter.chapter}</h1>
+                        <h2 className="text-(--clr-text-primary-button) line-clamp-2 2xl:line-clamp-3 text-sm 2xl:text-base">{chapter.title}</h2>
+                    </>
+                    : <h1 className="">{chapter.title}</h1>}
             </div>
         </div>
     )

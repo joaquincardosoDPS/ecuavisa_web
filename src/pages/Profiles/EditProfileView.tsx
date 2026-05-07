@@ -8,6 +8,7 @@ import { FullScreenSpinner } from "@/components/ui/FullScreenSpinner";
 import Modal from "@/components/ui/Modal";
 import { useConfigStore } from "@/features/config/useConfigStore";
 import fallbackLogo from "@/assets/img/logo.svg";
+import Button from "@/components/ui/Button";
 
 function EditProfileView() {
   const { id } = useParams<{ id: string }>();
@@ -133,12 +134,12 @@ function EditProfileView() {
         <img src={logo} alt="Logo" className="h-14 w-auto" />
       </div>
       <div className="flex justify-end">
-        <button
+        <Button
+          variant="tertiary"
           onClick={() => navigate(-1)}
-          className="bg-(--clr-secondary) py-2 px-6 rounded-md text-white cursor-pointer hover:brightness-110 transition-all duration-200"
         >
           Volver
-        </button>
+        </Button>
       </div>
 
       <div className="grid grid-cols-4 gap-20">
@@ -164,17 +165,18 @@ function EditProfileView() {
             </p>
           )}
 
-          <button
+          <Button
+            variant="secondary"
             onClick={handleSubmit}
             disabled={isSubmitting}
-            className="bg-(--foc-primary) px-5 py-3 rounded-md text-(--clr-primary-text,#000) w-full uppercase text-sm hover:brightness-110 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
+            className="w-full uppercase text-sm"
           >
             {isSubmitting
               ? "Guardando..."
               : isCreateMode
                 ? "Crear perfil"
                 : "Guardar cambios"}
-          </button>
+          </Button>
 
           {!isCreateMode && !isDefaultProfile && (
             <p
@@ -244,19 +246,21 @@ function EditProfileView() {
             ¿Quieres borrar el perfil de {name || existingProfile?.name_perfil}?
           </p>
           <div className="flex gap-4 w-full mt-2">
-            <button
+            <Button
+              variant="tertiary"
               onClick={() => setShowDeleteModal(false)}
-              className="flex-1 py-3 rounded-md border border-white/20 text-white hover:bg-white/10 transition-all duration-200 cursor-pointer uppercase"
+              className="flex-1 uppercase"
             >
               Cancelar
-            </button>
-            <button
+            </Button>
+            <Button
+              variant="secondary"
               onClick={handleDelete}
               disabled={isDeleting}
-              className="flex-1 py-3 rounded-md bg-(--foc-primary) text-(--clr-primary-text) hover:bg-red-700 transition-all duration-200 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed uppercase"
+              className="flex-1 uppercase"
             >
               {isDeleting ? "Borrando..." : "Borrar"}
-            </button>
+            </Button>
           </div>
         </div>
       </Modal>

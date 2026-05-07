@@ -6,6 +6,7 @@ import { useConfigStore } from "@/features/config/useConfigStore";
 import fallbackLogo from "@/assets/img/logo.svg";
 import iconoOculto from "@/assets/img/icons/iconos-oculto.svg";
 import iconoVisible from "@/assets/img/icons/iconos-visible.svg";
+import Button from "@/components/ui/Button";
 
 type Direction = "next" | "prev";
 
@@ -243,17 +244,18 @@ function LoginView() {
 
         {/* Botones */}
         <div className="flex gap-3 mt-6">
-          <button
+          <Button
+            variant="secondary"
             onClick={goNext}
             disabled={isSubmitting}
-            className="flex-1 py-3 text-base font-bold rounded-md transition-all duration-200 cursor-pointer bg-(--clr-secondary-button) text-(--clr-text-primary-button) border-none hover:brightness-115 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex-1"
           >
             {isSubmitting
               ? "Iniciando sesión..."
               : step < STEPS.length - 1
                 ? "Continuar"
                 : "Iniciar sesión"}
-          </button>
+          </Button>
         </div>
 
         {/* Links */}

@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { catalogService } from "@/services/catalogService";
+import Button from "@/components/ui/Button";
 
 function NotFoundView() {
   const navigate = useNavigate();
@@ -44,17 +45,9 @@ function NotFoundView() {
       </p>
 
       {/* Botón volver al inicio */}
-      <button
-        onClick={() => navigate("/home")}
-        className="mt-8 px-16 py-3 rounded-md text-sm font-semibold tracking-wide
-                   transition-all duration-200 hover:scale-105 hover:brightness-110 cursor-pointer"
-        style={{
-          backgroundColor: "var(--clr-secondary-button)",
-          color: "var(--clr-text-primary-button)",
-        }}
-      >
+      <Button variant="secondary" onClick={() => navigate("/home")} className="mt-8">
         Volver al home
-      </button>
+      </Button>
 
       {/* Recomendados */}
       <div className="w-full max-w-4xl mt-16">

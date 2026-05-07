@@ -17,7 +17,6 @@ export const useAppInitialization = () => {
 
     useEffect(() => {
         if (query.data?.data) {
-            console.log(query.data.data)
             const configData = query.data.data;
             setConfig(configData);
 

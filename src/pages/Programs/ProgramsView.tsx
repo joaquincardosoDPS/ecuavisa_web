@@ -5,9 +5,16 @@ import type { Program } from "@/interfaces/catalog.interface";
 import { useProgramsData } from "@/hooks/useProgramsData";
 import { useImagePreloader } from "@/hooks/useImagePreloader";
 import { FullScreenSpinner } from "@/components/ui/FullScreenSpinner";
+import { useRef } from "react";
 
 function ProgramsView() {
-	const { categories, isLoading } = useProgramsData();
+	const {
+		categories,
+		isLoading,
+		fetchNextPage,
+		hasNextPage,
+		isFetchingNextPage,
+	} = useProgramsData();
 	const activeProgram = useProgramsStore((state) => state.activeProgram);
 	const setActiveProgram = useProgramsStore((state) => state.setActiveProgram);
 
@@ -25,12 +32,12 @@ function ProgramsView() {
 
 	// Carga la imagen de fondo
 	const currentBgImage =
-		activeProgram?.image_slider?.big || activeProgram?.image_background?.big || activeProgram?.image_land?.big || "";
+		activeProgram?.image_slider?.medium || activeProgram?.image_background?.medium || activeProgram?.image_land?.medium || "";
 	const [images, setImages] = useState<{ src: string; loaded: boolean }[]>(
 		currentBgImage ? [{ src: currentBgImage, loaded: true }] : [],
 	);
 
-	const logo = activeProgram?.image_logo?.normal || activeProgram?.image_logo?.default;
+	const logo = activeProgram?.image_logo?.default || activeProgram?.image_logo?.default;
 
 	// Preload initial above-the-fold images before revealing the view
 	const criticalImages = useMemo(() => {
@@ -41,9 +48,9 @@ function ProgramsView() {
 		);
 		if (firstCategory) {
 			const firstProg = firstCategory.programs[0] as Program;
-			const bg = firstProg.image_slider?.big || firstProg.image_land?.big;
+			const bg = firstProg.image_slider?.medium || firstProg.image_land?.medium;
 			if (bg) urls.push(bg);
-			const progLogo = firstProg.image_logo?.normal || firstProg.image_logo?.default;
+			const progLogo = firstProg.image_logo?.default || firstProg.image_logo?.default;
 			if (progLogo) urls.push(progLogo);
 		}
 		return urls;
@@ -60,68 +67,90 @@ function ProgramsView() {
 			if (lastImage && lastImage.src === currentBgImage) {
 				return prev;
 			}
-
 			const lastLoaded = prev.filter((img) => img.loaded).slice(-1);
-			const isAlreadyCached = prev.some(
-				(img) => img.src === currentBgImage && img.loaded,
-			);
 
-			return [...lastLoaded, { src: currentBgImage, loaded: isAlreadyCached }];
+			return [...lastLoaded, { src: currentBgImage, loaded: false }];
 		});
 	}, [currentBgImage]);
+
+	// Infinite scroll observer (Scroll Listener version)
+	useEffect(() => {
+		const handleScroll = () => {
+			if (isLoading || !hasNextPage || isFetchingNextPage) return;
+
+			// Calculamos cuánto falta para el final
+			const scrollHeight = document.documentElement.scrollHeight;
+			const scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
+			const clientHeight = document.documentElement.clientHeight;
+
+			// Si faltan menos de 600px para el final, cargamos la siguiente página
+			if (scrollTop + clientHeight >= scrollHeight - 600) {
+				fetchNextPage();
+			}
+		};
+
+		window.addEventListener("scroll", handleScroll);
+		return () => window.removeEventListener("scroll", handleScroll);
+	}, [isLoading, hasNextPage, isFetchingNextPage, fetchNextPage]);
 
 	if (isLoading || !imagesReady) return <FullScreenSpinner />;
 
 	return (
-		<div className="relative min-h-screen | xs:max-md:pt-5">
-			<div className="fixed top-0 left-0 w-full h-[50vh] z-20 bg-(--clr-primary) overflow-hidden">
-				<div className="absolute inset-0 w-full h-full">
-					{/* Imagen de fondo  */}
-					<div className="relative w-full h-full">
-						{images.map((img) => (
-							<img
-								key={img.src}
-								src={img.src}
-								alt=""
-								onLoad={() => {
-									setImages((prev) =>
-										prev.map((i) =>
-											i.src === img.src ? { ...i, loaded: true } : i,
-										),
-									);
-								}}
-								className={`absolute inset-0 w-full h-full object-cover transition-all duration-200 ease-in-out ${img.loaded ? "opacity-100" : "opacity-0"}`}
-								style={{ backgroundColor: "var(--clr-primary)" }}
-							/>
-						))}
-						<div className="absolute inset-y-0 left-0 w-1/2 bg-linear-to-r from-(--clr-primary) via-(--clr-primary)/40 to-transparent pointer-events-none"></div>
-						<div className="absolute inset-x-0 bottom-0 h-1/2 bg-linear-to-t from-(--clr-primary) via-(--clr-primary)/40 to-transparent pointer-events-none"></div>
-
-						{/* Información del Programa  */}
-						<div className="absolute inset-0 px-12 py-7 2xl:py-12 flex flex-col justify-end gap-5 z-10 pointer-events-none">
+		<>
+			<div className="sticky top-0 h-[60vh] bg-(--clr-primary) z-20">
+				<div className="relative w-full h-full">
+					{images.map((img) => (
+						<div
+							key={img.src}
+							className={`absolute inset-0 -z-10 w-full h-full transition-opacity duration-500 ease-in-out ${img.loaded ? "opacity-100" : "opacity-0"}`}
+							style={{
+								backgroundImage: `url(${img.src})`,
+								backgroundSize: "cover",
+								backgroundPosition: "center",
+								backgroundColor: "var(--clr-primary)",
+							}}
+							ref={(el) => {
+								if (el && !img.loaded) {
+									const preload = new Image();
+									preload.onload = () => {
+										setImages((prev) =>
+											prev.map((i) =>
+												i.src === img.src ? { ...i, loaded: true } : i,
+											),
+										);
+									};
+									preload.src = img.src;
+								}
+							}}
+						/>
+					))}
+					<div className="absolute inset-y-0 left-0 w-1/2 bg-linear-to-r from-(--clr-primary) via-(--clr-primary)/40 to-transparent pointer-events-none"></div>
+					<div className="absolute inset-x-0 bottom-0 h-1/2 bg-linear-to-t from-(--clr-primary) via-(--clr-primary)/40 to-transparent pointer-events-none"></div>
+					<div className="relative h-full px-20 py-7 2xl:py-12 flex flex-col justify-end gap-5 z-10 pointer-events-none">
+						<div className="h-46 flex items-center | xs:max-sm:h-7.5">
 							{logo ? (
 								<img
 									src={logo}
 									alt={activeProgram.title}
-									className="h-30 w-auto mb-4 object-contain drop-shadow-2xl self-start"
+									className="w-auto h-full object-contain"
 								/>
 							) : (
-								<h1 className="text-2xl 2xl:text-5xl font-bold text-white mb-2 2xl:mb-4 drop-shadow-lg">
+								<h1 className="text-4xl  font-title font-bold text-white drop-shadow-2xl">
 									{activeProgram?.title}
 								</h1>
 							)}
-
-							{activeProgram?.description_short && (
-								<p className="text-white/90 text-lg 2xl:text-2xl max-w-4xl drop-shadow-md mb-2 2xl:mb-5">
-									{activeProgram.description_short}
-								</p>
-							)}
 						</div>
+
+						{activeProgram?.description_short && (
+							<p className="text-lg font-text line-clamp-3 drop-shadow-md leading-8 h-[150px] max-w-4xl | xs:max-md:h-auto xs:max-md:leading-8 2xl:text-2xl">
+								{activeProgram.description_short}
+							</p>
+						)}
 					</div>
 				</div>
 			</div>
 
-			<div className="relative z-10 mt-[50vh] pb-20 | xs:max-md:pb-5">
+			<div className="relative z-10 pb-20 | xs:max-md:pb-5">
 				{categories
 					?.filter((category) => category.format === "default")
 					.map((category) => (
@@ -129,8 +158,15 @@ function ProgramsView() {
 							<CarrouselContainer category={category} />
 						</div>
 					))}
+
+				{/* Sentry for infinite scroll */}
+				<div className="h-20 w-full flex items-center justify-center">
+					{isFetchingNextPage && (
+						<div className="w-8 h-8 border-4 border-(--foc-primary) border-t-transparent rounded-full animate-spin"></div>
+					)}
+				</div>
 			</div>
-		</div>
+		</>
 	);
 }
 

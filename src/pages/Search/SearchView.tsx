@@ -3,6 +3,7 @@ import { useState } from "react";
 import ProgramGrid from "@/components/ProgramCard/ProgramGrid";
 import { useDebounce } from "@/hooks/useDebounce";
 import { catalogService } from "@/services/catalogService";
+import Button from "@/components/ui/Button";
 
 const SEARCH_LIMIT = 12;
 
@@ -59,13 +60,14 @@ function SearchView() {
 
 			{hasNextPage && (
 				<div className="flex justify-center my-10">
-					<button
+					<Button
+						variant="tertiary"
 						onClick={() => fetchNextPage()}
 						disabled={isFetchingNextPage}
-						className="cursor-pointer px-12 py-3 border-2 border-white/30 text-white rounded-full font-bold hover:bg-white hover:text-black transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+						className="rounded-full"
 					>
 						{isFetchingNextPage ? "Cargando..." : "Ver más"}
-					</button>
+					</Button>
 				</div>
 			)}
 		</div>

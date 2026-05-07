@@ -22,11 +22,11 @@ const baseClasses =
 
 const variantClasses: Record<ButtonVariant, string> = {
     primary:
-        "bg-[var(--clr-primary-button)] text-[var(--clr-text-primary-button)] hover:bg-white hover:text-black hover:scale-105 hover:shadow-[0_0_20px_4px_var(--clr-primary-button)]",
+        "bg-[var(--clr-primary-button)] text-[var(--clr-text-primary-button)] hover:bg-white hover:text-black hover:shadow-[0_0_20px_4px_var(--clr-primary-button)]",
     secondary:
-        "bg-[var(--clr-secondary-button)] text-[var(--clr-text-secondary-button)] hover:scale-105 hover:shadow-[0_0_20px_0px_#FF1A73]",
+        "bg-[var(--clr-secondary-button)] text-[var(--clr-text-secondary-button)] hover:shadow-[0_0_20px_0px_#FF1A73]",
     tertiary:
-        "bg-transparent text-[var(--clr-text-tertiary-button)] border-[var(--clr-text-tertiary-button)] hover:bg-[var(--clr-text-tertiary-button)] hover:text-black hover:scale-105 hover:shadow-[0_0_20px_4px_var(--clr-text-tertiary-button)]",
+        "bg-transparent text-[var(--clr-text-tertiary-button)] border-[var(--clr-text-tertiary-button)] hover:bg-[var(--clr-text-tertiary-button)] hover:text-black ",
 };
 
 function Button({
