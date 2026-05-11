@@ -1,6 +1,6 @@
 import type { Program, Event } from "@/interfaces/catalog.interface";
 import { useNavigate } from "react-router-dom";
-import RankingIcon from "@/assets/img/icons/iconos-ranking.svg"
+import RankingIcon from "@/assets/img/icons/iconos-ranking.svg";
 import { getEventStatus } from "@/utils/eventStatus";
 
 interface CardVerticalProps {
@@ -22,7 +22,7 @@ function CardVertical({ program, format, index }: CardVerticalProps) {
     : programData?.image_port?.small;
 
   const eventStatus = isEvent && eventData ? getEventStatus(eventData) : null;
-  const showDate = (eventStatus !== null && eventStatus.label === "Próximamente")
+  const showDate = eventStatus !== null && eventStatus.label === "Próximamente";
 
   const handleClick = () => {
     if (isEvent && eventData) {
@@ -47,8 +47,14 @@ function CardVertical({ program, format, index }: CardVerticalProps) {
         {/* Ranking badge */}
         {isRanking && index != null && (
           <div className="absolute top-2 left-0 z-10 w-15 h-15 flex items-center justify-center">
-            <img src={RankingIcon} alt="" className="absolute inset-0 w-full h-full" />
-            <span className="relative text-white font-bold text-lg text-center -mt-3.5">{index + 1}</span>
+            <img
+              src={RankingIcon}
+              alt=""
+              className="absolute inset-0 w-full h-full"
+            />
+            <span className="relative text-white font-bold text-lg text-center -mt-3.5">
+              {index + 1}
+            </span>
           </div>
         )}
 
@@ -64,15 +70,23 @@ function CardVertical({ program, format, index }: CardVerticalProps) {
 
         {showDate && (
           <div className="absolute bottom-0 left-0 right-0 z-10 py-1 px-3 bg-(--foc-primary) backdrop-blur-sm text-[10px] font-semibold uppercase tracking-wide text-(--clr-primary-title) text-center">
-
             {(() => {
-              const d = new Date(eventData!.gmt0_unlocked.replace(" ", "T") + "Z");
-              const date = d.toLocaleDateString("es-CL", { weekday: "short", day: "numeric", month: "long" });
-              const time = d.toLocaleTimeString("es-CL", { hour: "2-digit", minute: "2-digit", hour12: false });
+              const d = new Date(
+                eventData!.gmt0_unlocked.replace(" ", "T") + "Z",
+              );
+              const date = d.toLocaleDateString("es-CL", {
+                weekday: "short",
+                day: "numeric",
+                month: "long",
+              });
+              const time = d.toLocaleTimeString("es-CL", {
+                hour: "2-digit",
+                minute: "2-digit",
+                hour12: false,
+              });
               return `${date}, ${time} hrs`;
             })()}
           </div>
-
         )}
 
         {imageSrc ? (
@@ -90,11 +104,7 @@ function CardVertical({ program, format, index }: CardVerticalProps) {
           </div>
         )}
       </div>
-
-
-
-
-    </div >
+    </div>
   );
 }
 
