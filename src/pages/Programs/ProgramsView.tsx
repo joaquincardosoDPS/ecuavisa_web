@@ -5,7 +5,7 @@ import type { Program } from "@/interfaces/catalog.interface";
 import { useProgramsData } from "@/hooks/useProgramsData";
 import { useImagePreloader } from "@/hooks/useImagePreloader";
 import { FullScreenSpinner } from "@/components/ui/FullScreenSpinner";
-import { useRef } from "react";
+
 
 function ProgramsView() {
 	const {

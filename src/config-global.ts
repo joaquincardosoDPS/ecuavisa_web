@@ -6,29 +6,45 @@ export const RUDO_BASE_USER = 'https://consumers.rudo.video/users'
  * Detección del cliente multi-fuente (orden de prioridad):
  * 1. Query param en la URL principal:  ?client=latina
  * 2. Query param dentro del hash:      #/home?client=latina
- * 3. Sub-carpeta en el pathname:       /web/latina/  → segmento [2]
- * 4. Fallback:                         'chv'
+ * 3. Valor previamente guardado en localStorage
+ * 4. Fallback:                         'dps'
  */
+const LS_CLIENT_KEY = 'app_client';
+const LS_VERSION_KEY = 'app_client_v';
+const LS_CURRENT_VERSION = '2'; // Bump to invalidate stale LS values
+
+// Limpia valores viejos de localStorage cuando cambia la versión
+if (localStorage.getItem(LS_VERSION_KEY) !== LS_CURRENT_VERSION) {
+  localStorage.removeItem(LS_CLIENT_KEY);
+  localStorage.setItem(LS_VERSION_KEY, LS_CURRENT_VERSION);
+}
+
 function resolveClient(): string {
+  let resolved: string | null = null;
+
   // 1. ?client= en la URL real (antes del #)
-  const fromSearch = new URLSearchParams(window.location.search).get('client');
-  if (fromSearch) return fromSearch;
+  resolved = new URLSearchParams(window.location.search).get('client');
+  if (resolved) {
+    localStorage.setItem(LS_CLIENT_KEY, resolved);
+    return resolved;
+  }
 
   // 2. ?client= dentro del hash (después del #)
   const hashParts = window.location.hash.split('?');
   if (hashParts.length > 1) {
-    const fromHash = new URLSearchParams(hashParts[1]).get('client');
-    if (fromHash) return fromHash;
+    resolved = new URLSearchParams(hashParts[1]).get('client');
+    if (resolved) {
+      localStorage.setItem(LS_CLIENT_KEY, resolved);
+      return resolved;
+    }
   }
 
-  // 3. Segmento del pathname solo bajo /web/ (ej. /web/latina/ → 'latina')
-  if (window.location.pathname.startsWith('/web/')) {
-    const pathSegment = window.location.pathname.split('/')[2];
-    if (pathSegment && pathSegment !== '#') return pathSegment;
-  }
+  // 3. Valor guardado en localStorage
+  const fromStorage = localStorage.getItem(LS_CLIENT_KEY);
+  if (fromStorage) return fromStorage;
 
   // 4. Fallback
-  return 'chv';
+  return 'dps';
 }
 
 export const CLIENT = resolveClient();

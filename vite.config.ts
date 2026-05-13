@@ -6,7 +6,7 @@ import { fileURLToPath, URL } from 'node:url'
 
 // https://vite.dev/config/
 export default defineConfig({
-  base: '/chvweb/',
+  base: '/web/',
   plugins: [
     tailwindcss(),
     react(),

@@ -10,7 +10,7 @@ interface ChapterCardProps {
 
 function ChapterCard({ chapter, programKey, showChapter = true }: ChapterCardProps) {
     const navigate = useNavigate();
-    const imageSrc = chapter.image_land.default;
+    const imageSrc = chapter.image_land.small;
 
     const handleClick = () => {
         navigate(`/play/${programKey}/${chapter.key_segment}/${chapter.season}/${chapter.chapter}`);

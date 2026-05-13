@@ -37,7 +37,7 @@ export const APP_ROUTES: RouteObject[] = [
     id: "root",
     element: <MainLayout />,
     children: [
-      { index: true, element: <Navigate to="/home" replace /> },
+      { path: "/", element: <Navigate to="/home" replace /> },
       { path: "home", element: <Lazy><HomeView /></Lazy> },
       { path: "buscar", element: <Lazy><SearchView /></Lazy> },
       { path: "programas", element: <Lazy><ProgramsView /></Lazy> },
