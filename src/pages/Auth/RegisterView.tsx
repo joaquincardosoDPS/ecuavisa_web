@@ -34,10 +34,12 @@ const STEPS = [
 function RegisterView() {
   const navigate = useNavigate();
   const logo = useConfigStore((s) => s.config?.logo) || fallbackLogo;
+  const termsUrl = useConfigStore((s) => s.config?.["terminos-condiciones"]) || "#";
   const [step, setStep] = useState(0);
   const [direction, setDirection] = useState<Direction>("next");
   const [isAnimating, setIsAnimating] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [acceptTerms, setAcceptTerms] = useState(false);
 
   const [formData, setFormData] = useState({
     name: "",
@@ -92,6 +94,10 @@ function RegisterView() {
         setIsAnimating(false);
       }, 350);
     } else {
+      if (!acceptTerms) {
+        setSubmitError("Debes aceptar los términos y condiciones");
+        return;
+      }
       handleSubmit();
     }
   };
@@ -178,14 +184,21 @@ function RegisterView() {
           Paso {step + 1} de {STEPS.length}
         </p>
 
+        {/* Error de registro */}
+        {submitError && (
+          <p className="text-sm text-red-500 mb-2">
+            {submitError}
+          </p>
+        )}
+
         {/* Contenedor de slides */}
         <div className="relative overflow-hidden min-h-[130px]">
           {STEPS.map((s, i) => (
             <div
               key={s.id}
               className={`register-slide ${getSlideClass(i)} ${i === step && !isAnimating
-                  ? "relative"
-                  : "absolute top-0 left-0"
+                ? "relative"
+                : "absolute top-0 left-0"
                 } w-full`}
             >
               {/* Label */}
@@ -213,8 +226,8 @@ function RegisterView() {
                   }
                   onKeyDown={handleKeyDown}
                   className={`w-full text-base outline-none transition-all duration-300 bg-[#102F40] rounded-md px-5 py-4 text-white placeholder:text-white/30 focus:border-(--foc-primary) focus:shadow-[0_0_0_3px_rgba(255,19,118,0.15)] ${errors[s.id]
-                      ? "border-2 border-red-500"
-                      : "border-2 border-white/10"
+                    ? "border-2 border-red-500"
+                    : "border-2 border-white/10"
                     } ${s.id === "password" ? "pr-14" : ""}`}
                   autoComplete={s.type === "password" ? "new-password" : s.id}
                 />
@@ -249,11 +262,28 @@ function RegisterView() {
           ))}
         </div>
 
-        {/* Error de registro */}
-        {submitError && (
-          <p className="text-sm text-red-500 text-center mt-4 mb-2">
-            {submitError}
-          </p>
+        {/* Checkboxes de términos y privacidad (solo en paso password) */}
+        {step === STEPS.length - 1 && (
+          <label className="flex items-start gap-2.5 cursor-pointer group mt-3">
+            <input
+              type="checkbox"
+              checked={acceptTerms}
+              onChange={(e) => setAcceptTerms(e.target.checked)}
+              className="mt-0.5 w-4 h-4 rounded accent-[var(--foc-primary)] cursor-pointer flex-shrink-0"
+            />
+            <span className="text-sm text-white/60 group-hover:text-white/80 transition-colors">
+              Acepto los{" "}
+              <a
+                href={termsUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-(--foc-primary) hover:underline font-medium"
+                onClick={(e) => e.stopPropagation()}
+              >
+                Términos, Condiciones y Políticas de Privacidad
+              </a>
+            </span>
+          </label>
         )}
 
         {/* Botones */}

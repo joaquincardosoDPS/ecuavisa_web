@@ -17,7 +17,6 @@ function InfoBanner({ program }: InfoBannerProps) {
   );
   const { item: continueWatchingItem } = useContinueWatching(program.key);
 
-  console.log(program);
   const handlePlay = () => {
     if (continueWatchingItem) {
       navigate(
@@ -38,7 +37,7 @@ function InfoBanner({ program }: InfoBannerProps) {
   const genderNames = program.genders?.map((gender) => gender.name).join(", ");
   return (
     <div className="animate-in fade-in slide-in-from-left-10 duration-1000 mt-25 ml-25 min-h-[calc(100vh-55vh)] max-h-[calc(100vh-40vh)]">
-      <div className="max-h-40 min-h-20 2xl:h-55 flex items-end">
+      <div className="max-h-40 min-h-20 h-55 flex items-end">
         {logoImg ? (
           <img
             src={logoImg}

@@ -1,6 +1,16 @@
 <IfModule mod_rewrite.c>
   RewriteEngine On
   RewriteBase /web/
+
+  # ── OpenGraph: Intercept social media crawlers ──
+  # When a bot requests any route, serve og.php with the original
+  # path forwarded as a query param. Normal users are unaffected.
+  RewriteCond %{HTTP_USER_AGENT} (facebookexternalhit|Facebot|Twitterbot|LinkedInBot|WhatsApp|Slackbot|TelegramBot|Discordbot|Googlebot|bingbot|Applebot|Pinterest|vkShare|W3C_Validator|OpenGraph|OGP|Iframely|embedly|Datanyze|Screaming.Frog|Semrush|AhrefsBot) [NC]
+  RewriteCond %{REQUEST_URI} !\.(?:js|css|png|jpg|jpeg|gif|svg|ico|woff2?|ttf|map)$ [NC]
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteRule ^(.+)$ og.php?route=$1 [QSA,L]
+
+  # ── SPA fallback: serve index.html for all other routes ──
   RewriteRule ^index\.html$ - [L]
   RewriteCond %{REQUEST_FILENAME} !-f
   RewriteCond %{REQUEST_FILENAME} !-d
