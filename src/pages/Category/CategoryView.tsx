@@ -3,12 +3,14 @@ import { useParams } from "react-router-dom";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { catalogService } from "@/services/catalogService";
 import { FullScreenSpinner } from "@/components/ui/FullScreenSpinner";
+import { useDocumentTitle } from "@/hooks/useDocumentTitle";
 import ProgramGrid from "@/components/ProgramCard/ProgramGrid";
 import Button from "@/components/ui/Button";
 
 function CategoryView() {
   const { slug } = useParams<{ slug: string }>();
   const [categoryTitle, setCategoryTitle] = useState("");
+  useDocumentTitle(categoryTitle || slug);
 
   const {
     data,

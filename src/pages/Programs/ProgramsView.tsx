@@ -4,10 +4,13 @@ import { useProgramsStore } from "@/features/programs/programsStore";
 import type { Program } from "@/interfaces/catalog.interface";
 import { useProgramsData } from "@/hooks/useProgramsData";
 import { useImagePreloader } from "@/hooks/useImagePreloader";
+import { useDocumentTitle } from "@/hooks/useDocumentTitle";
 import { FullScreenSpinner } from "@/components/ui/FullScreenSpinner";
 
 
 function ProgramsView() {
+	useDocumentTitle('Programas');
+
 	const {
 		categories,
 		isLoading,

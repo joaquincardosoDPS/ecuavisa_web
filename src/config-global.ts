@@ -20,37 +20,37 @@ if (localStorage.getItem(LS_VERSION_KEY) !== LS_CURRENT_VERSION) {
 }
 
 function resolveClient(): string {
-  let resolved: string | null = null;
+  // let resolved: string | null = null;
 
-  // 1. ?client= en la URL real (antes del #)
-  resolved = new URLSearchParams(window.location.search).get('client');
-  if (resolved) {
-    localStorage.setItem(LS_CLIENT_KEY, resolved);
-    return resolved;
-  }
+  // // 1. ?client= en la URL real (antes del #)
+  // resolved = new URLSearchParams(window.location.search).get('client');
+  // if (resolved) {
+  //   localStorage.setItem(LS_CLIENT_KEY, resolved);
+  //   return resolved;
+  // }
 
-  // 2. ?client= dentro del hash (después del #)
-  const hashParts = window.location.hash.split('?');
-  if (hashParts.length > 1) {
-    resolved = new URLSearchParams(hashParts[1]).get('client');
-    if (resolved) {
-      localStorage.setItem(LS_CLIENT_KEY, resolved);
-      return resolved;
-    }
-  }
+  // // 2. ?client= dentro del hash (después del #)
+  // const hashParts = window.location.hash.split('?');
+  // if (hashParts.length > 1) {
+  //   resolved = new URLSearchParams(hashParts[1]).get('client');
+  //   if (resolved) {
+  //     localStorage.setItem(LS_CLIENT_KEY, resolved);
+  //     return resolved;
+  //   }
+  // }
 
-  // 3. Valor guardado en localStorage
-  const fromStorage = localStorage.getItem(LS_CLIENT_KEY);
-  if (fromStorage) return fromStorage;
+  // // 3. Valor guardado en localStorage
+  // const fromStorage = localStorage.getItem(LS_CLIENT_KEY);
+  // if (fromStorage) return fromStorage;
 
   // 4. Fallback
-  return 'dps';
+  return 'chv';
 }
 
 export const CLIENT = resolveClient();
 export const BASENAME = import.meta.env.BASE_URL.replace(/\/+$/, '') || '/';
 
-export const ADS_FALLBACK_DOMAIN = 'https://www.chv.cl';
+export const ADS_FALLBACK_DOMAIN = 'https://www.michv.cl';
 
 // Social Login Configuration - These will be loaded from API
 export const GOOGLE_CLIENT_ID = 'https://consumers.rudo.video/users/login_rrss'; // Will be loaded from API configuration  

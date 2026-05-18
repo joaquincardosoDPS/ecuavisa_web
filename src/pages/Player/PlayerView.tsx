@@ -1,8 +1,21 @@
+import { useMemo } from "react";
 import { RudoPlayer } from "@/components/RudoPlayer";
 import { usePlayerEpisode } from "@/hooks/usePlayerEpisode";
+import { useDocumentTitle } from "@/hooks/useDocumentTitle";
+import { useAnalyticsPath } from "@/hooks/useGoogleAnalytics";
 import { PlayerLoading } from "./components/PlayerLoading";
 import { PlayerError } from "./components/PlayerError";
 import { ShrunkBackdrop } from "./components/ShrunkBackdrop";
+
+/** Convierte texto a slug (sin tildes, sin espacios, lowercase). */
+function toSlug(text: string): string {
+  return text
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-zA-Z0-9]+/g, '-')
+    .replace(/^-|-$/g, '')
+    .toLowerCase();
+}
 
 function PlayerView() {
   const {
@@ -24,7 +37,22 @@ function PlayerView() {
     playNext,
     goBack,
     goToEpisodes,
+    programKey,
+    segment,
+    chapterTitle,
   } = usePlayerEpisode();
+
+  useDocumentTitle(episodeTitle);
+
+  // Override del path para GA4: /programas/{programa}/{segmento}/{titulo-video}
+  const analyticsPath = useMemo(() => {
+    if (!programKey || !chapterTitle) return null;
+    const parts = ['/programas', programKey];
+    if (segment) parts.push(segment);
+    parts.push(toSlug(chapterTitle));
+    return parts.join('/');
+  }, [programKey, segment, chapterTitle]);
+  useAnalyticsPath(analyticsPath);
 
   if (loading) {
     return <PlayerLoading chapterImage={chapterImage} />;

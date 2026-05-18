@@ -1,9 +1,12 @@
 import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "@/features/auth/authStore";
 import { useConfigStore } from "@/features/config/useConfigStore";
+import { useDocumentTitle } from "@/hooks/useDocumentTitle";
 import fallbackLogo from "@/assets/img/logo.svg";
 
 function MyAccountView() {
+  useDocumentTitle('Mi Cuenta');
+
   const navigate = useNavigate();
   const logo = useConfigStore((s) => s.config?.logo) || fallbackLogo;
   const user = useAuthStore((s) => s.user);

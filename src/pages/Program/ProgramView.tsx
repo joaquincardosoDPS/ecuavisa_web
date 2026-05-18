@@ -1,5 +1,6 @@
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import type { Program, Segment } from "@/interfaces/catalog.interface";
+import { useAnalyticsPath, sendPageView } from "@/hooks/useGoogleAnalytics";
 import Banner from "./components/Banner";
 import Tabs from "./components/Tabs";
 import DetailsProgram from "./components/DetailsProgram";
@@ -18,6 +19,20 @@ function ProgramView({ program: programDetail, slug, setIsLoading }: ProgramView
   const [showDetails, setShowDetails] = useState(false);
   const tabsRef = useRef<HTMLDivElement>(null);
   const pendingScroll = useRef(false);
+
+  // Override del path para GA4: /programas/{slug}/{segmento}
+  const analyticsPath = useMemo(() => {
+    if (!activeSegment?.key) return `/programas/${slug}`;
+    return `/programas/${slug}/${activeSegment.key}`;
+  }, [slug, activeSegment?.key]);
+  useAnalyticsPath(analyticsPath);
+
+  // Enviar page_view cuando cambia el segmento (la URL no cambia)
+  useEffect(() => {
+    if (activeSegment?.key) {
+      sendPageView(analyticsPath);
+    }
+  }, [analyticsPath, activeSegment?.key]);
 
   const scrollToTabs = useCallback(() => {
     setTimeout(() => {

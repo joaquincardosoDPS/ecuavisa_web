@@ -1,7 +1,8 @@
-import { useState, useRef, useCallback, useEffect } from "react";
+import { useState, useRef, useCallback, useEffect, useMemo } from "react";
 import type { Program, Segment } from "@/interfaces/catalog.interface";
 import { useQuery } from "@tanstack/react-query";
 import { catalogService } from "@/services/catalogService";
+import { useAnalyticsPath, sendPageView } from "@/hooks/useGoogleAnalytics";
 import Banner from "./components/Banner";
 import DetailsProgram from "./components/DetailsProgram";
 import TabsSingle from "./components/TabsSingle";
@@ -36,7 +37,7 @@ function ProgramSingleView({ program: programDetail, setIsLoading }: ProgramSing
     const segments = programDetail.segments ?? [];
     const hasSegments = segments.length > 0;
 
-    // Active tab: segment object, "related", or "details"
+    // Tab activo: objeto de segmento, "related" o "details"
     const [activeTab, setActiveTab] = useState<ActiveTab>(
         hasSegments ? segments[0] : "related"
     );
@@ -46,6 +47,21 @@ function ProgramSingleView({ program: programDetail, setIsLoading }: ProgramSing
 
     const tabsRef = useRef<HTMLDivElement>(null);
     const pendingScroll = useRef(false);
+
+    // Override del path para GA4
+    const analyticsPath = useMemo(() => {
+        const basePath = `/programas/${programDetail.key}`;
+        if (typeof activeTab === 'object' && activeTab.key) {
+            return `${basePath}/${activeTab.key}`;
+        }
+        return basePath;
+    }, [programDetail.key, activeTab]);
+    useAnalyticsPath(analyticsPath);
+
+    // Enviar page_view cuando cambia el tab/segmento (la URL no cambia)
+    useEffect(() => {
+        sendPageView(analyticsPath);
+    }, [analyticsPath]);
 
     const scrollToTabs = useCallback(() => {
         setTimeout(() => {
@@ -64,21 +80,21 @@ function ProgramSingleView({ program: programDetail, setIsLoading }: ProgramSing
         }
     }, [scrollToTabs]);
 
-    // Reset season when switching segment tabs
+    // Resetear temporada al cambiar de segmento
     useEffect(() => {
         if (typeof activeTab === "object" && activeTab.all_temp?.length > 0) {
             setActiveSeason(activeTab.all_temp[0]);
         }
     }, [activeTab]);
 
-    // Signal parent that this view is ready when all data loads
+    // Notificar al padre que la vista está lista
     useEffect(() => {
         if (!isLoadingChapters && !isLoadingRelatedPrograms) {
             setIsLoading(false);
         }
     }, [isLoadingChapters, isLoadingRelatedPrograms, setIsLoading]);
 
-    // Determine the active segment for ChaptersContainer
+    // Segmento activo para ChaptersContainer
     const activeSegment: Segment | null =
         typeof activeTab === "object" ? activeTab : null;
 

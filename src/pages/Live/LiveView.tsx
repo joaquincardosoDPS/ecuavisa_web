@@ -1,12 +1,15 @@
 import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { useLiveData } from "@/hooks/useLiveData";
+import { useDocumentTitle } from "@/hooks/useDocumentTitle";
 import { FullScreenSpinner } from "@/components/ui/FullScreenSpinner";
 import EPGGrid from "./components/EPGGrid";
 import LivePlayerSection from "./components/LivePlayerSection";
 import LiveSignalInfo from "./components/LiveSignalInfo";
 
 function LiveView() {
+  useDocumentTitle('En Vivo');
+
   const { epg, playlistPremium, isLoading } = useLiveData();
   const location = useLocation();
 

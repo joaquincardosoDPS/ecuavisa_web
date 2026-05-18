@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useEvent } from "@/hooks/useEvent";
+import { useDocumentTitle } from "@/hooks/useDocumentTitle";
 import Banner from "./components/Banner";
 import type { TabKey } from "./components/Tabs";
 import Tabs from "./components/Tabs";
@@ -11,6 +12,7 @@ import DetailEvent from "./components/DetailEvent";
 function EventView() {
     const { slug } = useParams<{ slug: string }>();
     const { event, events, isLoading } = useEvent(slug);
+    useDocumentTitle(event?.title || slug);
     const [activeTab, setActiveTab] = useState<TabKey>("relacionados");
 
     useEffect(() => {

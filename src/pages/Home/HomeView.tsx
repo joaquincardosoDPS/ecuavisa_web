@@ -4,11 +4,14 @@ import ContinueWatchingCarousel from "@/pages/Home/components/ContinueWatchingCa
 import { FullScreenSpinner } from "@/components/ui/FullScreenSpinner";
 import { useHomeData } from "@/hooks/useHomeData";
 import { useImagePreloader } from "@/hooks/useImagePreloader";
+import { useDocumentTitle } from "@/hooks/useDocumentTitle";
 import Banner from "./components/Banner";
 import { useMemo } from "react";
 import { useAppInitialization } from "@/hooks/useAppInitilization";
 
 function HomeView() {
+	useDocumentTitle('Home');
+
 	const {
 		slider,
 		categories,

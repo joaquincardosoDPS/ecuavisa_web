@@ -2,12 +2,15 @@ import { useInfiniteQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import ProgramGrid from "@/components/ProgramCard/ProgramGrid";
 import { useDebounce } from "@/hooks/useDebounce";
+import { useDocumentTitle } from "@/hooks/useDocumentTitle";
 import { catalogService } from "@/services/catalogService";
 import Button from "@/components/ui/Button";
 
 const SEARCH_LIMIT = 12;
 
 function SearchView() {
+	useDocumentTitle('Buscador');
+
 	const [query, setQuery] = useState("");
 	const debouncedQuery = useDebounce(query, 500);
 

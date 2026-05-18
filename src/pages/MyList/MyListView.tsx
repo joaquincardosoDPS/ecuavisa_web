@@ -3,11 +3,14 @@ import { useNavigate } from "react-router-dom";
 import ProgramGrid from "@/components/ProgramCard/ProgramGrid";
 import { FullScreenSpinner } from "@/components/ui/FullScreenSpinner";
 import { useAuthStore } from "@/features/auth/authStore";
+import { useDocumentTitle } from "@/hooks/useDocumentTitle";
 import { favoritesService } from "@/services/favoritesService";
 import EmptyList from "./components/EmptyList";
 import Button from "@/components/ui/Button";
 
 function MyListView() {
+	useDocumentTitle('Mi Lista');
+
 	const navigate = useNavigate();
 	const token = useAuthStore((s) => s.token);
 	const activeProfile = useAuthStore((s) => s.activeProfile);

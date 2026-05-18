@@ -1,6 +1,7 @@
 import { Navigate, type RouteObject } from "react-router-dom";
 import { lazy, Suspense } from "react";
 import MainLayout from "@/layout/MainLayout";
+import { AnalyticsWrapper } from "@/layout/AnalyticsWrapper";
 import ProtectedRoute from "@/router/ProtectedRoute";
 import { FullScreenSpinner } from "@/components/ui/FullScreenSpinner";
 
@@ -27,39 +28,45 @@ const Lazy = ({ children }: { children: React.ReactNode }) => (
 
 export const APP_ROUTES: RouteObject[] = [
   {
-    path: "auth",
+    // Layout raíz para tracking de analytics en todas las rutas
+    element: <AnalyticsWrapper />,
     children: [
-      { path: "login", element: <Lazy><LoginView /></Lazy> },
-      { path: "registro", element: <Lazy><RegisterView /></Lazy> },
-    ],
-  },
-  {
-    id: "root",
-    element: <MainLayout />,
-    children: [
-      { path: "/", element: <Navigate to="/home" replace /> },
-      { path: "home", element: <Lazy><HomeView /></Lazy> },
-      { path: "buscar", element: <Lazy><SearchView /></Lazy> },
-      { path: "programas", element: <Lazy><ProgramsView /></Lazy> },
-      { path: "programas/:slug", element: <Lazy><ProgramPage /></Lazy> },
-      { path: "categoria/:slug", element: <Lazy><CategoryView /></Lazy> },
-      { path: "eventos/:slug", element: <Lazy><EventView /></Lazy> },
-      { path: "en-vivo", element: <Lazy><LiveView /></Lazy> },
-      { path: "mi-lista", element: <Lazy><MyListView /></Lazy> },
-      { path: "*", element: <Lazy><NotFoundView /></Lazy> },
-    ],
-  },
-  {
-    path: "play/:program/:segment/:season/:chapter",
-    element: <Lazy><PlayerView /></Lazy>,
-  },
-  {
-    element: <ProtectedRoute />,
-    children: [
-      { path: "cuenta", element: <Lazy><MyAccountView /></Lazy> },
-      { path: "perfiles", element: <Lazy><ProfilesView /></Lazy> },
-      { path: "perfiles/:id", element: <Lazy><EditProfileView /></Lazy> },
-      { path: "tv", element: <Lazy><TVPairView /></Lazy> },
+      {
+        path: "auth",
+        children: [
+          { path: "login", element: <Lazy><LoginView /></Lazy> },
+          { path: "registro", element: <Lazy><RegisterView /></Lazy> },
+        ],
+      },
+      {
+        id: "root",
+        element: <MainLayout />,
+        children: [
+          { path: "/", element: <Navigate to="/home" replace /> },
+          { path: "home", element: <Lazy><HomeView /></Lazy> },
+          { path: "buscar", element: <Lazy><SearchView /></Lazy> },
+          { path: "programas", element: <Lazy><ProgramsView /></Lazy> },
+          { path: "programas/:slug", element: <Lazy><ProgramPage /></Lazy> },
+          { path: "categoria/:slug", element: <Lazy><CategoryView /></Lazy> },
+          { path: "eventos/:slug", element: <Lazy><EventView /></Lazy> },
+          { path: "en-vivo", element: <Lazy><LiveView /></Lazy> },
+          { path: "mi-lista", element: <Lazy><MyListView /></Lazy> },
+          { path: "*", element: <Lazy><NotFoundView /></Lazy> },
+        ],
+      },
+      {
+        path: "play/:program/:segment/:season/:chapter",
+        element: <Lazy><PlayerView /></Lazy>,
+      },
+      {
+        element: <ProtectedRoute />,
+        children: [
+          { path: "cuenta", element: <Lazy><MyAccountView /></Lazy> },
+          { path: "perfiles", element: <Lazy><ProfilesView /></Lazy> },
+          { path: "perfiles/:id", element: <Lazy><EditProfileView /></Lazy> },
+          { path: "tv", element: <Lazy><TVPairView /></Lazy> },
+        ],
+      },
     ],
   },
 ];

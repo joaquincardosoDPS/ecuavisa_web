@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { fetchAppConfig } from '../services/configService';
 import { useConfigStore } from '../features/config/useConfigStore';
 import { useAuthStore } from '../features/auth/authStore';
+import { initGtag } from './useGoogleAnalytics';
 import { useEffect, useRef } from 'react';
 
 export const useAppInitialization = () => {
@@ -39,6 +40,11 @@ export const useAppInitialization = () => {
                     root.style.setProperty(`--${key}`, value as string);
                 }
             });
+
+            // Inicializar Google Analytics si el cliente tiene google_id configurado
+            if (configData.google_id) {
+                initGtag(configData.google_id);
+            }
 
             // Validar sesión una vez al cargar la app
             if (!sessionChecked.current) {

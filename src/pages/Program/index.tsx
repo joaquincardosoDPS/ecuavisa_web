@@ -1,5 +1,6 @@
 import { FullScreenSpinner } from "@/components/ui/FullScreenSpinner";
 import { useProgramDetail } from "@/hooks/useProgramDetail";
+import { useDocumentTitle } from "@/hooks/useDocumentTitle";
 import { useParams } from "react-router-dom";
 import ProgramSingleView from "./ProgramSingleView";
 import ProgramView from "./ProgramView";
@@ -13,6 +14,8 @@ function ProgramPage() {
         isLoading: isLoadingProgramDetail,
         isError,
     } = useProgramDetail(slug || "");
+
+    useDocumentTitle(programDetail?.title);
 
     const showSpinner = isLoadingProgramDetail || isChildLoading;
 

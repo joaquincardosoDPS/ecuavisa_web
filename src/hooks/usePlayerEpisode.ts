@@ -27,12 +27,13 @@ export function usePlayerEpisode() {
   const [vodSlug, setVodSlug] = useState("");
   const [chapterImage, setChapterImage] = useState("");
   const [programKey, setProgramKey] = useState("");
+  const [chapterTitle, setChapterTitle] = useState("");
   const [initialSeconds, setInitialSeconds] = useState<number | undefined>(
     undefined,
   );
   const [nextChapter, setNextChapter] = useState<Chapter | null>(null);
 
-  // Shrink state
+  // Estado de minimización
   const [isShrunk, setIsShrunk] = useState(false);
   const [remainingSeconds, setRemainingSeconds] = useState(SHRINK_THRESHOLD_SECONDS);
   const isShrunkRef = useRef(false);
@@ -40,7 +41,7 @@ export function usePlayerEpisode() {
   const autoPlayCancelledRef = useRef(false);
   const nextChapterRef = useRef<Chapter | null>(null);
 
-  // Keep ref in sync with state
+  // Mantener ref sincronizado con el estado
   nextChapterRef.current = nextChapter;
 
   const handleTimeUpdate = (currentTime: number, duration: number) => {
@@ -148,6 +149,7 @@ export function usePlayerEpisode() {
           setVodSlug(chapterData.slug);
           setChapterImage(chapterData.image_land?.big || "");
           setProgramKey(chapterData.key_program || "");
+          setChapterTitle(chapterData.title || "");
 
           let resolvedInitialSeconds: number | undefined;
           if (token && activeProfile) {
@@ -166,7 +168,7 @@ export function usePlayerEpisode() {
                 resolvedInitialSeconds = timelineItem.time;
               }
             } catch {
-              // Timeline not available, start from beginning
+              // Timeline no disponible, iniciar desde el principio
             }
           }
           setInitialSeconds(resolvedInitialSeconds);
@@ -209,7 +211,7 @@ export function usePlayerEpisode() {
     };
   }, [segment, season, chapter, token, activeProfile]);
 
-  // Reset state on episode change
+  // Resetear estado al cambiar de episodio
   useEffect(() => {
     setIsShrunk(false);
     isShrunkRef.current = false;
@@ -221,7 +223,7 @@ export function usePlayerEpisode() {
   }, [segment, season, chapter]);
 
 
-  // Always prevent scroll on the player page
+  // Prevenir scroll en la página del player
   useEffect(() => {
     document.body.style.overflow = "hidden";
     document.documentElement.style.overflow = "hidden";
@@ -232,7 +234,7 @@ export function usePlayerEpisode() {
   }, []);
 
   return {
-    // Data
+    // Datos
     loading,
     error,
     currentKey,
@@ -244,20 +246,21 @@ export function usePlayerEpisode() {
     nextChapter,
     segment,
 
-    // Shrink
+    // Minimización
     isShrunk,
     remainingSeconds,
     expandPlayer,
     handleTimeUpdate,
 
-    // Auth (pass-through for RudoPlayer)
+    // Autenticación
     token,
     activeProfile,
 
-    // Navigation
+    // Navegación
     playNext,
     goBack,
     goToEpisodes,
     programKey,
+    chapterTitle,
   };
 }

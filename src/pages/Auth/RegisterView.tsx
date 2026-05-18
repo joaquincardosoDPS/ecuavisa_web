@@ -4,6 +4,7 @@ import { authService } from "@/services/authService";
 import { useAuthStore } from "@/features/auth/authStore";
 import RegisterComplete from "./components/RegisterComplete";
 import { useConfigStore } from "@/features/config/useConfigStore";
+import { useDocumentTitle } from "@/hooks/useDocumentTitle";
 import fallbackLogo from "@/assets/img/logo.svg";
 import iconoOculto from "@/assets/img/icons/iconos-oculto.svg";
 import iconoVisible from "@/assets/img/icons/iconos-visible.svg";
@@ -32,6 +33,8 @@ const STEPS = [
 ] as const;
 
 function RegisterView() {
+  useDocumentTitle('Registro');
+
   const navigate = useNavigate();
   const logo = useConfigStore((s) => s.config?.logo) || fallbackLogo;
   const termsUrl = useConfigStore((s) => s.config?.["terminos-condiciones"]) || "#";
