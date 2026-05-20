@@ -110,7 +110,7 @@ export const RUDO_VOD_TIME = `https://consumers.rudo.video/history/add` // Permi
 export const RUDO_SESSION = `https://consumers.rudo.video/users/session` // Permite ver la información de la sessión
 
 // Configuración ----
-export const RUDO_CONFIG = `https://consumers.rudo.video/config/all2` // Permite modificar la configuración de la app - config all
+export const RUDO_CONFIG = `https://consumers.rudo.video/config/all` // Permite modificar la configuración de la app - config all
 
 // Registro
 export const RUDO_REGISTER = `https://consumers.rudo.video/users/register` // Permite registrar un nuevo usuario - register
