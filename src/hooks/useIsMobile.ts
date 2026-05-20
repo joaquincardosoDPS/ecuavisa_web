@@ -1,16 +1,26 @@
+import { useState, useEffect } from "react";
+
 /**
- * Hook que detecta si el usuario está accediendo desde un dispositivo móvil.
- * Combina la detección por User-Agent y por ancho de pantalla (< 768px).
- * Escucha cambios de tamaño de ventana para reaccionar en tiempo real.
+ * Hook que detecta si el usuario está accediendo desde un dispositivo móvil o tablet.
+ * Utiliza User-Agent y capacidades táctiles para evitar bloquear navegadores de escritorio reducidos.
  */
 export function useIsMobile(): boolean {
-  const mobileRegex =
-    /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i;
+  const [isMobile, setIsMobile] = useState(false);
 
-  const isUserAgentMobile = mobileRegex.test(navigator.userAgent);
+  useEffect(() => {
+    const mobileRegex =
+      /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i;
+    const isUserAgentMobile = mobileRegex.test(navigator.userAgent);
 
-  // Considerar tablets en modo portrait como dispositivo no soportado
-  const isSmallScreen = window.innerWidth < 1024;
+    // Los iPads en iOS 13+ se identifican como "Macintosh" por defecto, 
+    // pero podemos detectarlos verificando si soportan toques (touch points).
+    const isIPadOS =
+      navigator.userAgent.includes("Mac") &&
+      "maxTouchPoints" in navigator &&
+      navigator.maxTouchPoints > 2;
 
-  return isUserAgentMobile || isSmallScreen;
+    setIsMobile(isUserAgentMobile || isIPadOS);
+  }, []);
+
+  return isMobile;
 }

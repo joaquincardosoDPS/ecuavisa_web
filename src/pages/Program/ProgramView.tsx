@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from "react";
-import type { Program, Segment } from "@/interfaces/catalog.interface";
-import { useAnalyticsPath, sendPageView } from "@/hooks/useGoogleAnalytics";
+import type { Program, Segment, Chapter } from "@/interfaces/catalog.interface";
+import { useAnalytics } from "@/layout/AnalyticsWrapper";
 import Banner from "./components/Banner";
 import Tabs from "./components/Tabs";
 import DetailsProgram from "./components/DetailsProgram";
@@ -17,22 +17,22 @@ function ProgramView({ program: programDetail, slug, setIsLoading }: ProgramView
   const [activeSegment, setActiveSegment] = useState<Segment | null>(null);
   const [activeSeason, setActiveSeason] = useState<number | null>(null);
   const [showDetails, setShowDetails] = useState(false);
+  const [firstChapter, setFirstChapter] = useState<Chapter | null>(null);
   const tabsRef = useRef<HTMLDivElement>(null);
   const pendingScroll = useRef(false);
+
+  const { trackPage } = useAnalytics();
 
   // Override del path para GA4: /programas/{slug}/{segmento}
   const analyticsPath = useMemo(() => {
     if (!activeSegment?.key) return `/programas/${slug}`;
     return `/programas/${slug}/${activeSegment.key}`;
   }, [slug, activeSegment?.key]);
-  useAnalyticsPath(analyticsPath);
 
   // Enviar page_view cuando cambia el segmento (la URL no cambia)
   useEffect(() => {
-    if (activeSegment?.key) {
-      sendPageView(analyticsPath);
-    }
-  }, [analyticsPath, activeSegment?.key]);
+    trackPage(analyticsPath);
+  }, [analyticsPath, trackPage]);
 
   const scrollToTabs = useCallback(() => {
     setTimeout(() => {
@@ -79,7 +79,7 @@ function ProgramView({ program: programDetail, slug, setIsLoading }: ProgramView
 
   return (
     <>
-      <Banner program={programDetail} />
+      <Banner program={programDetail} firstChapter={firstChapter} />
       <div className="h-[calc(100vh-20px)]">
         <Tabs
           program={programDetail}
@@ -103,6 +103,7 @@ function ProgramView({ program: programDetail, slug, setIsLoading }: ProgramView
               activeSeason={activeSeason}
               setActiveSeason={setActiveSeason}
               onLoaded={handleChaptersLoaded}
+              onFirstChapter={setFirstChapter}
               showChapter={programDetail.active_number}
             />
           )}

@@ -85,6 +85,7 @@ export interface CategoriesResponse {
     total_display_records: number;
     last_page: number;
     data: Category[];
+    msj?: string;
 }
 
 // Live Signals Interfaces

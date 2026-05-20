@@ -114,7 +114,7 @@ function Header({ isTransparent }: Props) {
 					onClick={() => navigate("/auth/login")}
 					className="mt-3.5 px-6 py-2.5 text-sm uppercase mr-10 xl:mr-25 shrink-0"
 				>
-					Login
+					Iniciar Sesión
 				</Button>
 			)}
 		</header>

@@ -41,9 +41,10 @@ export const useAppInitialization = () => {
                 }
             });
 
-            // Inicializar Google Analytics si el cliente tiene google_id configurado
-            if (configData.google_id) {
-                initGtag(configData.google_id);
+            // Inicializar Google Analytics si el cliente tiene key-analytics configurado
+            const analyticsKey = configData["key-analytics"];
+            if (analyticsKey) {
+                initGtag(analyticsKey);
             }
 
             // Validar sesión una vez al cargar la app

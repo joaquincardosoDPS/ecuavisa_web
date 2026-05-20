@@ -149,13 +149,13 @@ function LoginView() {
   return (
     <div className="min-h-screen flex items-center justify-center relative overflow-hidden bg-(--clr-primary)">
       {/* Card central */}
-      <div className="relative z-10 w-full max-w-md mx-4 backdrop-blur-2xl px-10 py-12">
+      <div className="relative z-10 w-full max-w-md mx-4 backdrop-blur-2xl px-5 py-8 sm:px-10 sm:py-12">
         {/* Logo */}
-        <div className="flex justify-center mb-8">
+        <div className="flex justify-center mb-5 sm:mb-8">
           <img
             src={logo}
             alt="Logo"
-            className="h-28 w-auto cursor-pointer"
+            className="h-16 sm:h-28 w-auto cursor-pointer"
             onClick={() => navigate("/home")}
           />
         </div>
@@ -266,7 +266,7 @@ function LoginView() {
           ¿No tienes cuenta?{" "}
           <span
             className="cursor-pointer font-semibold text-(--foc-primary) hover:underline transition-colors duration-200"
-            onClick={() => navigate("/auth/registro")}
+            onClick={() => navigate("/auth/registro", { state: { from: (location.state as { from?: string })?.from } })}
           >
             Regístrate
           </span>

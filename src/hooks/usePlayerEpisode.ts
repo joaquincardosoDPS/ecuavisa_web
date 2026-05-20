@@ -28,6 +28,8 @@ export function usePlayerEpisode() {
   const [chapterImage, setChapterImage] = useState("");
   const [programKey, setProgramKey] = useState("");
   const [chapterTitle, setChapterTitle] = useState("");
+  const [chapterNumber, setChapterNumber] = useState<number | null>(null);
+  const [seasonNumber, setSeasonNumber] = useState<number | null>(null);
   const [initialSeconds, setInitialSeconds] = useState<number | undefined>(
     undefined,
   );
@@ -150,6 +152,8 @@ export function usePlayerEpisode() {
           setChapterImage(chapterData.image_land?.big || "");
           setProgramKey(chapterData.key_program || "");
           setChapterTitle(chapterData.title || "");
+          setChapterNumber(chapterData.chapter ?? null);
+          setSeasonNumber(chapterData.season ?? null);
 
           let resolvedInitialSeconds: number | undefined;
           if (token && activeProfile) {
@@ -262,5 +266,7 @@ export function usePlayerEpisode() {
     goToEpisodes,
     programKey,
     chapterTitle,
+    chapterNumber,
+    seasonNumber,
   };
 }

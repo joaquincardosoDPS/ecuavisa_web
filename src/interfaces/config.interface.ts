@@ -41,5 +41,7 @@ export interface AppConfig {
     nombre_recomendados?: string;
     nombre_slider?: string;
     "ranking-name"?: string;
+    "key-analytics"?: string | null;
+    "splash-video-tv"?: string | null;
 }
 

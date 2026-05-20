@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import InfoBanner from "./InfoBanner";
 import InfoBannerSingle from "./InfoBannerSingle";
 
-function Banner({ program, isSingle = false, chapter }: { program: Program, isSingle?: boolean, chapter?: Chapter }) {
+function Banner({ program, isSingle = false, chapter, firstChapter }: { program: Program, isSingle?: boolean, chapter?: Chapter, firstChapter?: Chapter | null }) {
 
   const [scrollOpacity, setScrollOpacity] = useState(0);
 
@@ -21,9 +21,9 @@ function Banner({ program, isSingle = false, chapter }: { program: Program, isSi
   }, []);
 
   const bgImg =
-    program?.image_slider?.big ||
     program?.image_background?.big ||
-    program?.image_land?.big;
+    program?.image_land?.big ||
+    program?.image_slider?.big;
 
   return (
     <>
@@ -49,7 +49,7 @@ function Banner({ program, isSingle = false, chapter }: { program: Program, isSi
       </div>
       {/* Info del programa */}
       {!isSingle ? (
-        <InfoBanner program={program} />
+        <InfoBanner program={program} firstChapter={firstChapter} />
 
       ) : (
         <InfoBannerSingle program={program} chapter={chapter} />

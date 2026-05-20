@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { authService } from "@/services/authService";
 import { useAuthStore } from "@/features/auth/authStore";
 import RegisterComplete from "./components/RegisterComplete";
@@ -36,6 +36,8 @@ function RegisterView() {
   useDocumentTitle('Registro');
 
   const navigate = useNavigate();
+  const location = useLocation();
+  const from = (location.state as { from?: string })?.from || "/perfiles";
   const logo = useConfigStore((s) => s.config?.logo) || fallbackLogo;
   const termsUrl = useConfigStore((s) => s.config?.["terminos-condiciones"]) || "#";
   const [step, setStep] = useState(0);
@@ -132,7 +134,7 @@ function RegisterView() {
 
       setRegistrationComplete(true);
       setTimeout(() => {
-        navigate("/perfiles");
+        navigate(from, { replace: true });
       }, 3000);
     } catch (error: any) {
       const msg =
@@ -171,13 +173,13 @@ function RegisterView() {
   return (
     <div className="min-h-screen flex items-center justify-center relative overflow-hidden bg-(--clr-primary)">
       {/* Card central */}
-      <div className="relative z-10 w-full max-w-md mx-4  backdrop-blur-2xl px-10 py-12">
+      <div className="relative z-10 w-full max-w-md mx-4 backdrop-blur-2xl px-5 py-8 sm:px-10 sm:py-12">
         {/* Logo */}
-        <div className="flex justify-center mb-8">
+        <div className="flex justify-center mb-5 sm:mb-8">
           <img
             src={logo}
             alt="Logo"
-            className="h-28 w-auto cursor-pointer"
+            className="h-16 sm:h-28 w-auto cursor-pointer"
             onClick={() => navigate("/home")}
           />
         </div>
@@ -309,7 +311,7 @@ function RegisterView() {
           ¿Ya tienes cuenta?{" "}
           <span
             className="cursor-pointer font-semibold text-(--foc-primary) hover:underline transition-colors duration-200"
-            onClick={() => navigate("/auth/login")}
+            onClick={() => navigate("/auth/login", { state: { from } })}
           >
             Inicia sesión
           </span>

@@ -19,35 +19,36 @@ if (localStorage.getItem(LS_VERSION_KEY) !== LS_CURRENT_VERSION) {
   localStorage.setItem(LS_VERSION_KEY, LS_CURRENT_VERSION);
 }
 
-function resolveClient(): string {
-  // let resolved: string | null = null;
+// function resolveClient(): string {
+//   let resolved: string | null = null;
 
-  // // 1. ?client= en la URL real (antes del #)
-  // resolved = new URLSearchParams(window.location.search).get('client');
-  // if (resolved) {
-  //   localStorage.setItem(LS_CLIENT_KEY, resolved);
-  //   return resolved;
-  // }
+//   // 1. ?client= en la URL real (antes del #)
+//   resolved = new URLSearchParams(window.location.search).get('client');
+//   if (resolved) {
+//     localStorage.setItem(LS_CLIENT_KEY, resolved);
+//     return resolved;
+//   }
 
-  // // 2. ?client= dentro del hash (después del #)
-  // const hashParts = window.location.hash.split('?');
-  // if (hashParts.length > 1) {
-  //   resolved = new URLSearchParams(hashParts[1]).get('client');
-  //   if (resolved) {
-  //     localStorage.setItem(LS_CLIENT_KEY, resolved);
-  //     return resolved;
-  //   }
-  // }
+//   // 2. ?client= dentro del hash (después del #)
+//   const hashParts = window.location.hash.split('?');
+//   if (hashParts.length > 1) {
+//     resolved = new URLSearchParams(hashParts[1]).get('client');
+//     if (resolved) {
+//       localStorage.setItem(LS_CLIENT_KEY, resolved);
+//       return resolved;
+//     }
+//   }
 
-  // // 3. Valor guardado en localStorage
-  // const fromStorage = localStorage.getItem(LS_CLIENT_KEY);
-  // if (fromStorage) return fromStorage;
+//   // 3. Valor guardado en localStorage
+//   const fromStorage = localStorage.getItem(LS_CLIENT_KEY);
+//   if (fromStorage) return fromStorage;
 
-  // 4. Fallback
-  return 'chv';
-}
+//   // 4. Fallback
+//   return 'chv';
+// }
 
-export const CLIENT = resolveClient();
+// export const CLIENT = resolveClient();
+export const CLIENT = 'chv';
 export const BASENAME = import.meta.env.BASE_URL.replace(/\/+$/, '') || '/';
 
 export const ADS_FALLBACK_DOMAIN = 'https://www.michv.cl';
@@ -109,7 +110,7 @@ export const RUDO_VOD_TIME = `https://consumers.rudo.video/history/add` // Permi
 export const RUDO_SESSION = `https://consumers.rudo.video/users/session` // Permite ver la información de la sessión
 
 // Configuración ----
-export const RUDO_CONFIG = `https://consumers.rudo.video/config/all` // Permite modificar la configuración de la app - config all
+export const RUDO_CONFIG = `https://consumers.rudo.video/config/all2` // Permite modificar la configuración de la app - config all
 
 // Registro
 export const RUDO_REGISTER = `https://consumers.rudo.video/users/register` // Permite registrar un nuevo usuario - register

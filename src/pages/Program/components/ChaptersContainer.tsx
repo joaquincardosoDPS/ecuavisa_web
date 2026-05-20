@@ -1,4 +1,4 @@
-import type { Segment } from "@/interfaces/catalog.interface";
+import type { Chapter, Segment } from "@/interfaces/catalog.interface";
 import { useChapters } from "@/hooks/useChapters";
 import { useEffect } from "react";
 import ChapterCard from "@/pages/Event/components/ChapterCard";
@@ -11,6 +11,7 @@ interface Props {
   activeSeason: number | null;
   setActiveSeason: (season: number) => void;
   onLoaded?: () => void;
+  onFirstChapter?: (chapter: Chapter) => void;
   showChapter?: boolean;
 }
 function ChaptersContainer({
@@ -20,6 +21,7 @@ function ChaptersContainer({
   activeSeason,
   setActiveSeason,
   onLoaded,
+  onFirstChapter,
   showChapter = true,
 }: Props) {
   const {
@@ -36,6 +38,9 @@ function ChaptersContainer({
   useEffect(() => {
     if (!isLoadingChapters && onLoaded) {
       onLoaded();
+    }
+    if (!isLoadingChapters && chapters.length > 0 && onFirstChapter) {
+      onFirstChapter(chapters[0]);
     }
   }, [isLoadingChapters]);
 

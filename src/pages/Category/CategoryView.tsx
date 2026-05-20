@@ -25,6 +25,7 @@ function CategoryView() {
       const response = await catalogService.searchPrograms({
         category: slug!,
         page: pageParam,
+        limit: 12,
       });
 
       console.log(response.data)

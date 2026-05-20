@@ -1,10 +1,9 @@
 import { useEffect } from 'react';
 import { useConfigStore } from '@/features/config/useConfigStore';
-import { sendPageView } from '@/hooks/useGoogleAnalytics';
 
 /**
  * Actualiza `document.title` con el formato "Título | NombreApp".
- * Envía un page_view a GA4 cuando el título está listo.
+ * Ya NO envía page_views — el AnalyticsProvider se encarga de eso.
  * Restaura el título base al desmontar el componente.
  */
 export function useDocumentTitle(pageTitle: string | undefined | null): void {
@@ -15,9 +14,6 @@ export function useDocumentTitle(pageTitle: string | undefined | null): void {
 
     const fullTitle = appName ? `${pageTitle} | ${appName}` : pageTitle;
     document.title = fullTitle;
-
-    // Enviar page_view ahora que el título está listo
-    sendPageView(window.location.pathname);
 
     return () => {
       if (appName) document.title = appName;

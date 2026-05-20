@@ -1,5 +1,5 @@
 import Button from "@/components/ui/Button";
-import type { Program } from "@/interfaces/catalog.interface";
+import type { Chapter, Program } from "@/interfaces/catalog.interface";
 import { useFavorite } from "@/hooks/useFavorite";
 import FavoriteButton from "@/components/ui/FavoriteButton";
 import ProgressBar from "@/components/ui/ProgressBar";
@@ -8,14 +8,17 @@ import { useNavigate } from "react-router-dom";
 
 interface InfoBannerProps {
   program: Program;
+  firstChapter?: Chapter | null;
 }
 
-function InfoBanner({ program }: InfoBannerProps) {
+function InfoBanner({ program, firstChapter }: InfoBannerProps) {
   const navigate = useNavigate();
   const { isFavorited, isToggling, isEnabled, toggleFavorite } = useFavorite(
     program.key,
   );
   const { item: continueWatchingItem } = useContinueWatching(program.key);
+
+  const firstSegment = program.segments?.[0];
 
   const handlePlay = () => {
     if (continueWatchingItem) {
@@ -23,12 +26,8 @@ function InfoBanner({ program }: InfoBannerProps) {
         `/play/${program.key}/${continueWatchingItem.key_segment}/${continueWatchingItem.season}/${continueWatchingItem.chapter}`,
         { state: { resumeTime: continueWatchingItem.time } },
       );
-    } else {
-      const firstSegment = program.segments?.[0];
-      if (firstSegment) {
-        const firstSeason = firstSegment.all_temp?.[0] ?? 1;
-        navigate(`/play/${program.key}/${firstSegment.key}/${firstSeason}/1`);
-      }
+    } else if (firstSegment && firstChapter) {
+      navigate(`/play/${program.key}/${firstSegment.key}/${firstChapter.season}/${firstChapter.chapter}`);
     }
   };
 

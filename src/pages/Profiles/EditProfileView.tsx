@@ -16,6 +16,8 @@ function EditProfileView() {
   const logo = useConfigStore((s) => s.config?.logo) || fallbackLogo;
   const queryClient = useQueryClient();
   const token = useAuthStore((s) => s.token);
+  const activeProfile = useAuthStore((s) => s.activeProfile);
+  const setActiveProfile = useAuthStore((s) => s.setActiveProfile);
   const profiles = queryClient.getQueryData<
     import("@/interfaces/profile.interface").Profile[]
   >(["profiles", token]);
@@ -90,8 +92,20 @@ function EditProfileView() {
         return;
       }
 
-      // Invalidar cache de perfiles para refrescar la lista
-      queryClient.invalidateQueries({ queryKey: ["profiles"] });
+      // Refetch cache de perfiles para tener la info fresca
+      await queryClient.refetchQueries({ queryKey: ["profiles"] });
+
+      // Si el perfil actualizado era el perfil activo actual, lo actualizamos en la store (y LS)
+      if (!isCreateMode && activeProfile?.id === id) {
+        const updatedProfiles = queryClient.getQueryData<
+          import("@/interfaces/profile.interface").Profile[]
+        >(["profiles", token]);
+        const updatedActive = updatedProfiles?.find((p) => p.id === id);
+        if (updatedActive) {
+          setActiveProfile(updatedActive);
+        }
+      }
+
       setSubmitSuccess(true);
       setTimeout(() => navigate("/perfiles"), 1500);
     } catch (err) {

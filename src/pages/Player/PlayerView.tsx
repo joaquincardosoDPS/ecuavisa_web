@@ -1,8 +1,8 @@
-import { useMemo } from "react";
+import { useMemo, useEffect } from "react";
 import { RudoPlayer } from "@/components/RudoPlayer";
 import { usePlayerEpisode } from "@/hooks/usePlayerEpisode";
 import { useDocumentTitle } from "@/hooks/useDocumentTitle";
-import { useAnalyticsPath } from "@/hooks/useGoogleAnalytics";
+import { useAnalytics } from "@/layout/AnalyticsWrapper";
 import { PlayerLoading } from "./components/PlayerLoading";
 import { PlayerError } from "./components/PlayerError";
 import { ShrunkBackdrop } from "./components/ShrunkBackdrop";
@@ -40,19 +40,39 @@ function PlayerView() {
     programKey,
     segment,
     chapterTitle,
+    chapterNumber,
+    seasonNumber,
   } = usePlayerEpisode();
 
   useDocumentTitle(episodeTitle);
 
-  // Override del path para GA4: /programas/{programa}/{segmento}/{titulo-video}
+  const { trackPage } = useAnalytics();
+
+  // Override del path para GA4: /programas/{programa}/{segmento}/{temporada}/{titulo-video}
   const analyticsPath = useMemo(() => {
     if (!programKey || !chapterTitle) return null;
     const parts = ['/programas', programKey];
     if (segment) parts.push(segment);
+    if (seasonNumber != null) parts.push(String(seasonNumber));
     parts.push(toSlug(chapterTitle));
     return parts.join('/');
-  }, [programKey, segment, chapterTitle]);
-  useAnalyticsPath(analyticsPath);
+  }, [programKey, segment, seasonNumber, chapterTitle]);
+
+  // Título descriptivo: "PROGRAMA | Segmento | Temporada X | Capítulo Y"
+  const analyticsTitle = useMemo(() => {
+    if (!episodeTitle) return null;
+    const parts = [episodeTitle];
+    if (segment) parts.push(segment.replace(/-/g, ' '));
+    if (seasonNumber != null) parts.push(`Temporada ${seasonNumber}`);
+    if (chapterNumber != null) parts.push(`Capitulo ${chapterNumber}`);
+    return parts.join(' | ');
+  }, [episodeTitle, segment, seasonNumber, chapterNumber]);
+
+  useEffect(() => {
+    if (analyticsPath && analyticsTitle) {
+      trackPage(analyticsPath, analyticsTitle);
+    }
+  }, [analyticsPath, analyticsTitle, trackPage]);
 
   if (loading) {
     return <PlayerLoading chapterImage={chapterImage} />;

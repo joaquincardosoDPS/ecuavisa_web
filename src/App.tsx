@@ -5,12 +5,19 @@ import { useIsMobile } from "./hooks/useIsMobile";
 import { FullScreenSpinner } from "./components/ui/FullScreenSpinner";
 import OnlyWebView from "./pages/Error/OnlyWebView";
 
+
+
 function App() {
   const isMobile = useIsMobile();
   const { isLoading, isError } = useAppInitialization();
+  
 
-  // Bloquear acceso desde dispositivos móviles antes de cualquier otra lógica
-  if (isMobile) return <OnlyWebView />;
+  // Permitir rutas de vinculación TV y autenticación en móvil
+  if (isMobile) {
+    const path = window.location.pathname;
+    const isAllowed = path.includes('/tv') || path.includes('/auth/');
+    if (!isAllowed) return <OnlyWebView />;
+  }
 
   if (isLoading) return <FullScreenSpinner />;
   if (isError) return <div>Error crítico al iniciar la aplicación.</div>;
@@ -21,3 +28,5 @@ function App() {
 }
 
 export default App
+
+

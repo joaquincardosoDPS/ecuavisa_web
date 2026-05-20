@@ -2,7 +2,7 @@ import { useState, useRef, useCallback, useEffect, useMemo } from "react";
 import type { Program, Segment } from "@/interfaces/catalog.interface";
 import { useQuery } from "@tanstack/react-query";
 import { catalogService } from "@/services/catalogService";
-import { useAnalyticsPath, sendPageView } from "@/hooks/useGoogleAnalytics";
+import { useAnalytics } from "@/layout/AnalyticsWrapper";
 import Banner from "./components/Banner";
 import DetailsProgram from "./components/DetailsProgram";
 import TabsSingle from "./components/TabsSingle";
@@ -48,6 +48,8 @@ function ProgramSingleView({ program: programDetail, setIsLoading }: ProgramSing
     const tabsRef = useRef<HTMLDivElement>(null);
     const pendingScroll = useRef(false);
 
+    const { trackPage } = useAnalytics();
+
     // Override del path para GA4
     const analyticsPath = useMemo(() => {
         const basePath = `/programas/${programDetail.key}`;
@@ -56,12 +58,11 @@ function ProgramSingleView({ program: programDetail, setIsLoading }: ProgramSing
         }
         return basePath;
     }, [programDetail.key, activeTab]);
-    useAnalyticsPath(analyticsPath);
 
     // Enviar page_view cuando cambia el tab/segmento (la URL no cambia)
     useEffect(() => {
-        sendPageView(analyticsPath);
-    }, [analyticsPath]);
+        trackPage(analyticsPath);
+    }, [analyticsPath, trackPage]);
 
     const scrollToTabs = useCallback(() => {
         setTimeout(() => {

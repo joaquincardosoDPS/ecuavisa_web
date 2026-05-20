@@ -95,6 +95,7 @@ function CardVertical({ program, format, index }: CardVerticalProps) {
             alt={program.title}
             className="w-full h-full object-cover transition-transform duration-300 select-none embla__slide__number scale-110 group-hover:scale-100 group-focus:scale-100"
             draggable={false}
+            loading="lazy"
           />
         ) : (
           <div className="w-full h-full bg-gray-800 flex items-center justify-center p-4 text-center transition-transform duration-300 scale-110 group-hover:scale-100 group-focus:scale-100">
