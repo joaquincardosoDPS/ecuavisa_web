@@ -35,7 +35,7 @@ const PlayPauseButtonComponent = ({
         color: hovered ? "var(--foc-primary)" : "var(--clr-text-primary-button)",
         transition: "color 0.15s ease",
       }}
-      title={playing ? "Pausar" : "Reproducir"}
+      title={playing ? "Pausar" : "Ver ahora"}
     >
       <span
         style={{ display: "inline-flex", width: 28, height: 28 }}

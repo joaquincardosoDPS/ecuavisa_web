@@ -59,7 +59,7 @@ function LiveSignalInfo({ signal, epg }: LiveSignalInfoProps) {
 						<img
 							src={image}
 							alt={title || "Programa actual"}
-							className="max-h-full w-auto object-contain rounded-lg"
+							className="h-37.5 w-auto object-contain rounded-lg "
 						/>
 					</div>
 				)}

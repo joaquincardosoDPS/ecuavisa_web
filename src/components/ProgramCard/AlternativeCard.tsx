@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 function AlternativeCard({ program }: { program: Program }) {
     const navigate = useNavigate();
 
-    const imageSrc = program?.image_land.normal;
+    const imageSrc = program?.image_land.small;
 
     const handleClick = () => {
         navigate(`/programas/${program.key}`);

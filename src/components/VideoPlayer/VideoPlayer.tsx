@@ -592,7 +592,7 @@ const VideoPlayerComponent = ({
                   (e.currentTarget.style.transform = "scale(1)")
                 }
               >
-                Reproducir ahora
+                Ver ahora
               </button>
             </div>
           )}

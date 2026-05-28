@@ -11,7 +11,7 @@ function Banner({ event }: { event: Event | null }) {
 
     const handlePlay = () => {
         if (event.live_associated?.key) {
-            navigate("/en-vivo", { state: { signal: event.live_associated.key } });
+            navigate(`/en-vivo?signal=${event.live_associated.key}`);
         } else if (event.program_associated?.key) {
             navigate(`/programas/${event.program_associated.key}`);
         }
@@ -112,7 +112,7 @@ function Banner({ event }: { event: Event | null }) {
                         )}
                     </div>
                     <Button variant="primary" showArrow onClick={handlePlay}>
-                        Play
+                        Ver ahora
                     </Button>
                     <div className="h-30 flex flex-row items-center gap-5">
                         {logoCat && (

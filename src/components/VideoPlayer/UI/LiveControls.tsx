@@ -137,7 +137,7 @@ const LiveControlsComponent = ({
       <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
         <LiveButton
           onClick={onPlayPause}
-          title={playing ? "Pausar" : "Reproducir"}
+          title={playing ? "Pausar" : "Ver ahora"}
           icon={playing ? iconoPauseRaw : iconoPlayRaw}
         />
         <LiveBadge />

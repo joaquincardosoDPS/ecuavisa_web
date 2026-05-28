@@ -28,7 +28,7 @@ export function BannerInfo({ program }: BannerInfoProps) {
 
 			<div className="flex items-center gap-4 pt-4">
 				<Button variant="primary" showArrow onClick={() => navigate(`/programas/${program.key}`)}>
-					Play
+					Ver ahora
 				</Button>
 			</div>
 

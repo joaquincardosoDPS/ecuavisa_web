@@ -78,7 +78,7 @@ function InfoBannerSingle({ program, chapter }: {
             {genderNames && <span>{genderNames}</span>}
             <div className="flex flex-row items-center gap-4 pt-4 mb-3">
                 <Button variant="primary" showArrow onClick={handlePlay}>
-                    {continueWatchingItem ? "Reanudar" : "Play"}
+                    {continueWatchingItem ? "Reanudar" : "Ver ahora"}
                 </Button>
 
                 <FavoriteButton
