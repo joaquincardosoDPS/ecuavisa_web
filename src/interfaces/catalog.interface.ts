@@ -165,6 +165,7 @@ export interface Chapter {
     key_segment: string;
     m3u8: string;
     "max-cap": number;
+    "next-cap": number;
     name_program: string;
     name_segment: string;
     restriction: string;

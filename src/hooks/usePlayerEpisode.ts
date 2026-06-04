@@ -177,14 +177,15 @@ export function usePlayerEpisode() {
           }
           setInitialSeconds(resolvedInitialSeconds);
 
-          // Intentar cargar el siguiente capítulo (solo si tiene segmentos)
-          if (!isNoSegments) {
+          // Intentar cargar el siguiente capítulo (solo si tiene segmentos y next-cap > 0)
+          const nextCapNum = chapterData["next-cap"];
+          if (!isNoSegments && nextCapNum > 0) {
             try {
               const nextRes = await catalogService.getChapterBySlug({
                 program,
                 segment,
                 season: seasonNum,
-                chapter: chapterNum + 1,
+                chapter: nextCapNum,
               });
               if (!cancelled && nextRes?.data?.key) {
                 setNextChapter(nextRes.data);
