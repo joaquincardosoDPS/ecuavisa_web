@@ -1,0 +1,11 @@
+User-agent: *
+Allow: /
+
+# Rutas que no deben indexarse
+Disallow: /auth/
+Disallow: /perfiles/
+Disallow: /cuenta
+Disallow: /tv
+Disallow: /mi-lista
+
+Sitemap: https://www.ecuavisa.com/sitemap.xml

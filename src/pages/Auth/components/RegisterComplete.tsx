@@ -1,4 +1,4 @@
-import bgPrograms from "@/assets/img/bgPrograms.png";
+import bgPrograms from "@/assets/img/bg_login.png";
 import fallbackLogo from "@/assets/img/logo.svg";
 import { Spinner } from "@/components/ui/Spinner";
 import { useConfigStore } from "@/features/config/useConfigStore";

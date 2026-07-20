@@ -1,283 +1,125 @@
-import { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useAuthStore } from "@/features/auth/authStore";
-import { profileService } from "@/services/profileService";
-import type { AvatarItem } from "@/interfaces/profile.interface";
+import { useEditProfile } from "@/hooks/profiles/useEditProfile";
 import { FullScreenSpinner } from "@/components/ui/FullScreenSpinner";
-import Modal from "@/components/ui/Modal";
-import { useConfigStore } from "@/features/config/useConfigStore";
-import fallbackLogo from "@/assets/img/logo.svg";
-import Button from "@/components/ui/Button";
+import ConfirmModal from "@/components/ui/ConfirmModal";
+import { BackButton } from "@/components/ui/BackButton";
+import ProfileActionRow from "@/components/ui/ProfileActionRow";
 
 function EditProfileView() {
-  const { id } = useParams<{ id: string }>();
-  const navigate = useNavigate();
-  const logo = useConfigStore((s) => s.config?.logo) || fallbackLogo;
-  const queryClient = useQueryClient();
-  const token = useAuthStore((s) => s.token);
-  const activeProfile = useAuthStore((s) => s.activeProfile);
-  const setActiveProfile = useAuthStore((s) => s.setActiveProfile);
-  const profiles = queryClient.getQueryData<
-    import("@/interfaces/profile.interface").Profile[]
-  >(["profiles", token]);
-
-  const isCreateMode = !id || id === "nuevo";
-
-  // Buscar perfil existente en el cache
-  const existingProfile = !isCreateMode
-    ? profiles?.find((p) => p.id === id)
-    : null;
-
-  const [name, setName] = useState("");
-  const [selectedAvatar, setSelectedAvatar] = useState<string | null>(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitError, setSubmitError] = useState("");
-  const [submitSuccess, setSubmitSuccess] = useState(false);
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [isDeleting, setIsDeleting] = useState(false);
-
-  const isDefaultProfile = existingProfile?.default === true;
-
-  // Prellenar datos si es edición
-  useEffect(() => {
-    if (existingProfile) {
-      setName(existingProfile.name_perfil);
-      setSelectedAvatar(existingProfile.avatar || null);
-    }
-  }, [existingProfile]);
-
   const {
-    data: avatarGroups,
+    existingProfile,
+    isDefaultProfile,
+    name,
+    setName,
+    selectedAvatar,
+    avatarGroups,
+    showDeleteModal,
+    setShowDeleteModal,
+    isDeleting,
     isLoading,
-    isError,
-    error,
-  } = useQuery({
-    queryKey: ["avatars"],
-    queryFn: async () => {
-      const response = await profileService.getAvatars();
-      if (response.status === "error") {
-        throw new Error(response.msj || "Error al cargar avatares.");
-      }
-      return response.data || [];
-    },
-  });
-
-  const getAvatarUrl = (avatar: AvatarItem): string | null => {
-    return avatar.images?.medium || avatar.images?.default || null;
-  };
-
-  const handleSubmit = async () => {
-    if (!token) return;
-    if (!name.trim()) {
-      setSubmitError("El nombre del perfil es obligatorio.");
-      return;
-    }
-
-    setIsSubmitting(true);
-    setSubmitError("");
-
-    try {
-      // En edición, si no se eligió avatar, mantener el avatar actual del perfil
-      const avatarToSend = isCreateMode
-        ? selectedAvatar
-        : (selectedAvatar ?? existingProfile?.avatar ?? null);
-
-      const response = isCreateMode
-        ? await profileService.create(token, name.trim(), avatarToSend)
-        : await profileService.update(token, id!, name.trim(), avatarToSend);
-
-      if (response.status === "error") {
-        setSubmitError(response.msj || "Error al guardar el perfil.");
-        return;
-      }
-
-      // Refetch cache de perfiles para tener la info fresca
-      await queryClient.refetchQueries({ queryKey: ["profiles"] });
-
-      // Si el perfil actualizado era el perfil activo actual, lo actualizamos en la store (y LS)
-      if (!isCreateMode && activeProfile?.id === id) {
-        const updatedProfiles = queryClient.getQueryData<
-          import("@/interfaces/profile.interface").Profile[]
-        >(["profiles", token]);
-        const updatedActive = updatedProfiles?.find((p) => p.id === id);
-        if (updatedActive) {
-          setActiveProfile(updatedActive);
-        }
-      }
-
-      setSubmitSuccess(true);
-      setTimeout(() => navigate("/perfiles"), 1500);
-    } catch (err) {
-      console.error("[EditProfile] Error:", err);
-      setSubmitError("Error de conexión. Intenta de nuevo.");
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  const handleDelete = async () => {
-    if (!token || !id || isCreateMode) return;
-
-    setIsDeleting(true);
-    try {
-      const response = await profileService.delete(token, id);
-      if (response.status === "error") {
-        setSubmitError(response.msj || "Error al eliminar el perfil.");
-        setShowDeleteModal(false);
-        return;
-      }
-
-      queryClient.invalidateQueries({ queryKey: ["profiles"] });
-      navigate("/perfiles");
-    } catch (err) {
-      console.error("[EditProfile] Delete error:", err);
-      setSubmitError("Error de conexión. Intenta de nuevo.");
-      setShowDeleteModal(false);
-    } finally {
-      setIsDeleting(false);
-    }
-  };
+    handleSubmit,
+    handleDelete,
+    navigate,
+  } = useEditProfile();
 
   if (isLoading) return <FullScreenSpinner />;
 
+  // Buscar URL del avatar seleccionado o del existente
+  const avatarUrl = (() => {
+    if (selectedAvatar && avatarGroups) {
+      for (const group of avatarGroups) {
+        const found = group.avatars.find((a) => a.id === selectedAvatar);
+        if (found) {
+          return found.images?.big || found.images?.medium || found.images?.default || null;
+        }
+      }
+    }
+    if (existingProfile && !Array.isArray(existingProfile.images)) {
+      return existingProfile.images?.big || existingProfile.images?.medium || existingProfile.images?.default || null;
+    }
+    return null;
+  })();
+
   return (
-    <div className="min-h-screen flex flex-col px-25 py-3.5">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <img src={logo} alt="Logo" className="h-14 w-auto" />
-      </div>
-      <div className="flex justify-end">
-        <Button
-          variant="tertiary"
-          onClick={() => navigate(-1)}
-        >
-          Volver
-        </Button>
-      </div>
+    <div className="min-h-screen flex flex-col px-40 py-25" style={{ background: 'linear-gradient(to right, #17142C, #2D2533, #3D2E3D)' }}>
+      <BackButton />
+      <div className="flex flex-row">
+        <div className="w-1/2">
+          <h1 className="self-stretch text-4xl font-bold leading-12 mb-12">Mi perfil</h1>
+          <p className="self-stretch text-3xl font-bold leading-10 mb-4">Personalizá tu experiencia en Ecuavisa</p>
+          <p className="self-stretch text-2xl font-bold leading-8 ">Personaliza tu experiencia en Ecuavisa y disfruta de contenido hecho para ti</p>
 
-      <div className="grid grid-cols-4 gap-20">
-        {/* Formulario */}
-        <div className="flex flex-col gap-5 items-start mt-10 col-start-2">
-          <p className="text-xl leading-[43px]">
-            {isCreateMode ? "Crear perfil" : "Editar perfil"}
-          </p>
+          <div className="flex flex-col gap-10 mt-8">
+            {/* Elegir avatar */}
+            <ProfileActionRow
+              icon={
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v1.2c0 .7.5 1.2 1.2 1.2h16.8c.7 0 1.2-.5 1.2-1.2v-1.2c0-3.2-6.4-4.8-9.6-4.8z" />
+                </svg>
+              }
+              label="Elegir avatar"
+              variant="navigation"
+              onClick={() => navigate('avatars')}
+            />
 
-          <input
-            type="text"
-            placeholder="Nombre del perfil"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            className="w-full text-base outline-none transition-all duration-300 bg-[#102F40] rounded-md px-5 py-3 text-white placeholder:text-white/30 focus:border-(--foc-primary) focus:shadow-[0_0_0_3px_rgba(255,19,118,0.15)]"
-          />
+            {/* Nombre */}
+            <ProfileActionRow
+              icon={
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1 1 0 000-1.41l-2.34-2.34a1 1 0 00-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" />
+                </svg>
+              }
+              label="Nombre"
+              variant="editable"
+              value={name}
+              onValueChange={setName}
+              onSave={() => handleSubmit(name, false)}
+            />
 
-          {submitError && <p className="text-red-500 text-sm">{submitError}</p>}
-
-          {submitSuccess && (
-            <p className="text-green-500 text-sm">
-              {isCreateMode ? "Perfil creado" : "Perfil actualizado"} ✓
-            </p>
-          )}
-
-          <Button
-            variant="secondary"
-            onClick={handleSubmit}
-            disabled={isSubmitting}
-            className="w-full uppercase text-sm"
-          >
-            {isSubmitting
-              ? "Guardando..."
-              : isCreateMode
-                ? "Crear perfil"
-                : "Guardar cambios"}
-          </Button>
-
-          {!isCreateMode && !isDefaultProfile && (
-            <p
-              onClick={() => setShowDeleteModal(true)}
-              className="text-(--foc-primary) cursor-pointer hover:brightness-110"
-            >
-              Eliminar perfil
-            </p>
-          )}
-        </div>
-
-        {/* Avatares por grupo */}
-        <div className="mt-8 col-span-2 max-h-[calc(100vh-8rem)] overflow-y-auto pr-2 scrollbar-subtle">
-          {isError ? (
-            <p className="text-red-500 text-center">
-              {error instanceof Error
-                ? error.message
-                : "Error al cargar avatares."}
-            </p>
-          ) : (
-            avatarGroups?.map((group) => (
-              <div key={group.name} className="mb-8">
-                {/* Nombre del grupo */}
-                <h3 className="text-lg text-white/70 mb-4">{group.name}</h3>
-
-                {/* Grid de avatares */}
-                <div className="flex gap-5 flex-wrap">
-                  {group.avatars.map((avatar: AvatarItem) => {
-                    const avatarUrl = getAvatarUrl(avatar);
-                    const isSelected = selectedAvatar === avatar.id;
-                    return (
-                      <button
-                        key={avatar.id}
-                        onClick={() => setSelectedAvatar(avatar.id)}
-                        className="group cursor-pointer p-1 rounded-xl transition-all duration-200"
-                      >
-                        <div
-                          className={`w-24 h-24 rounded-full overflow-hidden bg-white/10 flex items-center justify-center border-3 transition-all duration-300 ${isSelected
-                              ? "border-(--foc-primary) scale-110"
-                              : "border-transparent group-hover:border-(--foc-primary)"
-                            }`}
-                        >
-                          {avatarUrl ? (
-                            <img
-                              src={avatarUrl}
-                              alt={`Avatar ${avatar.id}`}
-                              className="w-full h-full object-cover"
-                            />
-                          ) : (
-                            <span className="text-2xl text-(--clr-secondary-text)">?</span>
-                          )}
-                        </div>
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-            ))
-          )}
-        </div>
-      </div>
-
-      {/* Modal confirmacion eliminar */}
-      <Modal isOpen={showDeleteModal} onClose={() => setShowDeleteModal(false)}>
-        <div className="p-8 flex flex-col items-center gap-5 min-w-[350px]">
-          <p className="text-white text-center">
-            ¿Quieres borrar el perfil de {name || existingProfile?.name_perfil}?
-          </p>
-          <div className="flex gap-4 w-full mt-2">
-            <Button
-              variant="tertiary"
-              onClick={() => setShowDeleteModal(false)}
-              className="flex-1 uppercase"
-            >
-              Cancelar
-            </Button>
-            <Button
-              variant="secondary"
-              onClick={handleDelete}
-              disabled={isDeleting}
-              className="flex-1 uppercase"
-            >
-              {isDeleting ? "Borrando..." : "Borrar"}
-            </Button>
+            {/* Eliminar perfil */}
+            {!isDefaultProfile && (
+              <ProfileActionRow
+                icon={
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z" />
+                  </svg>
+                }
+                label="Eliminar perfil"
+                variant="action"
+                onClick={() => setShowDeleteModal(true)}
+              />
+            )}
           </div>
         </div>
-      </Modal>
+        <div className="w-1/2 flex items-center justify-center mt-20 flex-col">
+          {avatarUrl ? (
+            <div className="w-80 h-80 rounded-[40px] outline-4 outline-(--clr-primary-title) inline-flex flex-col justify-center items-center overflow-hidden bg-(--clr-secondary-button)/25">
+              <img src={avatarUrl} alt={name} className="w-full h-full object-cover" />
+            </div>
+          ) : (
+            <div data-tipo="NoAvatar" className="w-80 h-80 bg-(--foc-primary) rounded-[40px] outline-4 outline-(--clr-primary-title) inline-flex flex-col justify-center items-center gap-2 overflow-hidden">
+              <div className="self-stretch text-center justify-start text-(--clr-primary-title) text-[200px] font-bold font-['Gotham'] leading-[220px]">
+                {(name || existingProfile?.name_perfil || 'U').charAt(0).toUpperCase()}
+              </div>
+            </div>
+          )}
+          <p className="mt-10 text-5xl font-bold text-(--clr-primary-title) leading-14">
+            {name || existingProfile?.name_perfil}
+          </p>
+        </div>
+      </div>
+
+
+
+      {/* Modal confirmacion eliminar */}
+      <ConfirmModal
+        isOpen={showDeleteModal}
+        onClose={() => setShowDeleteModal(false)}
+        onConfirm={handleDelete}
+        message={`¿Quieres borrar el perfil de ${existingProfile?.name_perfil || existingProfile?.name_perfil}?`}
+        confirmLabel="Borrar"
+        loadingLabel="Borrando..."
+        isLoading={isDeleting}
+      />
     </div>
   );
 }

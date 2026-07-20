@@ -5,18 +5,8 @@ import type { Event } from "@/interfaces/catalog.interface";
 import Button from "@/components/ui/Button";
 
 function Banner({ event }: { event: Event | null }) {
-    if (!event) return null;
     const navigate = useNavigate();
     const [scrollOpacity, setScrollOpacity] = useState(0);
-
-    const handlePlay = () => {
-        if (event.live_associated?.key) {
-            navigate(`/en-vivo?signal=${event.live_associated.key}`);
-        } else if (event.program_associated?.key) {
-            navigate(`/programas/${event.program_associated.key}`);
-        }
-    };
-
 
     // Efecto de sombreado dinámico al hacer scroll
     useEffect(() => {
@@ -30,6 +20,16 @@ function Banner({ event }: { event: Event | null }) {
         window.addEventListener("scroll", handleScroll);
         return () => window.removeEventListener("scroll", handleScroll);
     }, []);
+
+    if (!event) return null;
+
+    const handlePlay = () => {
+        if (event.live_associated?.key) {
+            navigate(`/en-vivo?signal=${event.live_associated.key}`);
+        } else if (event.program_associated?.key) {
+            navigate(`/programas/${event.program_associated.key}`);
+        }
+    };
 
 
 
@@ -93,7 +93,13 @@ function Banner({ event }: { event: Event | null }) {
             <div className="animate-in fade-in slide-in-from-left-10 duration-1000 mt-25 ml-10 xl:ml-25 min-h-[calc(100vh-650px)]">
                 <div className="flex flex-col gap-5 items-start">
                     {eventStatus && (
-                        <span className="px-3 py-1 rounded-md text-sm  uppercase tracking-wide bg-(--foc-tertiary) text-(--clr-secondary-subtitle)">
+                        <span
+                            className="px-3 py-1 rounded-md text-sm uppercase tracking-wide font-bold"
+                            style={{
+                                backgroundColor: now < eventDate ? '#FFA500' : '#e11d48',
+                                color: now < eventDate ? '#000' : '#fff',
+                            }}
+                        >
                             {eventStatus}
                         </span>
                     )}
@@ -106,7 +112,7 @@ function Banner({ event }: { event: Event | null }) {
                     )}
                     <div className="flex flex-row gap-5">
                         {classification && (
-                            <span className="px-3 py-1 rounded-md text-sm  uppercase tracking-wide bg-[#31343C] text-white">
+                            <span className="px-3 py-1 rounded-md text-sm  uppercase tracking-wide bg-(--clr-secondary) text-(--clr-primary-title)">
                                 {classification}
                             </span>
                         )}

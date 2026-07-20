@@ -1,6 +1,5 @@
-import { useState, useEffect, useRef, useCallback, useMemo } from "react";
-import type { Program, Segment, Chapter } from "@/interfaces/catalog.interface";
-import { useAnalytics } from "@/layout/AnalyticsWrapper";
+import type { Program } from "@/interfaces/catalog.interface";
+import { useProgramViewData } from "@/hooks/program/useProgramViewData";
 import Banner from "./components/Banner";
 import Tabs from "./components/Tabs";
 import DetailsProgram from "./components/DetailsProgram";
@@ -14,73 +13,25 @@ interface ProgramViewProps {
 
 function ProgramView({ program: programDetail, slug, setIsLoading }: ProgramViewProps) {
 
-  const [activeSegment, setActiveSegment] = useState<Segment | null>(null);
-  const [activeSeason, setActiveSeason] = useState<number | null>(null);
-  const [showDetails, setShowDetails] = useState(false);
-  const [firstChapter, setFirstChapter] = useState<Chapter | null>(null);
-  const tabsRef = useRef<HTMLDivElement>(null);
-  const pendingScroll = useRef(false);
-
-  const { trackPage } = useAnalytics();
-
-  // Override del path para GA4: /programas/{slug}/{segmento}
-  const analyticsPath = useMemo(() => {
-    if (!activeSegment?.key) return `/programas/${slug}`;
-    return `/programas/${slug}/${activeSegment.key}`;
-  }, [slug, activeSegment?.key]);
-
-  // Enviar page_view cuando cambia el segmento (la URL no cambia)
-  useEffect(() => {
-    trackPage(analyticsPath);
-  }, [analyticsPath, trackPage]);
-
-  const scrollToTabs = useCallback(() => {
-    setTimeout(() => {
-      window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" });
-    }, 50);
-  }, []);
-
-  // Marca que el próximo onLoaded debe hacer scroll
-  const requestScroll = useCallback(() => {
-    pendingScroll.current = true;
-  }, []);
-
-  // Solo hace scroll si se pidió desde un clic en tab
-  const handleChaptersLoaded = useCallback(() => {
-    setIsLoading(false);
-    if (pendingScroll.current) {
-      pendingScroll.current = false;
-      scrollToTabs();
-    }
-  }, [scrollToTabs, setIsLoading]);
-
-  // Inicialización por defecto
-  useEffect(() => {
-    if (
-      programDetail?.segments &&
-      programDetail.segments.length > 0 &&
-      !activeSegment
-    ) {
-      const firstSegment = programDetail.segments[0];
-      setActiveSegment(firstSegment);
-      if (firstSegment.all_temp && firstSegment.all_temp.length > 0) {
-        setActiveSeason(firstSegment.all_temp[0]);
-      }
-    }
-  }, [programDetail, activeSegment]);
-
-  // Reset de temporada al cambiar de segmento manualmente
-  useEffect(() => {
-    if (activeSegment?.all_temp && activeSegment.all_temp.length > 0) {
-      setActiveSeason(activeSegment.all_temp[0]);
-    }
-  }, [activeSegment]);
-
+  const {
+    activeSegment,
+    setActiveSegment,
+    activeSeason,
+    setActiveSeason,
+    showDetails,
+    setShowDetails,
+    firstChapter,
+    setFirstChapter,
+    tabsRef,
+    scrollToTabs,
+    requestScroll,
+    handleChaptersLoaded,
+  } = useProgramViewData(programDetail, slug, setIsLoading);
 
   return (
-    <>
+    <div className="ml-40">
       <Banner program={programDetail} firstChapter={firstChapter} />
-      <div className="h-[calc(100vh-20px)]">
+      <div className="">
         <Tabs
           program={programDetail}
           activeSegment={activeSegment}
@@ -92,7 +43,7 @@ function ProgramView({ program: programDetail, slug, setIsLoading }: ProgramView
           requestScroll={requestScroll}
         />
 
-        <div className="mx-25 mt-5 2xl:mt-10 mb-10 2xl:mb-20">
+        <div className="mb-10 2xl:mb-20">
           {showDetails ? (
             <DetailsProgram programDetail={programDetail} />
           ) : (
@@ -109,9 +60,8 @@ function ProgramView({ program: programDetail, slug, setIsLoading }: ProgramView
           )}
         </div>
       </div>
-    </>
+    </div>
   );
 }
 
 export default ProgramView;
-

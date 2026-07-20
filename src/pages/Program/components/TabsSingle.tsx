@@ -21,14 +21,14 @@ function TabsSingle({
     const tabClass = (isActive: boolean) =>
         `pb-5 px-2 h-full cursor-pointer border-b-4 -mb-[2px] transition-colors ${
             isActive
-                ? "border-white text-white"
-                : "border-transparent text-(--clr-secondary-text) hover:text-white hover:border-white"
+                ? "border-(--clr-primary-title) text-(--clr-primary-title)"
+                : "border-transparent text-(--clr-secondary-text) hover:text-(--clr-primary-title) hover:border-(--clr-primary-title)"
         }`;
 
     return (
         <div
             ref={tabsRef}
-            className="mx-25 border-b-2 border-white/25 text-xl font-medium mt-10 scroll-mt-[94px]"
+            className="mx-25 border-b-2 border-(--clr-primary-title)/25 text-xl font-medium mt-10 scroll-mt-[94px]"
         >
             <div className="flex flex-row gap-10">
                 {/* Tabs de segmentos (si existen) */}

@@ -10,8 +10,8 @@ function FavoriteButton({ isFavorited, isToggling, onClick }: FavoriteButtonProp
             onClick={onClick}
             disabled={isToggling}
             className={`w-10 h-10 flex items-center justify-center rounded-full border-2 transition-all shadow-lg cursor-pointer group disabled:opacity-50 disabled:cursor-not-allowed ${isFavorited
-                ? "bg-white border-white text-black hover:bg-white/80"
-                : "bg-black/40 border-white text-white hover:bg-white hover:text-black hover:border-white"
+                ? "bg-(--clr-primary-title) border-(--clr-primary-title) text-black hover:bg-white/80"
+                : "bg-black/40 border-(--clr-primary-title) text-(--clr-primary-title) hover:bg-(--clr-primary-title) hover:text-black hover:border-(--clr-primary-title)"
                 }`}
             aria-label={isFavorited ? "Quitar de Mi Lista" : "Agregar a Mi Lista"}
         >

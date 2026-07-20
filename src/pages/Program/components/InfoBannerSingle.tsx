@@ -1,6 +1,6 @@
-import { useContinueWatching } from '@/hooks/useContinueWatching';
+import { useContinueWatching } from '@/hooks/program/useContinueWatching';
 import Button from '@/components/ui/Button';
-import { useFavorite } from '@/hooks/useFavorite';
+import { useFavorite } from '@/hooks/mylist/useFavorite';
 import type { Chapter, Program } from '@/interfaces/catalog.interface';
 import FavoriteButton from '@/components/ui/FavoriteButton';
 import { useNavigate } from 'react-router-dom';
@@ -55,13 +55,13 @@ function InfoBannerSingle({ program, chapter }: {
                         className="w-auto max-w-60 h-full object-contain"
                     />
                 ) : (
-                    <h2 className="text-2xl mb-3 font-title font-bold text-white drop-shadow-2xl">
+                    <h2 className="text-2xl mb-3 font-title font-bold text-(--clr-primary-title) drop-shadow-2xl">
                         {program.title}
                     </h2>
                 )}
             </div>
             <div className="text-lg font-medium flex items-center gap-2 mb-3">
-                <span className="px-2 bg-[#31343C] py-1 rounded-md">
+                <span className="px-2 bg-(--clr-secondary) py-1 rounded-md">
                     {program.classification}
                 </span>
                 {program.anio_production && (

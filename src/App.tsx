@@ -1,8 +1,8 @@
 import { RouterProvider } from "react-router-dom"
 import { useEffect, useRef, useState } from "react"
 import { appRouter } from "./router"
-import { useAppInitialization } from "./hooks/useAppInitilization";
-import { useIsMobile } from "./hooks/useIsMobile";
+import { useAppInitialization } from "./hooks/shared/useAppInitilization";
+import { useIsMobile } from "./hooks/shared/useIsMobile";
 import { useConfigStore } from "./features/config/useConfigStore";
 import { FullScreenSpinner } from "./components/ui/FullScreenSpinner";
 import OnlyWebView from "./pages/Error/OnlyWebView";
@@ -27,6 +27,7 @@ function App() {
     if (isAllowed) return;
 
     redirectAttempted.current = true;
+     
     setIsRedirecting(true);
 
     const timer = setTimeout(() => {

@@ -1,6 +1,6 @@
-# Gemini CLI - Project Guidelines (chvweb-2)
+# Gemini CLI - Project Guidelines (ecuavisaweb)
 
-Este archivo establece las reglas y estándares para el desarrollo del proyecto **chvweb-2**. Estas instrucciones son prioritarias para el agente.
+Este archivo establece las reglas y estándares para el desarrollo del proyecto **ecuavisaweb**. Estas instrucciones son prioritarias para el agente.
 
 ## 📺 Contexto del Proyecto
 - **Naturaleza:** Aplicación web de streaming gratuito para un canal de televisión.

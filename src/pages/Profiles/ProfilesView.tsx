@@ -1,70 +1,31 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
-import { useAuthStore } from "@/features/auth/authStore";
-import { profileService } from "@/services/profileService";
-import type { Profile } from "@/interfaces/profile.interface";
+import { useProfilesList } from "@/hooks/profiles/useProfilesList";
 import { FullScreenSpinner } from "@/components/ui/FullScreenSpinner";
-import { useConfigStore } from "@/features/config/useConfigStore";
-import fallbackLogo from "@/assets/img/logo.svg";
 import iconEdit from "@/assets/img/icons/iconos-edit.svg";
 import Button from "@/components/ui/Button";
+import { BackButton } from "@/components/ui/BackButton";
+import { useAuthStore } from "@/features/auth/authStore";
 
 function ProfilesView() {
-  const navigate = useNavigate();
-  const logo = useConfigStore((s) => s.config?.logo) || fallbackLogo;
-  const token = useAuthStore((s) => s.token);
-  const [isEditing, setIsEditing] = useState(false);
-
   const {
-    data: profiles,
+    profiles,
     isLoading,
     isError,
     error,
-  } = useQuery({
-    queryKey: ["profiles", token],
-    queryFn: async () => {
-      const response = await profileService.getAll(token!);
-      if (response.status === "error") {
-        throw new Error(response.msj || "Error al cargar perfiles.");
-      }
-      return response.data || [];
-    },
-    enabled: !!token,
-  });
-
-  const getAvatarUrl = (profile: Profile): string | null => {
-    if (Array.isArray(profile.images)) return null;
-    return profile.images?.medium || profile.images?.default || null;
-  };
-
-  const handleProfileClick = (profile: Profile) => {
-    if (isEditing) {
-      navigate(`/perfiles/${profile.id}`);
-    } else {
-      console.log("[Profiles] Selected:", profile.name_perfil, profile.id);
-      useAuthStore.getState().setActiveProfile(profile);
-      navigate("/home");
-    }
-  };
+    isEditing,
+    toggleEditing,
+    handleProfileClick,
+    getAvatarUrl,
+    navigate,
+  } = useProfilesList();
+  
+  const logout = useAuthStore((state) => state.logout);
 
   return (
-    <div className="min-h-screen flex flex-col px-25 py-3.5">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <img src={logo} alt="Logo" className="h-14 w-auto" />
-      </div>
-      <div className="flex justify-end">
-        <Button
-          variant="secondary"
-          onClick={() => setIsEditing((v) => !v)}
-        >
-          {isEditing ? "Listo" : "Editar Perfiles"}
-        </Button>
-      </div>
+    <div className="min-h-screen flex flex-col px-25 py-25" style={{ background: 'linear-gradient(to right, #17142C, #2D2533, #3D2E3D)' }}>
+      <BackButton />
 
       {/* Titulo */}
-      <div className="flex flex-col items-center mt-15">
+      <div className="flex flex-col items-center ">
         <p className="text-2xl leading-[43px]">¿Quién está ahí?</p>
       </div>
 
@@ -90,7 +51,7 @@ function ProfilesView() {
                 >
                   {/* Avatar */}
                   <div className="relative">
-                    <div className="w-36 h-36 rounded-full overflow-hidden bg-white/10 flex items-center justify-center border-3 border-transparent group-hover:border-(--foc-primary) transition-all duration-300">
+                    <div className="w-36 h-36 rounded-full overflow-hidden bg-(--clr-primary-title)/10 flex items-center justify-center border-3 border-transparent group-hover:border-(--foc-primary) transition-all duration-300">
                       {avatarUrl ? (
                         <img
                           src={avatarUrl}
@@ -105,14 +66,14 @@ function ProfilesView() {
                     </div>
                     {/* Icono editar */}
                     {isEditing && (
-                      <div className="absolute bottom-1 right-1 w-9 h-9 rounded-full bg-white flex items-center justify-center shadow-lg">
+                      <div className="absolute bottom-1 right-1 w-9 h-9 rounded-full bg-(--clr-primary-title) flex items-center justify-center shadow-lg">
                         <img src={iconEdit} alt="Editar" className="w-5 h-5" />
                       </div>
                     )}
                   </div>
 
                   {/* Nombre */}
-                  <span className="text-xl text-white/70 group-hover:text-white transition-colors duration-200">
+                  <span className="text-xl text-(--clr-primary-title)/70 group-hover:text-(--clr-primary-title) transition-colors duration-200">
                     {profile.name_perfil}
                   </span>
                 </button>
@@ -130,13 +91,28 @@ function ProfilesView() {
                     +
                   </span>
                 </div>
-                <span className="text-xl text-(--clr-secondary-text) group-hover:text-white transition-colors duration-200">
+                <span className="text-xl text-(--clr-secondary-text) group-hover:text-(--clr-primary-title) transition-colors duration-200">
                   Agregar perfil
                 </span>
               </button>
             )}
           </div>
         )}
+      </div>
+      <div className="flex justify-center gap-6 mt-8">
+        <Button
+          variant="secondary"
+          onClick={toggleEditing}
+        >
+          {isEditing ? "Listo" : "Editar Perfiles"}
+        </Button>
+        
+        <Button
+          variant="tertiary"
+          onClick={() => logout()}
+        >
+          Cerrar sesión
+        </Button>
       </div>
     </div>
   );

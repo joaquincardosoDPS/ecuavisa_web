@@ -13,7 +13,6 @@ const PlayerTopBarComponent = ({
   title,
   description,
   isVisible,
-  isLive: _isLive = false,
   onBackClick,
 }: PlayerTopBarProps) => {
   const [backHovered, setBackHovered] = useState(false);

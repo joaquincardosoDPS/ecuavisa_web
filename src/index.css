@@ -1,6 +1,30 @@
 @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap");
 @import "tailwindcss";
 
+@font-face {
+	font-family: "Gotham";
+	src: url("@/assets/fonts/Gotham Book.otf") format("opentype");
+	font-weight: 400;
+	font-style: normal;
+	font-display: swap;
+}
+
+@font-face {
+	font-family: "Gotham";
+	src: url("@/assets/fonts/Gotham Bold.otf") format("opentype");
+	font-weight: 700;
+	font-style: normal;
+	font-display: swap;
+}
+
+@font-face {
+	font-family: "Gotham";
+	src: url("@/assets/fonts/Gotham Black.otf") format("opentype");
+	font-weight: 900;
+	font-style: normal;
+	font-display: swap;
+}
+
 @theme {
 	/* Breakpoints */
 	--breakpoint-xs: 0px;
@@ -15,6 +39,7 @@
 	--font-title: var(--font-family-title);
 	--font-subtitle: var(--font-family-subtitle);
 	--font-text: var(--font-family-text);
+	--font-button: var(--font-family-button);
 
 	--text-title: var(--font-size-title);
 	--text-subtitle: var(--font-size-subtitle);
@@ -57,11 +82,11 @@
 	--font-weight-subtext: normal;
 	--font-weight-button: bold;
 
-	--font-family-title: "Poppins", Arial, Helvetica, sans-serif;
-	--font-family-subtitle: "Poppins", Arial, Helvetica, sans-serif;
-	--font-family-text: "Poppins", Arial, Helvetica, sans-serif;
-	--font-family-button: "Poppins", Arial, Helvetica, sans-serif;
-	--font-family-category: "Archia", Arial, Helvetica, sans-serif;
+	--font-family-title: "Gotham", Arial, Helvetica, sans-serif;
+	--font-family-subtitle: "Gotham", Arial, Helvetica, sans-serif;
+	--font-family-text: "Gotham", Arial, Helvetica, sans-serif;
+	--font-family-button: "Gotham", Arial, Helvetica, sans-serif;
+	--font-family-category: "Gotham", Arial, Helvetica, sans-serif;
 
 	/* Bordes y Sombras */
 	--bor-primary-radius: 5rem;
@@ -81,8 +106,8 @@
 	--tam-quaternary-container-height: 15vh;
 
 	/* Cards */
-	--card-w-vertical: 13vw;
-	--card-w-horizontal: 16vw;
+	--card-w-vertical: 15vw;
+	--card-w-horizontal: 15vw;
 
 	/* Avatar */
 	--avatar-size: 200px;
@@ -163,7 +188,21 @@ body {
 }
 
 .bg-header-gradient {
+	background-image: linear-gradient(to bottom, var(--clr-primary), transparent);
 	background-image: linear-gradient(to bottom,
-			hsl(from var(--clr-primary) h s l / 0.8),
-			hsl(from var(--clr-primary) h s l / 0));
+			color-mix(in srgb, var(--clr-primary) 80%, transparent),
+			transparent);
+}
+
+.banner-overlay {
+	background: linear-gradient(to bottom, var(--clr-primary) 0%, transparent 20%, transparent 50%, var(--clr-primary) 100%);
+	background: linear-gradient(
+		to bottom,
+		color-mix(in srgb, var(--clr-primary) 80%, transparent) 0%,
+		transparent 20%,
+		transparent 40%,
+		color-mix(in srgb, var(--clr-primary) 40%, transparent) 60%,
+		color-mix(in srgb, var(--clr-primary) 80%, transparent) 80%,
+		var(--clr-primary) 100%
+	);
 }

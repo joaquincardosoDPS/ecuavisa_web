@@ -20,7 +20,9 @@ function LivePlayer({ src, className }: LivePlayerProps) {
     let hls: Hls | null = null;
 
     if (Hls.isSupported()) {
-      hls = new Hls({ autoStartLoad: true });
+      hls = new Hls({
+        autoStartLoad: true,
+      });
       hls.loadSource(src);
       hls.attachMedia(video);
 

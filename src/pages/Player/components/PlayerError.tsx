@@ -16,7 +16,7 @@ export function PlayerError({ error, onBack }: PlayerErrorProps) {
         justifyContent: "center",
         alignItems: "center",
         background: "#000",
-        color: "#fff",
+        color: 'var(--clr-icon)',
         fontSize: "1.5rem",
         gap: "1rem",
       }}

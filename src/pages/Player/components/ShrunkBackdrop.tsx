@@ -47,9 +47,9 @@ export function ShrunkBackdrop({
           gap: "1rem",
         }}
       >
-        <h1 className="text-5xl font-bold text-white line-height-7 mb-5">{programTitle}</h1>
+        <h1 className="text-5xl font-bold text-(--clr-primary-title) line-height-7 mb-5">{programTitle}</h1>
         {nextChapter &&
-          <p className="text-white max-w-[50%]">{nextChapter.description}</p>}
+          <p className="text-(--clr-primary-title) max-w-[50%]">{nextChapter.description}</p>}
         <div className="flex flex-row gap-5 mt-5">
           {nextChapter && (
             <Button variant="primary" showArrow onClick={onPlayNext}>

@@ -1,10 +1,12 @@
 import Button from "@/components/ui/Button";
 import type { Chapter, Program } from "@/interfaces/catalog.interface";
-import { useFavorite } from "@/hooks/useFavorite";
-import FavoriteButton from "@/components/ui/FavoriteButton";
+import { useFavorite } from "@/hooks/mylist/useFavorite";
+// import FavoriteButton from "@/components/ui/FavoriteButton";
 import ProgressBar from "@/components/ui/ProgressBar";
-import { useContinueWatching } from "@/hooks/useContinueWatching";
+import { useContinueWatching } from "@/hooks/program/useContinueWatching";
 import { useNavigate } from "react-router-dom";
+import { BackButton } from "@/components/ui/BackButton";
+import StarIcon from "@/components/icons/StarIcon";
 
 interface InfoBannerProps {
   program: Program;
@@ -13,7 +15,7 @@ interface InfoBannerProps {
 
 function InfoBanner({ program, firstChapter }: InfoBannerProps) {
   const navigate = useNavigate();
-  const { isFavorited, isToggling, isEnabled, toggleFavorite } = useFavorite(
+  const { isFavorited, isEnabled, toggleFavorite } = useFavorite(
     program.key,
   );
   const { item: continueWatchingItem } = useContinueWatching(program.key);
@@ -32,68 +34,52 @@ function InfoBanner({ program, firstChapter }: InfoBannerProps) {
   };
 
   const logoImg = program?.image_logo?.big;
-  const maxSeasons = program.segments?.[0]?.max_temp || 0;
-  const genderNames = program.genders?.map((gender) => gender.name).join(", ");
+  // const maxSeasons = program.segments?.[0]?.max_temp || 0;
+  // const genderNames = program.genders?.map((gender) => gender.name).join(", ");
   return (
-    <div className="animate-in fade-in slide-in-from-left-10 duration-1000 mt-25 ml-25 min-h-[calc(100vh-55vh)] max-h-[calc(100vh-40vh)]">
-      <div className="max-h-40 min-h-20 h-55 flex items-end">
-        {logoImg ? (
-          <img
-            src={logoImg}
-            alt={program.title}
-            className="w-auto h-full object-contain"
-          />
-        ) : (
-          <h2 className="text-2xl mb-3 font-title font-bold text-white drop-shadow-2xl">
-            {program.title}
-          </h2>
-        )}
-      </div>
-      <div className="text-lg font-medium flex items-center gap-2 mb-3">
-        <span className="px-2 bg-[#31343C] py-1 rounded-md">
-          {program.classification}
-        </span>
-        {program.anio_production && (
-          <span>
-            {program.anio_production} {"-"}
-          </span>
-        )}
-        {maxSeasons > 1 ? (
-          <span>
-            {maxSeasons + " Temporadas"} {"-"}
-          </span>
-        ) : (
-          <span>
-            {"1 Temporada"} {"-"}
-          </span>
-        )}
-        {genderNames && <span>{genderNames}</span>}
-      </div>
+    <div className="animate-in fade-in slide-in-from-left-10 duration-1000 pt-25 h-[85vh] flex flex-col justify-between">
+      <BackButton />
+      <div>
+        <div className="h-55 mb-3">
+          {logoImg ? (
+            <img
+              src={logoImg}
+              alt={program.title}
+              className="w-auto h-full object-contain"
+            />
+          ) : null}
+        </div>
+        <h2 className="text-6xl mb-6 font-title font-black text-(--clr-primary-title) drop-shadow-2xl">
+          {program.title}
+        </h2>
+        <p className="text-lg font-text mb-6 font-medium drop-shadow-md leading-8 h-[100px] max-w-4xl ">
+          {program.description_short}
+        </p>
 
-      <div className="flex flex-row items-center gap-4 pt-4 mb-3">
-        <Button variant="primary" showArrow onClick={handlePlay}>
-          {continueWatchingItem ? "Reanudar" : "Ver ahora"}
-        </Button>
-        {isEnabled && (
-          <FavoriteButton
-            isFavorited={isFavorited}
-            isToggling={isToggling}
-            onClick={toggleFavorite}
+
+        <div className="flex flex-row items-center gap-4 mb-6">
+          <Button variant="primary" showArrow onClick={handlePlay} className="uppercase">
+            {continueWatchingItem ? "Reanudar" : "Ver ahora"}
+          </Button>
+          {isEnabled && (
+            <Button variant="primary" showArrow={false} onClick={toggleFavorite} className="uppercase">
+              <StarIcon filled={isFavorited} size={24} className="mr-2 shrink-0" />
+              {isFavorited ? "Eliminar" : "Agregar"}
+            </Button>
+
+          )}
+        </div>
+
+        {/* Barra de progreso "Seguir viendo" */}
+        {continueWatchingItem && (
+          <ProgressBar
+            duration={continueWatchingItem.duration}
+            time={continueWatchingItem.time}
           />
         )}
+
+
       </div>
-
-      {/* Barra de progreso "Seguir viendo" */}
-      {continueWatchingItem && (
-        <ProgressBar
-          duration={continueWatchingItem.duration}
-          time={continueWatchingItem.time}
-        />
-      )}
-
-      <p className="text-lg font-text font-medium drop-shadow-md leading-8 h-[100px] max-w-4xl ">
-        {program.description_short}
-      </p>
     </div>
   );
 }

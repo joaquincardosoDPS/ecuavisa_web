@@ -1,5 +1,5 @@
 import type { Chapter, Segment } from "@/interfaces/catalog.interface";
-import { useChapters } from "@/hooks/useChapters";
+import { useChapters } from "@/hooks/program/useChapters";
 import { useEffect } from "react";
 import ChapterCard from "@/pages/Event/components/ChapterCard";
 import Button from "@/components/ui/Button";
@@ -42,10 +42,11 @@ function ChaptersContainer({
     if (!isLoadingChapters && chapters.length > 0 && onFirstChapter) {
       onFirstChapter(chapters[0]);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- only fire when loading state changes, not when callbacks change identity
   }, [isLoadingChapters]);
 
   return (
-    <div className="flex flex-col gap-5 2xl:gap-10 animate-in fade-in duration-500 min-h-[calc(100vh-281px)]">
+    <div className="flex flex-col mr-40 gap-5 2xl:gap-10 animate-in fade-in duration-500 min-h-[calc(100vh-281px)]">
       <div className="grid grid-cols-5 2xl:grid-cols-8 gap-5">
         {activeSegment?.all_temp.map((temp) => {
           const isSeasonActive = activeSeason === temp;
@@ -54,8 +55,8 @@ function ChaptersContainer({
               key={temp}
               onClick={() => setActiveSeason(temp)}
               className={`shrink-0 font-bold text-base transition-colors cursor-pointer ${isSeasonActive
-                ? "text-white"
-                : "text-(--clr-secondary-text) hover:text-white"
+                ? "text-(--clr-primary-title)"
+                : "text-(--clr-secondary-text) hover:text-(--clr-primary-title)"
                 }`}
             >
               Temporada {temp}
@@ -65,7 +66,7 @@ function ChaptersContainer({
       </div>
 
       {isLoadingChapters ? (
-        <p className="text-white">Cargando capítulos...</p>
+        <p className="text-(--clr-primary-title)">Cargando capítulos...</p>
       ) : chapters && chapters.length > 0 ? (
         <>
           <div className="grid grid-cols-5 gap-x-6 gap-y-10">
@@ -93,7 +94,7 @@ function ChaptersContainer({
           )}
         </>
       ) : (
-        <p className="text-white">
+        <p className="text-(--clr-primary-title)">
           No hay capítulos disponibles para esta temporada.
         </p>
       )}

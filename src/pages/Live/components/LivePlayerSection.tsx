@@ -38,7 +38,7 @@ function LivePlayerSection({
   if (!signal || !rudoKey) {
     return (
       <div className="h-full w-full rounded-xl bg-black/50 flex items-center justify-center">
-        <span className="text-white/50">Sin señal disponible</span>
+        <span className="text-(--clr-primary-title)/50">Sin señal disponible</span>
       </div>
     );
   }
@@ -55,7 +55,7 @@ function LivePlayerSection({
         key={rudoKey}
         ref={iframeRef}
         id="vrudo"
-        src={`https://rudo.video/live/${rudoKey}`}
+        src={`https://rudo.video/live/${rudoKey}?platform=ecuavisaweb`}
         width="100%"
         height="100%"
         title={signal.name_live || "Canal en vivo"}

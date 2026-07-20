@@ -1,7 +1,7 @@
 import { useMemo, useEffect } from "react";
 import { RudoPlayer } from "@/components/RudoPlayer";
-import { usePlayerEpisode } from "@/hooks/usePlayerEpisode";
-import { useDocumentTitle } from "@/hooks/useDocumentTitle";
+import { usePlayerEpisode } from "@/hooks/player/usePlayerEpisode";
+import { useDocumentTitle } from "@/hooks/shared/useDocumentTitle";
 import { useAnalytics } from "@/layout/AnalyticsWrapper";
 import { PlayerLoading } from "./components/PlayerLoading";
 import { PlayerError } from "./components/PlayerError";

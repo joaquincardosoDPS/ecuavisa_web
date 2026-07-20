@@ -55,8 +55,10 @@ export function useWatchHistory({
     const durationRef = useRef(duration);
 
     // Mantener refs actualizados
-    currentTimeRef.current = currentTime;
-    durationRef.current = duration;
+    useEffect(() => {
+        currentTimeRef.current = currentTime;
+        durationRef.current = duration;
+    }, [currentTime, duration]);
 
     const canSave = !!vodSlug && !!token && !!profile && !isLive;
 

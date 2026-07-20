@@ -91,7 +91,7 @@ const VolumeControlComponent = ({
             direction: "rtl",
             width: "4px",
             height: "80px",
-            accentColor: "#fff",
+            accentColor: 'var(--clr-icon)',
             cursor: "pointer",
             appearance: "auto",
           }}

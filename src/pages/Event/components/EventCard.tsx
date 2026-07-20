@@ -21,12 +21,12 @@ function EventCard({ event }: CardProps) {
         <div className="flex flex-col gap-3" onClick={handleClick}>
 
             <div
-                className='group relative shrink-0 overflow-hidden cursor-pointer transition-all duration-300 hover:z-10 hover:ring-2 hover:ring-(--foc-primary) hover:shadow-[0_0_20px_rgba(255,19,118,0.3)] focus:outline-none focus:z-10 focus:ring-2 focus:ring-(--foc-primary) focus:shadow-[0_0_20px_rgba(255,19,118,0.3)] bg-[#0a0a0a] embla_slide aspect-video rounded-lg'
+                className='group relative shrink-0 overflow-hidden cursor-pointer transition-all duration-300 hover:z-10 hover:ring-2 hover:ring-(--foc-primary) hover:shadow-[0_0_20px_rgba(255,19,118,0.3)] focus:outline-none focus:z-10 focus:ring-2 focus:ring-(--foc-primary) focus:shadow-[0_0_20px_rgba(255,19,118,0.3)] bg-(--clr-primary) embla_slide aspect-video rounded-lg'
             >
                 {eventStatus && (
                     <span
                         className="absolute top-0 left-0 z-10 px-3 py-1 rounded text-xs font-semibold uppercase tracking-[0.05em] text-black"
-                        style={{ backgroundColor: `var(${eventStatus.colorVar})` }}
+                        style={{ backgroundColor: eventStatus.bgColor, color: eventStatus.textColor }}
                     >
                         {eventStatus.label}
                     </span>

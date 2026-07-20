@@ -4,12 +4,14 @@ export interface HistoryItem {
     key: string;
     slug: string;
     title: string;
+    name_program: string;
     key_segment: string;
     key_program: string;
     description: string;
     season: number;
     chapter: number;
     duration: string;
+    duration_seg: number;
     image_land: ImageSet;
     image: string;
     m3u8: string;

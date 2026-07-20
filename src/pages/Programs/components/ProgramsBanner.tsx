@@ -20,6 +20,7 @@ export default function ProgramsBanner({ activeProgram }: ProgramsBannerProps) {
 	useEffect(() => {
 		if (!currentBgImage) return;
 
+		 
 		setImages((prev) => {
 			const lastImage = prev[prev.length - 1];
 			if (lastImage && lastImage.src === currentBgImage) {
@@ -73,7 +74,7 @@ export default function ProgramsBanner({ activeProgram }: ProgramsBannerProps) {
 								className="w-auto h-full object-contain"
 							/>
 						) : (
-							<h1 className="text-4xl font-title font-bold text-white drop-shadow-2xl">
+							<h1 className="text-4xl font-title font-bold text-(--clr-primary-title) drop-shadow-2xl">
 								{activeProgram.title}
 							</h1>
 						)}

@@ -1,40 +1,91 @@
-import type { Program } from "@/interfaces/catalog.interface";
+import type { Program, Event } from "@/interfaces/catalog.interface";
 import { useNavigate } from "react-router-dom";
 import Button from "@/components/ui/Button";
+import { getEventStatus } from "@/utils/eventStatus";
+import { PlayButton } from "@/components/icons/play-button";
+import { InfoCircle } from "@/components/icons/info-circle";
 
 interface BannerInfoProps {
-	program: Program;
+	program: Program | Event;
 }
 
 export function BannerInfo({ program }: BannerInfoProps) {
 	const navigate = useNavigate();
 	if (!program) return null;
 
+	const isEvent = 'type' in program;
+	const eventData = isEvent ? (program as Event) : null;
+	const eventStatus = isEvent && eventData ? getEventStatus(eventData) : null;
+
+	const handleClick = () => {
+		if (isEvent && eventData) {
+			if (eventData.skip_view && eventData.program_associated?.key) {
+				navigate(`/programas/${eventData.program_associated.key}`);
+			} else {
+				navigate(`/eventos/${eventData.key}`);
+			}
+		} else {
+			navigate(`/programas/${program.key}`);
+		}
+	};
+
 	return (
-		<div className="space-y-6 animate-in fade-in slide-in-from-left-10 duration-1000 flex flex-col justify-end">
-			<div className="h-46 flex items-center | xs:max-sm:h-7.5">
-				{program.image_logo.medium ? (
-					<img
-						src={program.image_logo.medium}
-						alt={program.title}
-						className="w-auto h-full object-contain"
-					/>
-				) : (
-					<h2 className="text-4xl  font-title font-bold text-white drop-shadow-2xl">
+		<>
+			{/* Badge de estado */}
+			{eventStatus && (
+				<span
+					className="inline-block mb-4 px-3 py-1 rounded-md text-sm font-bold uppercase tracking-wide"
+					style={{
+						backgroundColor: eventStatus.bgColor,
+						color: eventStatus.textColor,
+					}}
+				>
+					{eventStatus.label}
+				</span>
+			)}
+
+			{/* Descripción + Metadata */}
+			<div className="max-w-[50vw] z-2 flex flex-row justify-start mb-8">
+				{/* Logo del programa */}
+				<div className="max-h-[15vw] max-w-[20vw] w-fit z-2 pr-4">
+					{program.image_logo?.medium ? (
+						<img
+							src={program.image_logo.default}
+							alt={program.title}
+							className="h-full object-contain drop-shadow-[0_2px_8px_rgba(0,0,0,0.6)]"
+						/>
+					) : (
+						null
+					)}
+				</div>
+				<div>
+					<h2 className="text-[4rem] font-black leading-20 mb-4">
 						{program.title}
 					</h2>
-				)}
+					<p className="text-[1.5rem] font-bold leading-10 line-clamp-2">
+						{program.description_short}
+					</p>
+				</div>
 			</div>
 
-			<div className="flex items-center gap-4 pt-4">
-				<Button variant="primary" showArrow onClick={() => navigate(`/programas/${program.key}`)}>
-					Ver ahora
+			{/* Botones */}
+			<div className='flex flex-row uppercase' style={{ columnGap: '1rem' }}>
+				<Button
+					variant="primary"
+					onClick={handleClick}
+				>
+					<PlayButton className="mr-2 shrink-0" width={30} height={30} />
+					Ver en vivo
+				</Button>
+				<Button
+					variant="primary"
+					onClick={handleClick}
+				>
+					<InfoCircle className="mr-2 shrink-0" width={30} height={30} />
+					Información
 				</Button>
 			</div>
-
-			<p className="text-lg font-text line-clamp-3 drop-shadow-md leading-8 h-[150px] max-w-4xl | xs:max-md:h-auto xs:max-md:leading-8 2xl:text-2xl">
-				{program.description_short}
-			</p>
-		</div>
+			<div></div>
+		</>
 	);
 }

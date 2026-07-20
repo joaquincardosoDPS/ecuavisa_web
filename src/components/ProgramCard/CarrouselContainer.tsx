@@ -13,7 +13,7 @@ function CarrouselContainer({ category }: CarrouselContainerProps) {
 			className={`px-20 relative flex flex-col gap-5 mt-5 mb-5 | xs:max-md:pl-7.5 xs:max-md:pr-0 xs:max-md:gap-2.5`}
 			style={{ fontFamily: "var(--font-family-category)" }}
 		>
-			<h2 className="relative z-10 text-2xl font-bold text-white line-height-7 | xs:max-md:text-xl xs:max-md:pr-7.5">
+			<h2 className="relative z-10 text-2xl font-bold text-(--clr-primary-title) line-height-7 | xs:max-md:text-xl xs:max-md:pr-7.5">
 				{category.title}
 			</h2>
 

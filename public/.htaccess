@@ -1,10 +1,10 @@
 <IfModule mod_rewrite.c>
   RewriteEngine On
-  RewriteBase /
+  RewriteBase /ecuavisa/
 
   # SPA fallback: servir index.html para todas las rutas
   RewriteRule ^index\.html$ - [L]
   RewriteCond %{REQUEST_FILENAME} !-f
   RewriteCond %{REQUEST_FILENAME} !-d
-  RewriteRule . /index.html [L]
+  RewriteRule . /ecuavisa/index.html [L]
 </IfModule>

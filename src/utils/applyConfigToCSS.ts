@@ -1,6 +1,6 @@
 // src/utils/applyConfigToCSS.ts
 // Aplica la configuración dinámica del cliente a las variables CSS de :root
-export function applyConfigToCSS(config: any) {
+export function applyConfigToCSS(config: Record<string, string>) {
     if (!config) return;
     const root = document.documentElement;
 

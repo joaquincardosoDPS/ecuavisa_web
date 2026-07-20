@@ -17,7 +17,7 @@ interface VastPlayerProps {
 const VastPlayerComponent = ({ url, onAdsPlaying, onAdsFinished }: VastPlayerProps) => {
     const containerRef = useRef<HTMLDivElement>(null);
     const videoRef = useRef<HTMLVideoElement>(null);
-    const imaPlayerRef = useRef<any>(null);
+    const imaPlayerRef = useRef<Player | null>(null);
     const mountIdRef = useRef(0);
     const adTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
     const [isLoading, setIsLoading] = useState(true);
@@ -112,7 +112,7 @@ const VastPlayerComponent = ({ url, onAdsPlaying, onAdsFinished }: VastPlayerPro
                     // También llamar resizeAd en el player
                     try {
                         imaPlayer.resizeAd(w, h);
-                    } catch (_e) { /* ignore */ }
+                    } catch { /* ignore */ }
                 };
 
                 // Timeout de seguridad: si el ad no inicia en 30s, continuar
@@ -123,7 +123,7 @@ const VastPlayerComponent = ({ url, onAdsPlaying, onAdsFinished }: VastPlayerPro
                 }, 30000);
 
                 // Event listeners del IMA player
-                imaPlayer.addEventListener('AdStarted', (event: any) => {
+                imaPlayer.addEventListener('AdStarted', (event: CustomEvent) => {
                     const podInfo = event.detail?.ad?.getAdPodInfo?.();
                     console.log('[VAST] Ad started', podInfo);
                     setIsLoading(false);
@@ -136,7 +136,7 @@ const VastPlayerComponent = ({ url, onAdsPlaying, onAdsFinished }: VastPlayerPro
                 // Si el ad se pausa (SIMID/TrueView play button), reanudar automáticamente
                 imaPlayer.addEventListener('AdPaused', () => {
                     console.log('[VAST] Ad pausado, reanudando automáticamente');
-                    try { videoRef.current?.play(); } catch (_e) { /* ignore */ }
+                    try { videoRef.current?.play(); } catch { /* ignore */ }
                 });
 
                 imaPlayer.addEventListener('AdAllAdsCompleted', () => {
@@ -145,7 +145,7 @@ const VastPlayerComponent = ({ url, onAdsPlaying, onAdsFinished }: VastPlayerPro
                     onAdsFinished?.();
                 });
 
-                imaPlayer.addEventListener('AdError', (event: any) => {
+                imaPlayer.addEventListener('AdError', (event: CustomEvent) => {
                     const detail = event?.detail;
                     const code = detail?.errorCode || 'unknown';
                     const msg = detail?.message || detail?.error?.message || 'Unknown';
@@ -186,20 +186,23 @@ const VastPlayerComponent = ({ url, onAdsPlaying, onAdsFinished }: VastPlayerPro
         initAds();
 
         // Cleanup
+        // Capture ref values for cleanup to satisfy exhaustive-deps
+        const videoElement = videoRef.current;
+
         return () => {
             if (adTimeoutRef.current) clearTimeout(adTimeoutRef.current);
             if (imaPlayerRef.current) {
                 try {
                     imaPlayerRef.current.destroy?.();
-                } catch (_e) {
+                } catch {
                     // Silenciar errores de destroy
                 }
                 imaPlayerRef.current = null;
             }
-            if (videoRef.current) {
-                videoRef.current.pause();
-                videoRef.current.removeAttribute('src');
-                videoRef.current.load();
+            if (videoElement) {
+                videoElement.pause();
+                videoElement.removeAttribute('src');
+                videoElement.load();
             }
             console.log('[VAST] Cleanup completo');
         };
@@ -249,7 +252,7 @@ const VastPlayerComponent = ({ url, onAdsPlaying, onAdsFinished }: VastPlayerPro
                             marginBottom: '16px',
                         }}
                     />
-                    <span style={{ color: '#fff', fontSize: '1.1rem' }}>
+                    <span style={{ color: 'var(--clr-icon)', fontSize: '1.1rem' }}>
                         Cargando publicidad...
                     </span>
                     <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>

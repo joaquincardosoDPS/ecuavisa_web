@@ -19,7 +19,7 @@ function CardHorizontal({ program, format }: CardHorizontalProps) {
   const programData = !isEvent ? (program as Program) : null;
 
   const imageSrc = isEvent
-    ? eventData?.image_land?.small
+    ? eventData?.image_land?.small || eventData?.image_background?.small
     : programData?.image_land?.small;
 
   const eventStatus = isEvent && eventData ? getEventStatus(eventData) : null;
@@ -56,10 +56,10 @@ function CardHorizontal({ program, format }: CardHorizontalProps) {
   };
 
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col shrink-0" style={{ width: 'var(--card-w-horizontal)' }}>
       <div
         tabIndex={0}
-        className="group relative shrink-0 overflow-hidden cursor-pointer transition-all duration-300 hover:z-10 hover:ring-2 hover:ring-(--foc-primary) hover:shadow-[0_0_20px_rgba(255,19,118,0.3)] focus:outline-none focus:z-10 focus:ring-2 focus:ring-(--foc-primary) focus:shadow-[0_0_20px_rgba(255,19,118,0.3)] bg-[#0a0a0a] embla_slide aspect-video rounded-lg"
+        className="group relative shrink-0 overflow-hidden cursor-pointer transition-all duration-300 hover:z-10 hover:ring-2 hover:ring-(--foc-primary) hover:shadow-[0_0_20px_rgba(255,19,118,0.3)] focus:outline-none focus:z-10 focus:ring-2 focus:ring-(--foc-primary) focus:shadow-[0_0_20px_rgba(255,19,118,0.3)] bg-(--clr-primary) embla_slide aspect-video rounded-lg"
         style={{ width: "var(--card-w-horizontal)" }}
         onMouseEnter={handleFocusEnter}
         onMouseLeave={handleFocusLeave}
@@ -70,8 +70,11 @@ function CardHorizontal({ program, format }: CardHorizontalProps) {
         {/* Event status badge */}
         {eventStatus && (
           <span
-            className="absolute top-0 left-0 z-10 px-2 py-0.5 rounded text-xs font-semibold uppercase tracking-wide text-black"
-            style={{ backgroundColor: `var(${eventStatus.colorVar})` }}
+            className="absolute top-0 left-0 z-10 px-2.5 py-1 rounded-br-md text-xs font-bold uppercase tracking-wide"
+            style={{
+              backgroundColor: eventStatus.bgColor,
+              color: eventStatus.textColor,
+            }}
           >
             {eventStatus.label}
           </span>
@@ -85,26 +88,60 @@ function CardHorizontal({ program, format }: CardHorizontalProps) {
             loading="lazy"
           />
         ) : (
-          <div className="w-full h-full bg-gray-800 flex items-center justify-center p-4 text-center transition-transform duration-300 scale-110 group-hover:scale-100 group-focus:scale-100">
-            <span className="text-white text-sm md:text-base font-medium">
+          <div className="w-full h-full bg-(--clr-secondary) flex items-center justify-center p-4 text-center transition-transform duration-300 scale-110 group-hover:scale-100 group-focus:scale-100">
+            <span className="text-(--clr-primary-title) text-sm md:text-base font-medium">
               {program.title}
             </span>
           </div>
         )}
       </div>
       {showDate && (
-        <div className="z-10 my-2 rounded text-xs font-semibold uppercase tracking-wide text-(--clr-secondary-text)">
-          <h1>
+        <div className="mt-2 px-0.5">
+          <p className="text-(--clr-primary-title) text-sm font-semibold tracking-wider">
             {(() => {
+              const days = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
               const d = new Date(eventData!.gmt0_unlocked.replace(" ", "T") + "Z");
-              const date = d.toLocaleDateString("es-CL", { weekday: "short", day: "numeric", month: "long" });
-              const time = d.toLocaleTimeString("es-CL", { hour: "2-digit", minute: "2-digit", hour12: false });
-              return `${date}, ${time} hrs`;
+              const day = days[d.getDay()];
+              const time = d.toLocaleTimeString('es-EC', { hour: '2-digit', minute: '2-digit', hour12: false });
+              return `${day} | ${time}`;
             })()}
-          </h1>
-          <p className="py-1">{program.title}</p>
+          </p>
+          <p className="text-(--clr-primary-title) text-base uppercase font-bold line-clamp-1 mt-0.5">
+            {program.title}
+          </p>
         </div>
-
+      )}
+      {isEvent && !showDate && eventData && (
+        <div className="mt-2 px-0.5">
+          <p className="text-(--clr-primary-title) text-base font-bold line-clamp-1">
+            {program.title}
+          </p>
+          <p className="text-(--clr-primary-title)/60 text-sm mt-0.5 line-clamp-2">
+            {eventData.category?.name || eventData.description_short || ''}
+          </p>
+        </div>
+      )}
+      {!isEvent && programData && (
+        <div className="mt-2 px-0.5">
+          <p className="text-(--clr-primary-title) text-base font-bold line-clamp-1">
+            {program.title}
+          </p>
+          <p className="text-(--clr-primary-title)/60 text-sm mt-0.5">
+            {(() => {
+              const parts: string[] = [];
+              const totalSeasons = programData.segments?.reduce(
+                (acc, seg) => acc + (seg.all_temp?.length || 0), 0
+              ) || 0;
+              if (totalSeasons > 0) {
+                parts.push(`${totalSeasons} temporada${totalSeasons > 1 ? 's' : ''}`);
+              }
+              if (programData["max-cap"]?.chapter) {
+                parts.push(`${programData["max-cap"].chapter} capítulo${programData["max-cap"].chapter > 1 ? 's' : ''}`);
+              }
+              return parts.join(' · ') || programData.name_category;
+            })()}
+          </p>
+        </div>
       )}
     </div>
   );

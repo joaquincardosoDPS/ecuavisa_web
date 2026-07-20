@@ -45,7 +45,7 @@ function NotFoundView() {
       </p>
 
       {/* Botón volver al inicio */}
-      <Button variant="secondary" onClick={() => navigate("/home")} className="mt-8">
+      <Button variant="secondary" onClick={() => navigate("/")} className="mt-8">
         Volver al home
       </Button>
 
@@ -63,7 +63,7 @@ function NotFoundView() {
               key={program.key}
               className="group relative overflow-hidden cursor-pointer rounded-lg transition-all duration-300
                          hover:ring-2 hover:ring-(--foc-primary) hover:shadow-[0_0_20px_rgba(255,19,118,0.3)]
-                         w-60 aspect-video bg-[#0a0a0a]"
+                         w-60 aspect-video bg-(--clr-primary)"
               onClick={() => navigate(`/programas/${program.key}`)}
             >
               {program.image_land?.medium && (

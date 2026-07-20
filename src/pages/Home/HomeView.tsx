@@ -1,16 +1,19 @@
+import { useEffect, useRef } from "react";
 import CardCarrousel from "@/components/ProgramCard/CardCarrousel";
 import CarrouselContainerHome from "@/pages/Home/components/CarrouselContainerHome";
 import ContinueWatchingCarousel from "@/pages/Home/components/ContinueWatchingCarousel";
 import { FullScreenSpinner } from "@/components/ui/FullScreenSpinner";
-import { useHomeData } from "@/hooks/useHomeData";
-import { useImagePreloader } from "@/hooks/useImagePreloader";
-import { useDocumentTitle } from "@/hooks/useDocumentTitle";
+import { useHomeData } from "@/hooks/home/useHomeData";
+import { useDocumentTitle } from "@/hooks/shared/useDocumentTitle";
 import Banner from "./components/Banner";
-import { useMemo } from "react";
-import { useAppInitialization } from "@/hooks/useAppInitilization";
+import { useAppInitialization } from "@/hooks/shared/useAppInitilization";
+import HomeLiveGrid from "./components/HomeLiveGrid";
 
 function HomeView() {
-	useDocumentTitle('Home');
+	useDocumentTitle('Inicio', {
+		description: 'Mira tus programas favoritos en vivo y on demand en Ecuavisa. Series, reality shows, noticias y entretenimiento, todo gratis y sin suscripción.',
+		canonical: 'https://www.ecuavisa.com/',
+	});
 
 	const {
 		slider,
@@ -19,37 +22,39 @@ function HomeView() {
 		continueWatching,
 		isLoading,
 		isError,
+		fetchNextPage,
+		hasNextPage,
+		isFetchingNextPage,
 	} = useHomeData();
 
 	const { data } = useAppInitialization()
 
-	// Extract critical above-the-fold image URLs for preloading
-	const criticalImages = useMemo(() => {
-		if (!slider || slider.length === 0) return [];
-		const urls: string[] = [];
-		// Banner background (most important)
-		const main = slider[0];
-		const bannerSrc = main.image_slider.big || main.image_land.default;
-		if (bannerSrc) urls.push(bannerSrc);
-		// Banner logo
-		if (main.image_logo?.medium) urls.push(main.image_logo.medium);
-		// Featured cards (rest of slider)
-		slider.slice(1, 5).forEach((p) => {
-			const src = p.image_land?.medium || p.image_land?.default;
-			if (src) urls.push(src);
-		});
-		return urls;
-	}, [slider]);
+	// Infinite scroll sentinel
+	const sentinelRef = useRef<HTMLDivElement>(null);
+	useEffect(() => {
+		const el = sentinelRef.current;
+		if (!el) return;
 
-	const imagesReady = useImagePreloader(criticalImages, !isLoading && slider.length > 0);
+		const observer = new IntersectionObserver(
+			(entries) => {
+				if (entries[0].isIntersecting && hasNextPage && !isFetchingNextPage) {
+					fetchNextPage();
+				}
+			},
+			{ rootMargin: '400px' }
+		);
 
-	if (isLoading || !imagesReady) {
+		observer.observe(el);
+		return () => observer.disconnect();
+	}, [hasNextPage, isFetchingNextPage, fetchNextPage]);
+
+	if (isLoading) {
 		return <FullScreenSpinner />;
 	}
 
 	if (isError || !slider) {
 		return (
-			<div className="flex items-center justify-center min-h-[50vh] text-white">
+			<div className="flex items-center justify-center min-h-[50vh] text-(--clr-primary-title)">
 				<p className="text-red-500 font-title text-xl">
 					Error al cargar el catálogo.
 				</p>
@@ -60,38 +65,38 @@ function HomeView() {
 		<div className="relative min-h-screen overflow-x-hidden">
 			<Banner slider={slider} />
 
-			<div className="flex flex-col pb-20 gap-5 | xs:max-md:pb-10 xs:max-md:gap-2.5">
+			<div className="relative z-20 flex flex-col pb-20 gap-5 | xs:max-md:pb-10 xs:max-md:gap-2.5">
 				{/* Recomendados */}
-				{slider.length > 1 && (
+				{/* {slider.length > 1 && (
 					<div
-						className="px-20 flex flex-col gap-5 mt-5 mb-5 | xs:max-md:px-7.5"
+						className="pl-48 flex flex-col gap-5 mt-5 mb-5 | xs:max-md:px-7.5"
 						style={{ fontFamily: "var(--font-family-category)" }}
 					>
-						<h2 className="text-2xl font-bold text-white line-height-7">
+						<h2 className="text-2xl font-bold text-(--clr-primary-title) line-height-7">
 							{data?.data?.nombre_slider || "Destacados"}
 						</h2>
 						<CardCarrousel programs={slider.slice(1)} />
 					</div>
+				)} */}
+				<HomeLiveGrid />
+				{/* Seguir Viendo */}
+				{continueWatching.length > 0 && (
+					<ContinueWatchingCarousel items={continueWatching} />
 				)}
 				{/* Recomendados */}
 				{recommended.length > 0 && (
 					<div
-						className="px-20 flex flex-col gap-5 mt-5 mb-5 | xs:max-md:px-7.5"
+						className="pl-48 flex flex-col gap-5 mt-5 mb-5 | xs:max-md:px-7.5"
 						style={{ fontFamily: "var(--font-family-category)" }}
 					>
-						<h2 className="text-2xl font-bold text-white line-height-7">
+						<h2 className="text-2xl font-bold text-(--clr-primary-title) line-height-7">
 							{data?.data?.nombre_recomendados || "Recomendados para ti"}
 						</h2>
 						<CardCarrousel programs={recommended} />
 					</div>
 				)}
-				{/* Seguir Viendo */}
-				{continueWatching.length > 0 && (
-					<ContinueWatchingCarousel items={continueWatching} />
-				)}
 
 				{/* Listado de categorías */}
-
 				{categories.map(
 					(category) =>
 						category.programs.length > 0 && (
@@ -99,6 +104,13 @@ function HomeView() {
 						),
 				)}
 
+				{/* Sentinel para infinite scroll */}
+				<div ref={sentinelRef} className="h-1" />
+				{isFetchingNextPage && (
+					<div className="flex justify-center py-8">
+						<div className="w-8 h-8 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+					</div>
+				)}
 			</div>
 		</div>
 	);

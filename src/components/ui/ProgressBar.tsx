@@ -30,13 +30,13 @@ function ProgressBar({ duration, time }: ProgressBarProps) {
 
   return (
     <div className="flex items-center gap-3 max-w-sm">
-      <div className="flex-1 h-1 bg-white rounded-full overflow-hidden">
+      <div className="flex-1 h-1 bg-(--clr-primary-title) rounded-full overflow-hidden">
         <div
           className="h-full bg-(--foc-primary) rounded-full transition-all duration-500"
           style={{ width: `${progress}%` }}
         />
       </div>
-      <span className="text-sm text-white whitespace-nowrap">
+      <span className="text-sm text-(--clr-primary-title) whitespace-nowrap">
         {formatRemaining(remainingSeconds)} restantes
       </span>
     </div>

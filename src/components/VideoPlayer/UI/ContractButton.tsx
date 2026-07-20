@@ -12,7 +12,7 @@ const ContractButtonComponent = ({ onClick }: ContractButtonProps) => {
       style={{
         background: "none",
         border: "none",
-        color: "#fff",
+        color: 'var(--clr-icon)',
         cursor: "pointer",
         padding: "4px",
         display: "flex",

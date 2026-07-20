@@ -60,7 +60,7 @@ export function NextChapterCard({ chapter, onPlay }: NextChapterCardProps) {
         </span>
         <span
           style={{
-            color: "#fff",
+            color: 'var(--clr-icon)',
             fontSize: "1rem",
             fontWeight: 600,
             lineHeight: 1.3,

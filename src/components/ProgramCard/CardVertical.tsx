@@ -40,7 +40,7 @@ function CardVertical({ program, format, index }: CardVerticalProps) {
     <div className="flex flex-col">
       <div
         tabIndex={0}
-        className="group relative shrink-0 overflow-hidden cursor-pointer transition-all duration-300 hover:z-10 hover:ring-2 hover:ring-(--foc-primary) hover:shadow-[0_0_20px_rgba(255,19,118,0.3)] focus:outline-none focus:z-10 focus:ring-2 focus:ring-(--foc-primary) focus:shadow-[0_0_20px_rgba(255,19,118,0.3)] bg-[#0a0a0a] embla_slide aspect-9/16 rounded-xl"
+        className="group relative shrink-0 overflow-hidden cursor-pointer transition-all duration-300 hover:z-10 hover:ring-2 hover:ring-(--foc-primary) hover:shadow-[0_0_20px_rgba(255,19,118,0.3)] focus:outline-none focus:z-10 focus:ring-2 focus:ring-(--foc-primary) focus:shadow-[0_0_20px_rgba(255,19,118,0.3)] bg-(--clr-primary) embla_slide aspect-9/16 rounded-xl"
         style={{ width: "var(--card-w-vertical)" }}
         onClick={handleClick}
       >
@@ -52,7 +52,7 @@ function CardVertical({ program, format, index }: CardVerticalProps) {
               alt=""
               className="absolute inset-0 w-full h-full"
             />
-            <span className="relative text-white font-bold text-lg text-center -mt-3.5">
+            <span className="relative text-(--clr-primary-title) font-bold text-lg text-center -mt-3.5">
               {index + 1}
             </span>
           </div>
@@ -61,8 +61,11 @@ function CardVertical({ program, format, index }: CardVerticalProps) {
         {/* Event status badge */}
         {eventStatus && (
           <span
-            className="absolute top-0 left-0 z-10 px-2 py-0.5 rounded text-[0.7rem] uppercase tracking-wide text-black"
-            style={{ backgroundColor: `var(${eventStatus.colorVar})` }}
+            className="absolute top-0 left-0 z-10 px-2.5 py-1 rounded-br-md text-[0.7rem] font-bold uppercase tracking-wide"
+            style={{
+              backgroundColor: eventStatus.bgColor,
+              color: eventStatus.textColor,
+            }}
           >
             {eventStatus.label}
           </span>
@@ -98,8 +101,8 @@ function CardVertical({ program, format, index }: CardVerticalProps) {
             loading="lazy"
           />
         ) : (
-          <div className="w-full h-full bg-gray-800 flex items-center justify-center p-4 text-center transition-transform duration-300 scale-110 group-hover:scale-100 group-focus:scale-100">
-            <span className="text-white text-sm md:text-base font-medium">
+          <div className="w-full h-full bg-(--clr-secondary) flex items-center justify-center p-4 text-center transition-transform duration-300 scale-110 group-hover:scale-100 group-focus:scale-100">
+            <span className="text-(--clr-primary-title) text-sm md:text-base font-medium">
               {program.title}
             </span>
           </div>

@@ -18,15 +18,22 @@ interface ButtonProps {
 }
 
 const baseClasses =
-    "relative inline-flex items-center justify-center px-10 py-3.5 border-2 border-transparent rounded-lg text-base font-bold font-inherit cursor-pointer whitespace-nowrap transition-all duration-200 ease-out disabled:opacity-50 disabled:cursor-not-allowed";
+    "relative inline-flex items-center justify-center px-4 py-4 border-2 border-transparent rounded-2xl text-2xl leading-[32px] tracking-[-0.02em] font-bold font-button cursor-pointer whitespace-nowrap transition-all duration-200 ease-out disabled:opacity-50 disabled:cursor-not-allowed";
 
 const variantClasses: Record<ButtonVariant, string> = {
-    primary:
-        "bg-[var(--clr-primary-button)] text-[var(--clr-text-primary-button)] hover:bg-white hover:text-black hover:shadow-[0_0_20px_4px_var(--clr-primary-button)]",
-    secondary:
-        "bg-[var(--clr-secondary-button)] text-[var(--clr-text-secondary-button)] hover:shadow-[0_0_20px_0px_#FF1A73]",
-    tertiary:
-        "bg-transparent text-[var(--clr-text-tertiary-button)] border-[var(--clr-text-tertiary-button)] hover:bg-[var(--clr-text-tertiary-button)] hover:text-black ",
+    primary: [
+        'bg-(--clr-primary-title)/15 border-(--clr-primary-title)/20 text-(--clr-primary-title)',
+        'hover:bg-(--clr-primary-button) hover:text-(--clr-text-primary-button) hover:border-transparent',
+    ].join(' '),
+    secondary: [
+        'bg-(--clr-secondary-button) text-(--clr-text-secondary-button)',
+        'hover:[box-shadow:0_0_20px_0_var(--foc-secondary)]',
+    ].join(' '),
+    tertiary: [
+        'bg-transparent text-(--clr-text-tertiary-button) border-(--clr-text-tertiary-button)',
+        'hover:bg-(--clr-text-tertiary-button) hover:text-(--clr-primary)',
+        'hover:[box-shadow:0_0_10px_1px_var(--foc-tertiary)]',
+    ].join(' '),
 };
 
 function Button({
@@ -51,7 +58,7 @@ function Button({
                     viewBox="0 0 14 16"
                     fill="currentColor"
                     xmlns="http://www.w3.org/2000/svg"
-                    className="mr-3 shrink-0"
+                    className="mr-3 shrink-0 "
                 >
                     <path d="M14 8L0 16V0L14 8Z" />
                 </svg>

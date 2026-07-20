@@ -7,7 +7,7 @@ import { VastPlayer } from "./ads/VastPlayer";
 import { Spinner } from "@/components/ui/Spinner";
 import { PlayerTopBar } from "./UI/PlayerTopBar";
 import { PlayerControls } from "./UI/PlayerControls";
-import type { VideoPlayerProps } from "./types";
+import type { VideoPlayerProps, Chapter } from "./types";
 import "./VideoPlayer.css";
 
 /**
@@ -49,10 +49,10 @@ const VideoPlayerComponent = ({
 
   // End-of-episode PiP transition state
   const [isEndingTransition, setIsEndingTransition] = useState(false);
-  const [nextEpisode, setNextEpisode] = useState<any>(null);
+  const [nextEpisode, setNextEpisode] = useState<Chapter | null>(null);
   const [endingCountdown, setEndingCountdown] = useState(10);
   const endingTriggeredRef = useRef(false);
-  const nextEpisodeRef = useRef<any>(null);
+  const nextEpisodeRef = useRef<Chapter | null>(null);
   const autoNavFiredRef = useRef(false);
 
   // Hold-to-seek state
@@ -67,6 +67,7 @@ const VideoPlayerComponent = ({
     endingTriggeredRef.current = false;
     autoNavFiredRef.current = false;
     nextEpisodeRef.current = null;
+     
     setIsEndingTransition(false);
     setNextEpisode(null);
     setEndingCountdown(10);
@@ -83,6 +84,7 @@ const VideoPlayerComponent = ({
   useEffect(() => {
     if (evaluated && shouldPlayAds && effectiveVastUrl) {
       // console.log("[VideoPlayer] Ads detectados, activando playingAds");
+       
       setPlayingAds(true);
     }
   }, [evaluated, shouldPlayAds, effectiveVastUrl]);
@@ -161,7 +163,7 @@ const VideoPlayerComponent = ({
 
   // Analytics y Tracking de VOD
   const currentEpisodeDetails = episodes?.find(
-    (e: any) => e.key === currentEpisodeKey,
+    (e: Chapter) => e.key === currentEpisodeKey,
   );
   const analytics = usePlayerAnalytics(
     rudoKey,
@@ -229,12 +231,13 @@ const VideoPlayerComponent = ({
         // Buscar siguiente episodio si existe
         if (episodes && episodes.length > 0 && currentEpisodeKey) {
           const currentIndex = episodes.findIndex(
-            (ep: any) => ep.key === currentEpisodeKey,
+            (ep: Chapter) => ep.key === currentEpisodeKey,
           );
           const nextIndex = currentIndex + 1;
           if (currentIndex >= 0 && nextIndex < episodes.length) {
             const next = episodes[nextIndex];
             nextEpisodeRef.current = next;
+             
             setNextEpisode(next);
           }
         }
@@ -270,7 +273,7 @@ const VideoPlayerComponent = ({
   }, [hlsPlayer.isEnded, autoNavigateToNext, saveProgress]);
 
   const handleNextEpisodeSelect = useCallback(
-    (ep: any) => {
+    (ep: Chapter) => {
       setIsEndingTransition(false);
       if (onEpisodeSelect) onEpisodeSelect(ep);
     },
@@ -321,7 +324,7 @@ const VideoPlayerComponent = ({
       if (isPlaying) pause();
       else play();
     },
-    [isLive, isPlaying, play, pause, isEndingTransition, playingAds],
+    [isPlaying, play, pause, isEndingTransition, playingAds],
   );
 
   // --- Volume / Skip / Fullscreen handlers ---
@@ -378,8 +381,10 @@ const VideoPlayerComponent = ({
   // Refs estables para keyboard (evitar que el effect se re-ejecute cada frame)
   const currentTimeRef = useRef(currentTime);
   const durationRef = useRef(duration);
-  currentTimeRef.current = currentTime;
-  durationRef.current = duration;
+  useEffect(() => {
+    currentTimeRef.current = currentTime;
+    durationRef.current = duration;
+  }, [currentTime, duration]);
 
   // Keyboard controls con hold-to-seek
   useEffect(() => {
@@ -530,7 +535,7 @@ const VideoPlayerComponent = ({
                 left: "50%",
                 transform: "translate(-50%, -50%)",
                 textAlign: "center",
-                color: "#fff",
+                color: 'var(--clr-icon)',
                 zIndex: 2,
               }}
             >
@@ -668,8 +673,9 @@ const VideoPlayerComponent = ({
               hlsPlayer.isPlaying ? hlsPlayer.pause : hlsPlayer.play
             }
             onSeek={(time) => {
-              if (hlsPlayer.videoRef.current) {
-                hlsPlayer.videoRef.current.currentTime = time;
+              const videoEl = hlsPlayer.videoRef.current;
+              if (videoEl) {
+                videoEl.currentTime = time;
               }
             }}
             onSkip={handleSkip}

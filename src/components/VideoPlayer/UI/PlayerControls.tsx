@@ -25,7 +25,7 @@ export const PlayerOptionButton = ({
         borderRadius: "50%",
         border: "2px solid rgba(255, 255, 255, 0.6)",
         backgroundColor: "transparent",
-        color: "#fff",
+        color: 'var(--clr-icon)',
         transition: "all 0.2s ease",
         display: "flex",
         justifyContent: "center",
@@ -53,7 +53,7 @@ const QualityOption = ({ label, onSelect }: QualityOptionProps) => {
       onClick={onSelect}
       style={{
         padding: "8px 16px",
-        color: "#fff",
+        color: 'var(--clr-icon)',
         backgroundColor: "transparent",
         cursor: "pointer",
         whiteSpace: "nowrap",
@@ -92,7 +92,7 @@ export const PlayerQualityButton = ({
           borderRadius: "28px",
           border: "2px solid rgba(255, 255, 255, 0.6)",
           backgroundColor: "transparent",
-          color: "#fff",
+          color: 'var(--clr-icon)',
           fontSize: "1.3rem",
           fontWeight: "bold",
           // minHeight: "56px",

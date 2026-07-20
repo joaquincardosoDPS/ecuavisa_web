@@ -76,12 +76,19 @@ export function useHlsPlayer({ src, autoplay = true, isLive = false, livetoken, 
         videoElement.load();
 
         // Resetear estados para evitar datos residuales del stream anterior
+         
         setIsLoading(true);
+         
         setIsReady(false);
+         
         setIsEnded(false);
+         
         setCurrentTime(0);
+         
         setDuration(0);
+         
         setLoadedTime(0);
+         
         setLevels([]);
 
         console.log('[HLS] Inicializando player:', { src, isLive, autoplay, enabled });
@@ -235,6 +242,7 @@ export function useHlsPlayer({ src, autoplay = true, isLive = false, livetoken, 
             videoElement.removeAttribute('src');
             videoElement.load();
         };
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- Intentionally omitting onReady, onPlaying, onPause, effectiveLivetoken, initialSeconds to avoid re-creating HLS instance on callback/config ref changes
     }, [src, autoplay, isLive, livetoken, enabled]);
 
     const play = useCallback(() => {
@@ -259,7 +267,7 @@ export function useHlsPlayer({ src, autoplay = true, isLive = false, livetoken, 
                 }).catch(err => console.warn('[HLS] Play error after canplay:', err));
             }, { once: true });
         }
-    }, []);
+    }, [isPlaying]);
 
     const pause = useCallback(() => {
         videoRef.current?.pause();

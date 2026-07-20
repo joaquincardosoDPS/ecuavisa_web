@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import iconoVolverRaw from "@/assets/img/icons/iconos-volver.svg?raw";
-import { useWatchHistory } from "@/hooks/useWatchHistory";
+import { useWatchHistory } from "@/hooks/player/useWatchHistory";
 import { getStoredVolume, setStoredVolume } from "@/utils/volumeStorage";
 import "./RudoPlayer.css";
 
@@ -56,13 +56,17 @@ function RudoPlayer({
   const pauseDetectionRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const iframeSrc = mode === "vod"
-    ? `https://rudo.video/vod/${rudoKey}/autostart/true`
-    : `https://rudo.video/live/${rudoKey}`;
+    ? `https://rudo.video/vod/${rudoKey}/autostart/true?platform=ecuavisaweb`
+    : `https://rudo.video/live/${rudoKey}?platform=ecuavisaweb`;
 
   useEffect(() => {
+     
     setIframeLoaded(false);
+     
     setCurrentTime(0);
+     
     setDuration(0);
+     
     setIsPlaying(true);
     currentTimeRef.current = 0;
     durationRef.current = 0;
@@ -123,6 +127,17 @@ function RudoPlayer({
     },
     [postToIframe],
   );
+
+  // ---- UI visibility (auto-hide after 3s, never when paused) ----
+  const resetUIVisibility = useCallback(() => {
+    setIsUIVisible(true);
+    if (hideTimeoutRef.current) clearTimeout(hideTimeoutRef.current);
+    // No auto-hide si el video está pausado
+    if (!isPlayingRef.current) return;
+    hideTimeoutRef.current = setTimeout(() => {
+      setIsUIVisible(false);
+    }, 3000);
+  }, []);
 
   // ---- Listen for iframe messages ----
   useEffect(() => {
@@ -191,7 +206,7 @@ function RudoPlayer({
 
     window.addEventListener("message", handleMessage);
     return () => window.removeEventListener("message", handleMessage);
-  }, [onTimeUpdate]);
+  }, [onTimeUpdate, resetUIVisibility]);
 
   // ---- On iframe load: restore volume + seek resume ----
   useEffect(() => {
@@ -218,16 +233,7 @@ function RudoPlayer({
     return () => clearTimeout(volTimer);
   }, [iframeLoaded, initialSeconds, enviarSeek, enviarVolume, mode]);
 
-  // ---- UI visibility (auto-hide after 3s, never when paused) ----
-  const resetUIVisibility = useCallback(() => {
-    setIsUIVisible(true);
-    if (hideTimeoutRef.current) clearTimeout(hideTimeoutRef.current);
-    // No auto-hide si el video está pausado
-    if (!isPlayingRef.current) return;
-    hideTimeoutRef.current = setTimeout(() => {
-      setIsUIVisible(false);
-    }, 3000);
-  }, []);
+
 
   useEffect(() => {
     resetUIVisibility();

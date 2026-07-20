@@ -63,7 +63,7 @@ export interface SliderResponse {
     total_records: number;
     total_display_records: number;
     last_page: number;
-    data: Program[];
+    data: (Program | Event)[];
 }
 
 export interface Category {
@@ -158,6 +158,7 @@ export interface Chapter {
     date_update: string;
     description: string;
     duration: string;
+    duration_seg: number;
     image: string;
     image_land: ImageSet;
     key: string;
@@ -246,6 +247,7 @@ export interface Event {
     image_background: ImageSet;
     image_port: ImageSet;
     image_land: ImageSet;
+    image_slider?: ImageSet;
     program_associated: ChannelAssociation | null;
     live_associated: ChannelAssociation | null;
     classification: string;

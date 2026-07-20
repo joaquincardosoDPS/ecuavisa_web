@@ -23,7 +23,7 @@ import type {
 
 export const catalogService = {
     getSlider: async (): Promise<SliderResponse> => {
-        const { data } = await api.post<SliderResponse>(RUDO_VOD_BANNER, {});
+        const { data } = await api.post<SliderResponse>(RUDO_VOD_BANNER, { show_event: true });
         return data;
     },
 

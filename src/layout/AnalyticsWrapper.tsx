@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useEffect, useState, useCallback, useRef } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
-import { isGtagReady, getMeasurementId } from '@/hooks/useGoogleAnalytics';
+import { isGtagReady, getMeasurementId } from '@/hooks/shared/useGoogleAnalytics';
 
 interface AnalyticsContextProps {
   trackPage: (path: string, title?: string) => void;
@@ -20,7 +20,9 @@ function AnalyticsProvider({ children }: { children: React.ReactNode }) {
 
   // Resetear override cuando cambia la ruta
   useEffect(() => {
+     
     setManualPath(null);
+     
     setManualTitle(null);
   }, [location.pathname]);
 
@@ -78,6 +80,7 @@ function AnalyticsProvider({ children }: { children: React.ReactNode }) {
 /**
  * Hook para acceder al tracker desde cualquier componente.
  */
+// eslint-disable-next-line react-refresh/only-export-components
 export function useAnalytics(): AnalyticsContextProps {
   const context = useContext(AnalyticsContext);
   if (!context) {

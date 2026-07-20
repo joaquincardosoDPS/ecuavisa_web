@@ -39,7 +39,7 @@ function CardCarrousel({
 
   useEffect(() => {
     if (!emblaApi) return;
-    onSelect();
+    queueMicrotask(onSelect);
     emblaApi.on("select", onSelect);
     emblaApi.on("reInit", onSelect);
     return () => {
@@ -50,13 +50,19 @@ function CardCarrousel({
 
   const isVertical = orientation === "vertical";
 
+  // Center arrows on the card image, not the full card+text
+  const arrowTop = isVertical
+    ? 'calc(var(--card-w-vertical, 15vw) * 3 / 4)'
+    : 'calc(var(--card-w-horizontal, 15vw) * 9 / 32)';
+
   return (
     <div className="group/carousel relative">
       {/* Flecha izquierda */}
       <button
         onClick={() => emblaApi?.scrollPrev()}
         disabled={!canScrollPrev}
-        className={`absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1/2 z-20 w-12 h-12 rounded-full bg-black/60 backdrop-blur-sm border border-white/20 text-white flex items-center justify-center transition-opacity duration-300 ${canScrollPrev ? "opacity-0 group-hover/carousel:opacity-100 hover:bg-(--foc-primary) hover:border-(--foc-primary) cursor-pointer" : "opacity-0 group-hover/carousel:opacity-30 cursor-default"}`}
+        className={`absolute left-0 -translate-y-1/2 -translate-x-1/2 z-20 w-12 h-12 rounded-full bg-(--clr-primary)/60 backdrop-blur-sm border border-(--clr-primary-title)/20 text-(--clr-primary-title) flex items-center justify-center transition-opacity duration-300 ${canScrollPrev ? "opacity-0 group-hover/carousel:opacity-100 hover:bg-(--foc-primary) hover:border-(--foc-primary) cursor-pointer" : "opacity-0 group-hover/carousel:opacity-30 cursor-default"}`}
+        style={{ top: arrowTop }}
       >
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
           <polyline points="15 18 9 12 15 6" />
@@ -67,7 +73,8 @@ function CardCarrousel({
       <button
         onClick={() => emblaApi?.scrollNext()}
         disabled={!canScrollNext}
-        className={`absolute right-0 top-1/2 -translate-y-1/2 translate-x-1/2 z-20 w-12 h-12 rounded-full bg-black/60 backdrop-blur-sm border border-white/20 text-white flex items-center justify-center transition-opacity duration-300 ${canScrollNext ? "opacity-0 group-hover/carousel:opacity-100 hover:bg-(--foc-primary) hover:border-(--foc-primary) cursor-pointer" : "opacity-0 group-hover/carousel:opacity-30 cursor-default"}`}
+        className={`absolute right-12 -translate-y-1/2 z-20 w-12 h-12 rounded-full bg-(--clr-primary)/60 backdrop-blur-sm border border-(--clr-primary-title)/20 text-(--clr-primary-title) flex items-center justify-center transition-opacity duration-300 ${canScrollNext ? "opacity-0 group-hover/carousel:opacity-100 hover:bg-(--foc-primary) hover:border-(--foc-primary) cursor-pointer" : "opacity-0 group-hover/carousel:opacity-30 cursor-default"}`}
+        style={{ top: arrowTop }}
       >
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
           <polyline points="9 6 15 12 9 18" />
@@ -80,13 +87,14 @@ function CardCarrousel({
         className="overflow-hidden cursor-grab active:cursor-grabbing py-1 -ml-1 pl-1"
       >
         <div className="flex gap-5 items-stretch transform-gpu will-change-transform">
-          {programs.map((program, index) =>
-            isVertical ? (
-              <CardVertical key={program.id} program={program} format={format} index={index} />
+          {programs.map((program, index) => {
+            const itemFormat = 'type' in program ? 'event' : format;
+            return isVertical ? (
+              <CardVertical key={program.id} program={program} format={itemFormat} index={index} />
             ) : (
-              <CardHorizontal key={program.id} program={program} format={format} />
-            )
-          )}
+              <CardHorizontal key={program.id} program={program} format={itemFormat} />
+            );
+          })}
           {programs.length === 10 && categorySlug && format !== "ranking" && (
             <div
               onClick={() => navigate(`/categoria/${categorySlug}`)}
@@ -96,7 +104,7 @@ function CardCarrousel({
                 backgroundColor: "var(--clr-secondary)",
               }}
             >
-              <span className="text-2xl font-medium text-white">Ver Más </span>
+              <span className="text-2xl font-medium text-(--clr-primary-title)">Ver Más </span>
             </div>
           )}
 

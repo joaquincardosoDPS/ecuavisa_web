@@ -1,4 +1,4 @@
-import { useMemo, useRef, useCallback } from "react";
+import { useMemo, useRef, useCallback, useState, useEffect } from "react";
 import type { EPGChannel, EPGEvent } from "@/interfaces/catalog.interface";
 import type { LiveSignal } from "@/interfaces/catalog.interface";
 
@@ -9,8 +9,9 @@ interface EPGGridProps {
   onSelectSignal?: (keyLive: string) => void;
 }
 
-/** Horas visibles sin hacer scroll */
 const VISIBLE_HOURS = 4;
+const REFRESH_INTERVAL_MS = 60_000;
+const LOGO_COL_WIDTH = "17vw";
 
 /**
  * Filtra los eventos que caen dentro de la ventana de tiempo.
@@ -41,10 +42,10 @@ function getEventsInWindow(
       return { event, startPct, widthPct };
     })
     .filter(Boolean) as {
-    event: EPGEvent;
-    startPct: number;
-    widthPct: number;
-  }[];
+      event: EPGEvent;
+      startPct: number;
+      widthPct: number;
+    }[];
 }
 
 /** Formatea hora en HH:MM */
@@ -64,14 +65,15 @@ function getTimeMarks(
   const marks: { label: string; pct: number }[] = [];
   const windowMs = windowEnd.getTime() - windowStart.getTime();
 
+  // Empezar desde la hora actual (floor), no la siguiente
   const firstHour = new Date(windowStart);
   firstHour.setMinutes(0, 0, 0);
-  if (firstHour < windowStart) firstHour.setHours(firstHour.getHours() + 1);
 
   for (let t = firstHour; t <= windowEnd; t = new Date(t.getTime() + 3600000)) {
     const pct = ((t.getTime() - windowStart.getTime()) / windowMs) * 100;
-    if (pct >= 0 && pct <= 100) {
-      marks.push({ label: formatTime(t), pct });
+    // Permitir pct negativo para la hora actual (el slot se mostrará parcialmente)
+    if (pct <= 100) {
+      marks.push({ label: formatTime(t), pct: Math.max(0, pct) });
     }
   }
 
@@ -84,7 +86,13 @@ function EPGGrid({
   selectedKeyLive,
   onSelectSignal,
 }: EPGGridProps) {
-  const now = useMemo(() => new Date(), [epg]);
+
+  // Reloj que se actualiza periódicamente para re-renderizar posiciones
+  const [now, setNow] = useState(() => new Date());
+  useEffect(() => {
+    const id = setInterval(() => setNow(new Date()), REFRESH_INTERVAL_MS);
+    return () => clearInterval(id);
+  }, []);
   const windowStart = now;
 
   // Calcular el fin de la ventana según el último evento del EPG
@@ -191,126 +199,165 @@ function EPGGrid({
 
   return (
     <div
-      className="flex flex-col gap-0 w-full cursor-grab select-none"
+      className="flex flex-col gap-0 w-full h-full cursor-grab select-none"
       onMouseDown={handleMouseDown}
       onMouseMove={handleMouseMove}
       onMouseUp={handleMouseUp}
       onMouseLeave={handleMouseUp}
     >
-      {/* Header con marcas de tiempo — sticky + scrollable sincronizado */}
-      <div
-        ref={headerRef}
-        className="pl-[116px] relative h-8 mb-2 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sticky top-0 z-10 bg-(--clr-primary)"
-        onScroll={() => handleScroll(-1)}
-      >
-        <div className="relative h-full" style={{ width: innerWidthPct }}>
-          {timeMarks.map((mark) => (
-            <div
-              key={mark.label}
-              className="absolute text-xs text-white/50 -translate-x-1/2 bottom-0"
-              style={{ left: `${mark.pct}%` }}
-            >
-              {mark.label}
+      <div className="relative -mx-42 px-42 mt-2 mb-5 border-y border-(--clr-primary-title)/10 | xs:max-md:-mx-7.5 xs:max-md:px-7.5">
+        <div className="absolute inset-0 opacity-50" style={{ background: 'var(--epg-grad-bg)' }} />
+        <div className="relative flex z-10 py-2" style={{ background: 'var(--epg-bar-bg)' }}>
+          <div className="shrink-0 relative z-20" style={{ width: LOGO_COL_WIDTH }} />
+          <div
+            ref={headerRef}
+            className="flex-1 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+            onScroll={() => handleScroll(-1)}
+          >
+            <div className="flex h-full gap-1" style={{ width: innerWidthPct }}>
+              {timeMarks.map((mark, idx) => {
+                const markTime = new Date(windowStart.getTime() + (mark.pct / 100) * (windowEnd.getTime() - windowStart.getTime()));
+                const nextMark = timeMarks[idx + 1];
+                const nextTime = nextMark
+                  ? new Date(windowStart.getTime() + (nextMark.pct / 100) * (windowEnd.getTime() - windowStart.getTime()))
+                  : windowEnd;
+                const isCurrentHour = markTime <= now && now < nextTime;
+
+                const spanPct = nextMark ? nextMark.pct - mark.pct : 100 - mark.pct;
+
+                return (
+                  <div
+                    key={`${mark.label}-${idx}`}
+                    className={`@container h-8 rounded-xl flex items-center px-4 text-xs font-medium tracking-wide transition-all duration-300 shrink-0 text-(--clr-primary-title)`}
+                    style={{
+                      flex: `${spanPct} 0 0`,
+                      background: isCurrentHour
+                        ? 'linear-gradient(0deg, rgba(0, 198, 255, 0.64) 0%, rgba(0, 198, 255, 0.64) 100%), rgba(255, 255, 255, 0.10)'
+                        : 'rgba(255, 255, 255, 0.10)',
+                    }}
+                    title={mark.label}
+                  >
+                    <span className="@max-[60px]:hidden">
+                      {mark.label}
+                    </span>
+                  </div>
+                );
+              })}
             </div>
-          ))}
+          </div>
         </div>
       </div>
 
-      {/* Filas por canal */}
-      {signals.map((signal, rowIdx) => {
-        const channel = epgMap.get(signal.key_live) || epgMap.get(signal.key);
-        const events = channel
-          ? getEventsInWindow(channel.events, windowStart, windowEnd)
-          : [];
+      {/* Filas por canal — zona scrolleable */}
+      <div className="flex-1 overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+        {signals.map((signal, rowIdx) => {
+          const channel = epgMap.get(signal.key_live) || epgMap.get(signal.key);
+          const events = channel
+            ? getEventsInWindow(channel.events, windowStart, windowEnd)
+            : [];
 
-        const hasEpg = events.length > 0;
-        const isSelected = selectedKeyLive === signal.key_live;
+          const hasEpg = events.length > 0;
+          const isSelected = selectedKeyLive === signal.key_live;
 
-        return (
-          <div
-            key={signal.key_live}
-            className={`flex items-stretch gap-3 mb-3 cursor-pointer rounded-lg transition-all ${
-              isSelected ? "" : "opacity-70 hover:opacity-100"
-            }`}
-            onClick={() => handleRowClick(signal.key_live)}
-          >
-            {/* Logo del canal */}
-            <div className="w-26 h-26 shrink-0 self-center flex items-center justify-center bg-(--clr-secondary) rounded-lg">
-              {signal.logo ? (
-                <img
-                  src={signal.logo}
-                  alt={signal.name_live}
-                  className="w-12 h-12 object-contain"
-                />
+          return (
+            <div
+              key={signal.key_live}
+              className={`flex items-stretch gap-3 mb-6 cursor-pointer rounded-lg transition-all opacity-100`}
+              onClick={() => handleRowClick(signal.key_live)}
+            >
+              {/* Logo del canal */}
+              <div
+                className={`shrink-0 flex items-center justify-start rounded-lg  ${isSelected ? "border-2 border-(--clr-primary-title)" : ""}`}
+                style={{
+                  width: `calc(${LOGO_COL_WIDTH} - 12px)`,
+                  background: isSelected
+                    ? 'linear-gradient(90deg, #0D4B94 0%, #04172E 100%)'
+                    : 'linear-gradient(90deg, #8E9198 0%, #676D73 50%, #04172E 100%)',
+                }}
+              >
+                {/* {signal.logo ? (
+                  <img
+                    src={signal.logo}
+                    alt={signal.name_live}
+                    className="w-12 h-12 object-contain mx-4"
+                  />
+                ) : null
+                } */}
+                <div className="text-bold">
+                  <h2 className="ml-4 text-base text-(--clr-primary-title) text-start leading-tight">
+                    Canal
+                  </h2>
+                  <h1 className="ml-4 font-bold text-3xl">
+                    {signal.name_live}
+                  </h1>
+
+                </div>
+              </div>
+
+              {/* Barra de eventos */}
+              {hasEpg ? (
+                <div
+                  ref={(el) => { scrollRefs.current[rowIdx] = el; }}
+                  className="flex-1 relative h-26 rounded-lg overflow-x-auto overflow-y-hidden [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+                  onScroll={() => handleScroll(rowIdx)}
+                >
+                  <div
+                    className="flex h-full gap-1.5"
+                    style={{ width: innerWidthPct }}
+                  >
+                    {events.map(({ event, widthPct }) => {
+                      const begin = new Date(event.beginTime);
+                      const end = new Date(event.endTime);
+                      const isNow = begin <= now && end > now;
+                      const useHighlight = isSelected && isNow;
+
+                      return (
+                        <div
+                          key={event.id}
+                          className={`h-full rounded-lg px-3 py-2 flex flex-col justify-center overflow-hidden transition-all duration-300 shrink-0 border border-(--epg-accent)/40 ${!useHighlight && !isSelected
+                            ? "bg-(--clr-primary-title)/20"
+                            : ""
+                            }`}
+                          style={{
+                            flex: `${widthPct} 0 0`,
+                            ...(useHighlight && { background: 'var(--epg-accent)' }),
+                            ...(isSelected && !isNow && { background: '#16309A66' }),
+                          }}
+                          title={`${event.title} — ${formatTime(begin)} – ${formatTime(end)}`}
+                        >
+                          <p className="text-xl font-bold text-(--clr-primary-title) truncate leading-tight">
+                            {event.title}
+                          </p>
+                          {widthPct > 3 && (
+                            <p className="text-base font-bold text-(--clr-primary-title) truncate">
+                              {formatTime(begin)} – {formatTime(end)}
+                            </p>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
               ) : (
-                <span className="text-xs text-white/50 text-center leading-tight">
-                  {signal.name_live}
-                </span>
+                <div className="flex-1 relative h-26 rounded-lg overflow-hidden">
+                  <div
+                    className="absolute top-0 h-full rounded-lg px-3 py-2 flex items-center border border-(--epg-accent)/40"
+                    style={{
+                      left: "2px",
+                      width: "calc(100% - 4px)",
+                      background: isSelected ? '#00C6FF' : '#FFFFFF33',
+                    }}
+                  >
+                    <p className="text-xl font-bold text-(--clr-primary-title) truncate leading-tight">
+                      {signal.name_live}
+                    </p>
+                  </div>
+                </div>
               )}
             </div>
-
-            {/* Barra de eventos */}
-            {hasEpg ? (
-              <div
-                ref={(el) => { scrollRefs.current[rowIdx] = el; }}
-                className="flex-1 relative h-26 rounded-lg overflow-x-auto overflow-y-hidden [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-                onScroll={() => handleScroll(rowIdx)}
-              >
-                <div
-                  className="flex h-full gap-1.5"
-                  style={{ width: innerWidthPct }}
-                >
-                  {events.map(({ event, widthPct }) => {
-                    const begin = new Date(event.beginTime);
-                    const end = new Date(event.endTime);
-                    const isNow = begin <= now && end > now;
-                    const useHighlight = isSelected && isNow;
-
-                    return (
-                      <div
-                        key={event.id}
-                        className={`h-full rounded-lg px-3 py-2 flex flex-col justify-center overflow-hidden transition-all duration-300 shrink-0 ${
-                          useHighlight
-                            ? "bg-(--foc-primary)"
-                            : isNow
-                              ? "bg-(--clr-secondary) brightness-125"
-                              : "bg-(--clr-secondary)/60"
-                        }`}
-                        style={{ flex: `${widthPct} 0 0` }}
-                        title={`${event.title} — ${formatTime(begin)} – ${formatTime(end)}`}
-                      >
-                        <p className="text-sm font-medium text-white truncate leading-tight">
-                          {event.title}
-                        </p>
-                        {widthPct > 3 && (
-                          <p className="text-xs text-white/60 truncate">
-                            {formatTime(begin)} – {formatTime(end)}
-                          </p>
-                        )}
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            ) : (
-              <div className="flex-1 relative h-26 rounded-lg overflow-hidden">
-                <div
-                  className={`absolute top-0 h-full rounded-lg px-3 py-2 flex items-center ${
-                    isSelected
-                      ? "bg-(--foc-primary)"
-                      : "bg-(--clr-secondary) brightness-125"
-                  }`}
-                  style={{ left: "2px", width: "calc(100% - 4px)" }}
-                >
-                  <p className="text-sm font-medium text-white truncate leading-tight">
-                    {signal.name_live}
-                  </p>
-                </div>
-              </div>
-            )}
-          </div>
-        );
-      })}
+          );
+        })}
+      </div>
     </div>
   );
 }

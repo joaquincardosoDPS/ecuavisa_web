@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { useEvent } from "@/hooks/useEvent";
-import { useDocumentTitle } from "@/hooks/useDocumentTitle";
+import { useEvent } from "@/hooks/event/useEvent";
+import { useDocumentTitle } from "@/hooks/shared/useDocumentTitle";
 import Banner from "./components/Banner";
 import type { TabKey } from "./components/Tabs";
 import Tabs from "./components/Tabs";

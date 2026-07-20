@@ -10,11 +10,11 @@ function RelatedProgramsContainer({ programs, isLoading = false }: RelatedProgra
     return (
         <div className="flex flex-col gap-5 2xl:gap-10 animate-in fade-in duration-500 min-h-[calc(100vh-281px)]">
             {isLoading ? (
-                <p className="text-white">Cargando programas relacionados...</p>
+                <p className="text-(--clr-primary-title)">Cargando programas relacionados...</p>
             ) : programs.length > 0 ? (
                 <ProgramGrid programs={programs} cols={5} />
             ) : (
-                <p className="text-white/60">
+                <p className="text-(--clr-primary-title)/60">
                     No hay programas relacionados disponibles.
                 </p>
             )}

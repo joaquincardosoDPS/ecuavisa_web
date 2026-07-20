@@ -60,6 +60,10 @@ export const useAuthStore = create<AuthState>((set, get) => {
 
         setActiveProfile: (profile) => {
             localStorage.setItem('active_profile', JSON.stringify(profile));
+            const user = get().user;
+            if (user?.id) {
+                localStorage.setItem(`last_profile_${user.id}`, profile.id);
+            }
             set({ activeProfile: profile });
         },
 

@@ -18,7 +18,7 @@ function EventsContainer({ events }: Props) {
           ))}
         </div>
       ) : (
-        <p className="text-white">
+        <p className="text-(--clr-primary-title)">
           No hay eventos relacionados disponibles.
         </p>
       )}

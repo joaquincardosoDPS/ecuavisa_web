@@ -11,7 +11,7 @@ export interface DeviceAdInfo {
     idtype: string;
 }
 
-var cachedInfo: DeviceAdInfo | null = null;
+let cachedInfo: DeviceAdInfo | null = null;
 
 /**
  * Obtiene info de ads del dispositivo (cachéa resultado).
@@ -37,7 +37,7 @@ function getGenericAdInfo(): DeviceAdInfo {
         // Generador simple de UUID v4 de fallback
         const generateUUID = () => {
             return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
-                var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+                const r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
                 return v.toString(16);
             });
         };
@@ -61,15 +61,15 @@ export function appendAdParamsToVastUrl(vastUrl: string, adInfo: DeviceAdInfo): 
     }
     vastUrl = cleanedUrl;
 
-    var qIndex = vastUrl.indexOf('?');
-    var base = qIndex === -1 ? vastUrl : vastUrl.substring(0, qIndex);
-    var queryString = qIndex === -1 ? '' : vastUrl.substring(qIndex + 1);
+    const qIndex = vastUrl.indexOf('?');
+    let base = qIndex === -1 ? vastUrl : vastUrl.substring(0, qIndex);
+    const queryString = qIndex === -1 ? '' : vastUrl.substring(qIndex + 1);
 
-    var paramsMap: Record<string, string> = {};
+    const paramsMap: Record<string, string> = {};
     if (queryString) {
-        var pairs = queryString.split('&');
-        for (var i = 0; i < pairs.length; i++) {
-            var eqIndex = pairs[i].indexOf('=');
+        const pairs = queryString.split('&');
+        for (let i = 0; i < pairs.length; i++) {
+            const eqIndex = pairs[i].indexOf('=');
             if (eqIndex === -1) {
                 paramsMap[pairs[i]] = '';
             } else {
@@ -80,19 +80,12 @@ export function appendAdParamsToVastUrl(vastUrl: string, adInfo: DeviceAdInfo): 
 
     // --- RUDO LIVE -> GOOGLE (workaround CORS http/https mismatch) ---
     if (base.indexOf('rudo.video/ads/vmap/live/') !== -1) {
-        var slugParts = base.split('/');
-        var slug = slugParts[slugParts.length - 1].split('?')[0];
+        const slugParts = base.split('/');
+        const slug = slugParts[slugParts.length - 1].split('?')[0];
 
-        var iuMap: Record<string, string> = {
-            '13cl': '/112372207/13go/canal13/preroll',
-            't13': '/112372207/13go/t13/preroll',
-            'deportes': '/112372207/13go/13deportes/preroll',
-            'cultura': '/112372207/13go/13cultura/preroll',
-            'entretencion': '/112372207/13go/13entretencion/preroll',
-            '13cocina': '/112372207/13go/13cocina/preroll',
-            '13viajes': '/112372207/13go/13viajes/preroll',
-        };
-        var iu = iuMap[slug] || '/112372207/13go/canal13/preroll';
+        // Ad units por señal — agregar mapeos de Ecuavisa cuando estén definidos
+        const iuMap: Record<string, string> = {};
+        const iu = iuMap[slug];
 
         base = 'https://pubads.g.doubleclick.net/gampad/ads';
         paramsMap['iu'] = encodeURIComponent(iu);
@@ -135,8 +128,8 @@ export function appendAdParamsToVastUrl(vastUrl: string, adInfo: DeviceAdInfo): 
     }
 
     // --- FIXES SOLO PARA GOOGLE AD MANAGER (no aplicar a Rudo) ---
-    var isGoogleAds = base.indexOf('pubads.g.doubleclick.net') !== -1 ||
-                      base.indexOf('googleads.g.doubleclick.net') !== -1;
+    const isGoogleAds = base.indexOf('pubads.g.doubleclick.net') !== -1 ||
+                        base.indexOf('googleads.g.doubleclick.net') !== -1;
 
     if (isGoogleAds) {
         // Helper: detecta valores inválidos en params de URL
@@ -152,7 +145,7 @@ export function appendAdParamsToVastUrl(vastUrl: string, adInfo: DeviceAdInfo): 
         // 1. Corregir url si es inválida
         if (isInvalidUrlParam(paramsMap['url'])) {
             // Usar description_url como fallback si tiene un dominio real
-            var fallbackDomain = (!isInvalidUrlParam(paramsMap['description_url']))
+            const fallbackDomain = (!isInvalidUrlParam(paramsMap['description_url']))
                 ? decodeURIComponent(paramsMap['description_url'])
                 : ADS_FALLBACK_DOMAIN;
             paramsMap['url'] = encodeURIComponent(fallbackDomain);
@@ -173,8 +166,8 @@ export function appendAdParamsToVastUrl(vastUrl: string, adInfo: DeviceAdInfo): 
     }
     // ---------------------------------
 
-    var parts: string[] = [];
-    for (var key in paramsMap) {
+    const parts: string[] = [];
+    for (const key in paramsMap) {
         if (Object.prototype.hasOwnProperty.call(paramsMap, key)) {
             parts.push(key + '=' + paramsMap[key]);
         }

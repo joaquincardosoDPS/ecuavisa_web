@@ -3,9 +3,9 @@ import CarrouselContainer from "@/components/ProgramCard/CarrouselContainer";
 import ProgramsBanner from "./components/ProgramsBanner";
 import { useProgramsStore } from "@/features/programs/programsStore";
 import type { Program } from "@/interfaces/catalog.interface";
-import { useProgramsData } from "@/hooks/useProgramsData";
-import { useImagePreloader } from "@/hooks/useImagePreloader";
-import { useDocumentTitle } from "@/hooks/useDocumentTitle";
+import { useProgramsData } from "@/hooks/program/useProgramsData";
+import { useImagePreloader } from "@/hooks/shared/useImagePreloader";
+import { useDocumentTitle } from "@/hooks/shared/useDocumentTitle";
 import { FullScreenSpinner } from "@/components/ui/FullScreenSpinner";
 
 

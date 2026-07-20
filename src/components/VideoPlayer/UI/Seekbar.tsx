@@ -275,7 +275,7 @@ const SeekbarComponent = ({
             style={{
               width: "100%",
               height: "3px",
-              backgroundColor: "#525252",
+              backgroundColor: 'var(--clr-secondary)',
               borderRadius: "999px",
               position: "relative",
               transition: "outline 0.2s ease",
@@ -321,7 +321,7 @@ const SeekbarComponent = ({
                 transform: "translate(-50%, -50%)",
                 width: "15px",
                 height: "15px",
-                backgroundColor: "#FFFFFF",
+                backgroundColor: 'var(--clr-primary-title)',
                 border: "3px solid #FFFFFF",
                 borderRadius: "50%",
                 cursor: isDragging ? "grabbing" : "grab",

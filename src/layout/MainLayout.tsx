@@ -1,20 +1,12 @@
-import { Outlet, useLocation } from "react-router-dom";
-import Header from "./components/Header";
-import { twMerge } from "tailwind-merge";
+import { Outlet } from "react-router-dom";
+import Header from "./header/Header";
+// import Sidebar from "./sidebar/Sidebar";
 
 function MainLayout() {
-  const { pathname } = useLocation();
-  const isTransparent =
-    pathname === "/home" || pathname.startsWith("/programas") || pathname.startsWith("/eventos/");
-
-  const headerClasses = (isTransparent: boolean) =>
-    twMerge(
-      "flex flex-col transition-[padding] duration-300",
-      !isTransparent && "pt-[84px]",
-    );
   return (
-    <div className={twMerge(headerClasses(isTransparent), "min-h-screen")}>
-      <Header isTransparent={isTransparent} />
+    <div className="flex flex-col min-h-screen">
+      {/* <Sidebar /> */}
+      <Header />
       <main className="flex-1">
         <Outlet />
       </main>
