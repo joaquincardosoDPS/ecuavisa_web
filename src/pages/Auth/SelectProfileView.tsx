@@ -1,4 +1,4 @@
-import { useLocation, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useProfilesList } from "@/hooks/profiles/useProfilesList";
 import { FullScreenSpinner } from "@/components/ui/FullScreenSpinner";
 import { useAuthStore } from "@/features/auth/authStore";
@@ -10,8 +10,8 @@ function SelectProfileView() {
   const setActiveProfile = useAuthStore((s) => s.setActiveProfile);
   const logout = useAuthStore((s) => s.logout);
   const navigate = useNavigate();
-  const location = useLocation();
-  const from = location.state?.from || "/";
+  // const location = useLocation();
+  // const from = location.state?.from || "/";
 
   const handleSelect = (profile: any) => {
     if (isEditing) {
@@ -103,7 +103,7 @@ function SelectProfileView() {
         >
           {isEditing ? "Listo" : "Editar Perfiles"}
         </Button>
-        
+
         <Button
           variant="tertiary"
           onClick={() => logout()}

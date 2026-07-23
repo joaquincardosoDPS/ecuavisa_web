@@ -118,6 +118,14 @@
 	--foc-primary: #ff1376;
 	--grad-sidebar: #054668;
 
+	/* EPG Variables */
+	--epg-accent: #00c6ff;
+	--epg-selected: #16309a;
+	--epg-grad-live: linear-gradient(90deg, #0D4B94 0%, #04172E 100%);
+	--epg-grad-inactive: linear-gradient(90deg, #8E9198 0%, #676D73 50%, #04172E 100%);
+	--epg-grad-bg: linear-gradient(180deg, #030105 0%, #030C19 100%);
+	--epg-bar-bg: rgba(22, 8, 99, 0.20);
+
 	/* Masking vars */
 	--mask-right: linear-gradient(90deg, #000 0%, #000 85%, transparent 100%);
 }

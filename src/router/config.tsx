@@ -3,7 +3,7 @@ import { Navigate, type RouteObject } from "react-router-dom";
 import { lazy, Suspense } from "react";
 import MainLayout from "@/layout/MainLayout";
 import { AnalyticsWrapper } from "@/layout/AnalyticsWrapper";
-import ProtectedRoute from "@/router/ProtectedRoute";
+// import ProtectedRoute from "@/router/ProtectedRoute";
 import { FullScreenSpinner } from "@/components/ui/FullScreenSpinner";
 
 const HomeView = lazy(() => import("@/pages/Home/HomeView"));
@@ -43,7 +43,7 @@ export const APP_ROUTES: RouteObject[] = [
         ],
       },
       {
-        element: <ProtectedRoute />,
+        // element: <ProtectedRoute />,
         children: [
           { path: "seleccionar-perfil", element: <Lazy><SelectProfileView /></Lazy> },
           {

@@ -15,7 +15,7 @@ function ProtectedRoute({ children }: { children?: React.ReactNode }) {
     const isSelectProfileRoute = location.pathname === '/seleccionar-perfil';
     const shouldFetchProfiles = isAuthenticated && !activeProfile && !isSelectProfileRoute;
 
-    const { data: profiles, isLoading } = useQuery({
+    const { data: profiles } = useQuery({
         queryKey: ['profiles', token],
         queryFn: async () => {
             const response = await profileService.getAll(token!);
@@ -28,7 +28,7 @@ function ProtectedRoute({ children }: { children?: React.ReactNode }) {
         if (profiles && profiles.length > 0 && !activeProfile && !isSelectProfileRoute) {
             const user = useAuthStore.getState().user;
             let profileToSelect = profiles[0];
-            
+
             if (user?.id) {
                 const lastProfileId = localStorage.getItem(`last_profile_${user.id}`);
                 if (lastProfileId) {
@@ -38,7 +38,7 @@ function ProtectedRoute({ children }: { children?: React.ReactNode }) {
                     }
                 }
             }
-            
+
             setActiveProfile(profileToSelect);
         }
     }, [profiles, activeProfile, isSelectProfileRoute, setActiveProfile]);

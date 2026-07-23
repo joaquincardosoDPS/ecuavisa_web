@@ -80,6 +80,9 @@ function getTimeMarks(
   return marks;
 }
 
+const CURRENT_HOUR_BG =
+  "linear-gradient(0deg, rgba(0, 198, 255, 0.64) 0%, rgba(0, 198, 255, 0.64) 100%), rgba(255, 255, 255, 0.10)";
+
 function EPGGrid({
   epg,
   signals,
@@ -232,7 +235,7 @@ function EPGGrid({
                     style={{
                       flex: `${spanPct} 0 0`,
                       background: isCurrentHour
-                        ? 'linear-gradient(0deg, rgba(0, 198, 255, 0.64) 0%, rgba(0, 198, 255, 0.64) 100%), rgba(255, 255, 255, 0.10)'
+                        ? CURRENT_HOUR_BG
                         : 'rgba(255, 255, 255, 0.10)',
                     }}
                     title={mark.label}
@@ -271,18 +274,10 @@ function EPGGrid({
                 style={{
                   width: `calc(${LOGO_COL_WIDTH} - 12px)`,
                   background: isSelected
-                    ? 'linear-gradient(90deg, #0D4B94 0%, #04172E 100%)'
-                    : 'linear-gradient(90deg, #8E9198 0%, #676D73 50%, #04172E 100%)',
+                    ? 'var(--epg-grad-live)'
+                    : 'var(--epg-grad-inactive)',
                 }}
               >
-                {/* {signal.logo ? (
-                  <img
-                    src={signal.logo}
-                    alt={signal.name_live}
-                    className="w-12 h-12 object-contain mx-4"
-                  />
-                ) : null
-                } */}
                 <div className="text-bold">
                   <h2 className="ml-4 text-base text-(--clr-primary-title) text-start leading-tight">
                     Canal
@@ -320,8 +315,8 @@ function EPGGrid({
                             }`}
                           style={{
                             flex: `${widthPct} 0 0`,
-                            ...(useHighlight && { background: 'var(--epg-accent)' }),
-                            ...(isSelected && !isNow && { background: '#16309A66' }),
+                            ...(useHighlight && { background: CURRENT_HOUR_BG }),
+                            ...(isSelected && !isNow && { background: 'color-mix(in srgb, var(--epg-selected) 40%, transparent)' }),
                           }}
                           title={`${event.title} — ${formatTime(begin)} – ${formatTime(end)}`}
                         >
@@ -345,7 +340,7 @@ function EPGGrid({
                     style={{
                       left: "2px",
                       width: "calc(100% - 4px)",
-                      background: isSelected ? '#00C6FF' : '#FFFFFF33',
+                      background: isSelected ? CURRENT_HOUR_BG : '#FFFFFF33',
                     }}
                   >
                     <p className="text-xl font-bold text-(--clr-primary-title) truncate leading-tight">
