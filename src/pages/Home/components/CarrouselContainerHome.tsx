@@ -25,7 +25,7 @@ function CarrouselContainer({ category }: CarrouselContainerProps) {
 
 	return (
 		<div
-			className={`pl-48 relative flex flex-col gap-5 mt-5 mb-5 | xs:max-md:pl-7.5 xs:max-md:pr-0 ${hasBgImage ? "py-8 px-8" : ""}`}
+			className={`pl-25 relative flex flex-col gap-5 mt-5 mb-5 | xs:max-md:pl-7.5 xs:max-md:pr-0 ${hasBgImage ? "py-8 px-8" : ""}`}
 			style={{
 				fontFamily: "var(--font-family-category)",
 				...(bgImage

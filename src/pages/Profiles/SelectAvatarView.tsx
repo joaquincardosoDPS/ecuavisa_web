@@ -13,15 +13,16 @@ function SelectAvatarView() {
     name,
     navigate,
     getAvatarUrl,
+    isSubmitting,
   } = useEditProfile();
 
   if (isLoading) return <FullScreenSpinner />;
-  console.log(avatarGroups)
 
   const handleSelect = async (avatarId: string) => {
+    if (isSubmitting) return;
     setSelectedAvatar(avatarId);
     if (!isCreateMode) {
-      await handleSubmit(name, false);
+      await handleSubmit(name, false, avatarId);
     }
     navigate(-1);
   };
@@ -49,10 +50,11 @@ function SelectAvatarView() {
             <button
               key={avatar.id}
               onClick={() => handleSelect(avatar.id)}
-              className="relative focus:outline-none cursor-pointer group"
+              disabled={isSubmitting}
+              className={`relative focus:outline-none group w-full aspect-square ${isSubmitting ? "cursor-wait opacity-80" : "cursor-pointer"}`}
             >
               <div
-                className={`relative w-auto h-auto rounded-[32px] overflow-hidden bg-(--clr-primary-title)/5 flex items-center justify-center border-4 transition-all duration-300 ${isSelected
+                className={`relative w-full h-full aspect-square rounded-2xl overflow-hidden bg-(--clr-primary-title)/5 flex items-center justify-center border-4 transition-all duration-300 ${isSelected
                   ? "border-(--epg-accent) scale-105 shadow-[0_0_20px_rgba(16,212,255,0.4)]"
                   : "border-transparent group-hover:border-(--epg-accent)/50"
                   }`}
@@ -62,6 +64,11 @@ function SelectAvatarView() {
                   alt={`Avatar ${avatar.id}`}
                   className="w-full h-full object-cover"
                 />
+                {isSelected && isSubmitting && (
+                  <div className="absolute inset-0 flex items-center justify-center bg-black/50 backdrop-blur-[2px] z-20">
+                    <div className="w-8 h-8 border-3 border-t-(--epg-accent) border-white/20 rounded-full animate-spin" />
+                  </div>
+                )}
               </div>
               {isSelected && (
                 <div className="absolute -top-3 -right-3 z-10 transition-all duration-300 scale-105">

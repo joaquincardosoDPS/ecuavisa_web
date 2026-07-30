@@ -80,14 +80,14 @@ function Header() {
 				className={[
 					'fixed top-0 left-0 right-0 z-50',
 					'flex items-center',
-					'px-[1.25vw] h-[80px]',
+					'px-[1.25vw] h-20',
 				].join(' ')}
 			>
 				{/* Left: avatar */}
-				<div className='flex items-center shrink-0 w-[120px]'>
+				<div className='flex items-center shrink-0 w-30'>
 					<button
 						className={[
-							'w-[48px] h-[48px] rounded-xl overflow-hidden',
+							'w-12 h-12 rounded-xl overflow-hidden',
 							'border-2 transition-all duration-200 cursor-pointer',
 							'flex items-center justify-center',
 							'bg-(--clr-secondary)',
@@ -113,7 +113,7 @@ function Header() {
 				{/* Center: nav bar that expands to 2x on search */}
 				<div
 					ref={centerRef}
-					className='relative flex items-center justify-center border border-(--clr-primary-title)/15 rounded-full h-12 overflow-hidden transition-all duration-400 ease-in-out mx-auto min-w-[480px]'
+					className='relative flex items-center justify-center border border-(--clr-primary-title)/15 rounded-full h-12 overflow-hidden transition-all duration-400 ease-in-out mx-auto min-w-120'
 					style={{
 						width: naturalWidth
 							? (searchMode ? naturalWidth : naturalWidth)
@@ -189,11 +189,11 @@ function Header() {
 				</div>
 
 				{/* Right: logo */}
-				<div className='flex items-center justify-end shrink-0 w-[120px]'>
+				<div className='flex items-center justify-end shrink-0 w-30'>
 					<img
 						src={configLogo || logoFallback}
 						alt="Logo"
-						className='h-[40px] w-auto object-contain'
+						className='h-10 w-auto object-contain'
 						draggable={false}
 					/>
 				</div>

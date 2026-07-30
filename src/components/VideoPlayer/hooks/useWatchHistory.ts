@@ -1,5 +1,7 @@
 import { useEffect, useRef, useCallback } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { historyService } from '@/services/historyService';
+import type { HistoryItem } from '@/interfaces/history.interface';
 
 interface UseWatchHistoryOptions {
     /** Slug del capítulo actual (campo `vod` del EP) */
@@ -49,6 +51,7 @@ export function useWatchHistory({
     token,
     profile,
 }: UseWatchHistoryOptions) {
+    const queryClient = useQueryClient();
     const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
     const lastSavedTimeRef = useRef<number>(0);
     const currentTimeRef = useRef(currentTime);
@@ -62,6 +65,25 @@ export function useWatchHistory({
 
     const canSave = !!vodSlug && !!token && !!profile && !isLive;
 
+    const applyOptimisticUpdate = useCallback(
+        (time: number, end: 0 | 1 = 0) => {
+            if (!token || !profile || !vodSlug) return;
+            queryClient.setQueriesData<HistoryItem[]>(
+                { queryKey: ['continue-watching'] },
+                (oldData) => {
+                    if (!oldData) return oldData;
+                    return oldData.map((item) => {
+                        if (item.slug === vodSlug || item.key === vodSlug) {
+                            return { ...item, time, end };
+                        }
+                        return item;
+                    });
+                }
+            );
+        },
+        [queryClient, token, profile, vodSlug],
+    );
+
     const saveProgress = useCallback(
         (end?: 0 | 1) => {
             if (!canSave || !vodSlug || !token || !profile) return;
@@ -71,17 +93,23 @@ export function useWatchHistory({
             if (end === undefined && Math.abs(time - lastSavedTimeRef.current) < 2) return;
 
             lastSavedTimeRef.current = time;
-            console.log(`[WatchHistory] Saving progress: vod=${vodSlug}, time=${Math.floor(time)}s${end !== undefined ? `, end=${end}` : ''}`);
+            const endStatus = end ?? 0;
+
+            // Actualización optimista en caché
+            applyOptimisticUpdate(time, endStatus);
 
             historyService.saveProgress({
                 token,
                 profile,
                 vod: vodSlug,
                 time,
-                end,
+                end: endStatus,
+            }).then(() => {
+                queryClient.invalidateQueries({ queryKey: ['continue-watching'] });
+                queryClient.invalidateQueries({ queryKey: ['history'] });
             });
         },
-        [canSave, vodSlug, token, profile],
+        [canSave, vodSlug, token, profile, queryClient, applyOptimisticUpdate],
     );
 
     // Intervalo periódico basado en la duración del video
@@ -96,7 +124,6 @@ export function useWatchHistory({
         }
 
         const intervalMs = getSaveInterval(duration) * 1000;
-        console.log(`[WatchHistory] Starting periodic save every ${intervalMs / 1000}s (duration: ${Math.floor(duration)}s)`);
 
         intervalRef.current = setInterval(() => {
             saveProgress();
@@ -126,16 +153,24 @@ export function useWatchHistory({
         return () => {
             if (currentTimeRef.current > 0) {
                 const isFinished = durationRef.current > 0 && (durationRef.current - currentTimeRef.current) < 5;
+                const endStatus: 0 | 1 = isFinished ? 1 : 0;
+                const time = currentTimeRef.current;
+
+                applyOptimisticUpdate(time, endStatus);
+
                 historyService.saveProgress({
                     token: token!,
                     profile: profile!,
                     vod: vodSlug!,
-                    time: currentTimeRef.current,
-                    end: isFinished ? 1 : 0,
+                    time,
+                    end: endStatus,
+                }).then(() => {
+                    queryClient.invalidateQueries({ queryKey: ['continue-watching'] });
+                    queryClient.invalidateQueries({ queryKey: ['history'] });
                 });
             }
         };
-    }, [canSave, vodSlug, token, profile]);
+    }, [canSave, vodSlug, token, profile, queryClient, applyOptimisticUpdate]);
 
     // Retornar saveProgress para uso manual (e.g., marcar fin)
     return { saveProgress };

@@ -32,18 +32,18 @@ function Banner({ slider }: BannerProps) {
 			<div className="absolute inset-0 z-10 flex items-end">
 				<button
 					onClick={() => setCurrentIndex((i) => (i - 1 + total) % total)}
-					className="shrink-0 ml-28 text-(--clr-primary-title)/80 hover:text-(--clr-primary-title) cursor-pointer transition-all duration-200 drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)] mb-40"
+					className="shrink-0 ml-5 text-(--clr-primary-title)/80 hover:text-(--clr-primary-title) cursor-pointer transition-all duration-200 drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)] mb-40"
 				>
 					<svg width="30" height="50" viewBox="8 5 8 14" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
 						<polyline points="15 18 9 12 15 6" />
 					</svg>
 				</button>
 
-				<div className="relative flex-1 px-12">
+				<div className="relative flex-1 px-12.5">
 					{slider.map((program, i) => (
 						<div
 							key={program.id}
-							className="absolute bottom-0 left-0 right-0 px-12 transition-all duration-500 ease-in-out"
+							className="absolute bottom-0 left-0 right-0 px-12.5 transition-all duration-500 ease-in-out"
 							style={{
 								opacity: i === currentIndex ? 1 : 0,
 								transform: i === currentIndex ? 'translateY(0)' : 'translateY(20px)',
@@ -58,7 +58,7 @@ function Banner({ slider }: BannerProps) {
 				{/* Flecha derecha */}
 				<button
 					onClick={() => setCurrentIndex((i) => (i + 1) % total)}
-					className="shrink-0 mr-8 text-(--clr-primary-title)/80 hover:text-(--clr-primary-title) cursor-pointer transition-all duration-200 drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)]  mb-40"
+					className="shrink-0 mr-5 text-(--clr-primary-title)/80 hover:text-(--clr-primary-title) cursor-pointer transition-all duration-200 drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)]  mb-40"
 				>
 					<svg width="30" height="50" viewBox="8 5 8 14" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
 						<polyline points="9 18 15 12 9 6" />

@@ -15,7 +15,7 @@ if (localStorage.getItem(LS_VERSION_KEY) !== LS_CURRENT_VERSION) {
 
 
 // export const CLIENT = resolveClient();
-export const CLIENT = 'ecuavisa';
+export const CLIENT = 'dps';
 export const BASENAME = import.meta.env.BASE_URL.replace(/\/+$/, '') || '/';
 
 export const ADS_FALLBACK_DOMAIN = 'https://www.ecuavisa.com';

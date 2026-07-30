@@ -51,7 +51,7 @@ function ContinueWatchingCarousel({ items }: ContinueWatchingCarouselProps) {
 
     return (
         <div
-            className="pl-48 flex flex-col gap-5 mt-5 mb-5 | xs:max-md:px-7.5"
+            className="pl-25 flex flex-col gap-5 mt-5 mb-5 | xs:max-md:px-7.5"
             style={{ fontFamily: "var(--font-family-category)" }}
         >
             <h2 className="text-2xl font-bold text-(--clr-primary-title)">Seguir Viendo</h2>
@@ -85,69 +85,69 @@ function ContinueWatchingCarousel({ items }: ContinueWatchingCarouselProps) {
                     ref={emblaRef}
                     className="overflow-hidden cursor-grab active:cursor-grabbing py-1 -ml-1 pl-1"
                 >
-                <div className="flex items-stretch transform-gpu will-change-transform" style={{ columnGap: '1.25rem' }}>
-                    {items.map((item) => {
-                        const imgSrc =
-                            item.image_land?.medium || item.image_land?.default || item.image;
-                        const progress = item.duration_seg > 0
-                            ? Math.min(100, (item.time / item.duration_seg) * 100)
-                            : 0;
+                    <div className="flex items-stretch transform-gpu will-change-transform" style={{ columnGap: '1.25rem' }}>
+                        {items.map((item) => {
+                            const imgSrc =
+                                item.image_land?.medium || item.image_land?.default || item.image;
+                            const progress = item.duration_seg > 0
+                                ? Math.min(100, (item.time / item.duration_seg) * 100)
+                                : 0;
 
-                        return (
-                            <div
-                                key={item.slug}
-                                tabIndex={0}
-                                onClick={() =>
-                                    navigate(
-                                        `/play/${item.key_program}/${item.key_segment}/${item.season}/${item.chapter}`,
-                                        { state: { resumeTime: item.time } },
-                                    )
-                                }
-                                className="shrink-0 w-[15vw] cursor-pointer group"
-                            >
-                                {/* Card imagen */}
-                                <div className="relative w-full aspect-video rounded-xl overflow-hidden bg-(--clr-secondary,#054668) transition-all duration-200 group-hover:ring-2 group-hover:ring-(--foc-primary,#ff1376) group-hover:scale-[1.02]">
-                                    {imgSrc ? (
-                                        <img
-                                            src={imgSrc}
-                                            alt={item.title}
-                                            className="w-full h-full object-cover"
-                                            draggable={false}
-                                            decoding="async"
-                                        />
-                                    ) : (
-                                        <div className="w-full h-full flex items-center justify-center">
-                                            <span className="text-(--clr-primary-title)/40 text-sm">{item.title}</span>
+                            return (
+                                <div
+                                    key={item.slug}
+                                    tabIndex={0}
+                                    onClick={() =>
+                                        navigate(
+                                            `/play/${item.key_program}/${item.key_segment}/${item.season}/${item.chapter}`,
+                                            { state: { resumeTime: item.time } },
+                                        )
+                                    }
+                                    className="shrink-0 w-[15vw] cursor-pointer group"
+                                >
+                                    {/* Card imagen */}
+                                    <div className="relative w-full aspect-video rounded-xl overflow-hidden bg-(--clr-secondary,#054668) transition-all duration-200 group-hover:ring-2 group-hover:ring-(--foc-primary,#ff1376) group-hover:scale-[1.02]">
+                                        {imgSrc ? (
+                                            <img
+                                                src={imgSrc}
+                                                alt={item.title}
+                                                className="w-full h-full object-cover"
+                                                draggable={false}
+                                                decoding="async"
+                                            />
+                                        ) : (
+                                            <div className="w-full h-full flex items-center justify-center">
+                                                <span className="text-(--clr-primary-title)/40 text-sm">{item.title}</span>
+                                            </div>
+                                        )}
+
+                                        {/* Barra de progreso */}
+                                        <div className="absolute bottom-0 left-0 right-0 h-[5px] bg-white/20">
+                                            <div
+                                                className="h-full bg-(--foc-primary) transition-all duration-300"
+                                                style={{ width: `${progress}%` }}
+                                            />
                                         </div>
-                                    )}
+                                    </div>
 
-                                    {/* Barra de progreso */}
-                                    <div className="absolute bottom-0 left-0 right-0 h-[5px] bg-white/20">
-                                        <div
-                                            className="h-full bg-(--foc-primary) transition-all duration-300"
-                                            style={{ width: `${progress}%` }}
-                                        />
+                                    {/* Info debajo del card */}
+                                    <div className="mt-2 px-0.5">
+                                        <p className="text-(--clr-primary-title) text-sm font-semibold tracking-wider">
+                                            {item.name_program}
+                                        </p>
+                                        <p className="text-(--clr-primary-title) text-base uppercase font-bold line-clamp-1 mt-0.5">
+                                            {item.title}
+                                        </p>
+                                        <p className="text-(--clr-primary-title) text-base mt-0.5">
+                                            {formatDuration(item.duration_seg)}
+                                        </p>
                                     </div>
                                 </div>
-
-                                {/* Info debajo del card */}
-                                <div className="mt-2 px-0.5">
-                                    <p className="text-(--clr-primary-title) text-sm font-semibold tracking-wider">
-                                        {item.name_program}
-                                    </p>
-                                    <p className="text-(--clr-primary-title) text-base uppercase font-bold line-clamp-1 mt-0.5">
-                                        {item.title}
-                                    </p>
-                                    <p className="text-(--clr-primary-title) text-base mt-0.5">
-                                        {formatDuration(item.duration_seg)}
-                                    </p>
-                                </div>
-                            </div>
-                        );
-                    })}
-                    <div className="flex-none w-16" />
+                            );
+                        })}
+                        <div className="flex-none w-16" />
+                    </div>
                 </div>
-            </div>
             </div>
         </div>
     );

@@ -34,7 +34,9 @@ export function useContinueWatching(programKey: string): ContinueWatchingResult 
             return response.data || [];
         },
         enabled,
-        staleTime: 1000 * 60 * 2, // 2 minutos
+        staleTime: 0,
+        refetchOnMount: 'always',
+        refetchOnWindowFocus: true,
     });
 
     return {

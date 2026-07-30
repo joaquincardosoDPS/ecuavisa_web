@@ -81,7 +81,7 @@ function ProgramsView() {
 		<>
 			<ProgramsBanner activeProgram={activeProgram} />
 
-			<div className="relative z-10 pb-20 | xs:max-md:pb-5">
+			<div className="relative z-10 py-25 | xs:max-md:pb-5">
 				{categories
 					?.filter((category) => category.format === "default")
 					.map((category) => (

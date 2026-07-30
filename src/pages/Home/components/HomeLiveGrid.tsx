@@ -156,7 +156,7 @@ function HomeLiveGrid() {
     if (isLoading || !channels || channels.length === 0) return null;
 
     return (
-        <div className="pl-48" data-section="live-epg">
+        <div className="pl-25" data-section="live-epg">
             <h2 className="text-[1.5rem] font-bold text-(--clr-primary-title) capitalize mb-4">Noticias</h2>
             <div className="group/carousel relative">
                 {/* Flecha izquierda */}

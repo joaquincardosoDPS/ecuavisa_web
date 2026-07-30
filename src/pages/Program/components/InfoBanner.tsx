@@ -6,7 +6,8 @@ import ProgressBar from "@/components/ui/ProgressBar";
 import { useContinueWatching } from "@/hooks/program/useContinueWatching";
 import { useNavigate } from "react-router-dom";
 import { BackButton } from "@/components/ui/BackButton";
-import StarIcon from "@/components/icons/StarIcon";
+// import StarIcon from "@/components/icons/StarIcon";
+import HeartIcon from "@/components/icons/HeartIcon";
 
 interface InfoBannerProps {
   program: Program;
@@ -52,7 +53,7 @@ function InfoBanner({ program, firstChapter }: InfoBannerProps) {
         <h2 className="text-6xl mb-6 font-title font-black text-(--clr-primary-title) drop-shadow-2xl">
           {program.title}
         </h2>
-        <p className="text-lg font-text mb-6 font-medium drop-shadow-md leading-8 h-[100px] max-w-4xl ">
+        <p className="text-lg font-text mb-6 font-medium drop-shadow-md leading-8 h-25 max-w-4xl ">
           {program.description_short}
         </p>
 
@@ -62,11 +63,9 @@ function InfoBanner({ program, firstChapter }: InfoBannerProps) {
             {continueWatchingItem ? "Reanudar" : "Ver ahora"}
           </Button>
           {isEnabled && (
-            <Button variant="primary" showArrow={false} onClick={toggleFavorite} className="uppercase">
-              <StarIcon filled={isFavorited} size={24} className="mr-2 shrink-0" />
-              {isFavorited ? "Eliminar" : "Agregar"}
+            <Button variant="primary" showArrow={false} onClick={toggleFavorite} className={`w-14 h-14 p-0 flex items-center justify-center rounded-full text-3xl font-light ${isFavorited ? " text-white bg-(--foc-secondary)" : "bg-black border-white"}`}>
+              {isFavorited ? <HeartIcon filled size={24} /> : "+"}
             </Button>
-
           )}
         </div>
 

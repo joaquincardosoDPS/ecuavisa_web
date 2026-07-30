@@ -61,6 +61,8 @@ export interface UseRegisterFormReturn {
   inputRefs: React.MutableRefObject<(HTMLInputElement | null)[]>;
   /** Advance to the next step or submit on the last step */
   goNext: () => void;
+  /** Return to the previous step */
+  goPrev: () => void;
   /** Keyboard handler (Enter → goNext) */
   handleKeyDown: (e: React.KeyboardEvent) => void;
   /** Returns the CSS animation class for a given slide index */
@@ -229,8 +231,21 @@ export function useRegisterForm(): UseRegisterFormReturn {
     }
   };
 
+  const goPrev = () => {
+    if (isAnimating || step <= 0) return;
+    setDirection("prev");
+    setIsAnimating(true);
+    setTimeout(() => {
+      setStep((s) => s - 1);
+      setIsAnimating(false);
+    }, 350);
+  };
+
   // ── Keyboard ────────────────────────────────────────────────────────────
   const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Tab") {
+      e.preventDefault();
+    }
     if (e.key === "Enter") {
       e.preventDefault();
       goNext();
@@ -275,6 +290,7 @@ export function useRegisterForm(): UseRegisterFormReturn {
     termsUrl,
     inputRefs,
     goNext,
+    goPrev,
     handleKeyDown,
     getSlideClass,
     togglePassword,

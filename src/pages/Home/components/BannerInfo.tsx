@@ -47,17 +47,17 @@ export function BannerInfo({ program }: BannerInfoProps) {
 			{/* Descripción + Metadata */}
 			<div className="max-w-[50vw] z-2 flex flex-row justify-start mb-8">
 				{/* Logo del programa */}
-				<div className="max-h-[15vw] max-w-[20vw] w-fit z-2 pr-4">
-					{program.image_logo?.medium ? (
+				{program.image_logo?.medium ? (
+					<div className="max-h-[15vw] max-w-[20vw] w-fit z-2 pr-4">
 						<img
 							src={program.image_logo.default}
 							alt={program.title}
 							className="h-full object-contain drop-shadow-[0_2px_8px_rgba(0,0,0,0.6)]"
 						/>
-					) : (
-						null
-					)}
-				</div>
+					</div>
+				) : (
+					null
+				)}
 				<div>
 					<h2 className="text-[4rem] font-black leading-20 mb-4">
 						{program.title}

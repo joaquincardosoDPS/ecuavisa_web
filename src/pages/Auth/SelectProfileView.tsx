@@ -4,16 +4,17 @@ import { FullScreenSpinner } from "@/components/ui/FullScreenSpinner";
 import { useAuthStore } from "@/features/auth/authStore";
 import iconEdit from "@/assets/img/icons/iconos-edit.svg";
 import Button from "@/components/ui/Button";
+import type { Profile } from "@/interfaces/profile.interface";
 
 function SelectProfileView() {
-  const { profiles, isLoading, isError, error, getAvatarUrl, isEditing, toggleEditing } = useProfilesList();
+  const { profiles, isLoading, isError, error, getAvatarUrl, isEditing } = useProfilesList();
   const setActiveProfile = useAuthStore((s) => s.setActiveProfile);
   const logout = useAuthStore((s) => s.logout);
   const navigate = useNavigate();
   // const location = useLocation();
   // const from = location.state?.from || "/";
 
-  const handleSelect = (profile: any) => {
+  const handleSelect = (profile: Profile) => {
     if (isEditing) {
       navigate(`/mi-ecuavisa/perfiles/${profile.id}`);
     } else {
@@ -23,13 +24,10 @@ function SelectProfileView() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col justify-center px-25 py-25" style={{ background: 'linear-gradient(to right, #17142C, #2D2533, #3D2E3D)' }}>
-      {/* Titulo */}
+    <div className="min-h-screen flex flex-col justify-center px-25 py-25 " >
       <div className="flex flex-col items-center mb-10">
-        <p className="text-2xl leading-[43px]">¿Quién está ahí?</p>
+        <p className="text-2xl leading-10.75">¿Quién está ahí?</p>
       </div>
-
-      {/* Perfiles */}
       <div className="flex flex-col items-center">
         {isLoading ? (
           <FullScreenSpinner />
@@ -48,7 +46,7 @@ function SelectProfileView() {
                   className="flex flex-col items-center gap-3 group cursor-pointer py-8"
                 >
                   <div className="relative">
-                    <div className="w-36 h-36 rounded-full overflow-hidden bg-(--clr-primary-title)/10 flex items-center justify-center border-3 border-transparent group-hover:border-[var(--foc-primary)] transition-all duration-300">
+                    <div className="w-36 h-36 rounded-full overflow-hidden bg-(--clr-primary-title)/10 flex items-center justify-center border-3 border-transparent group-hover:border-(--foc-primary) transition-all duration-300">
                       {avatarUrl ? (
                         <img
                           src={avatarUrl}
@@ -56,7 +54,7 @@ function SelectProfileView() {
                           className="w-full h-full object-cover"
                         />
                       ) : (
-                        <span className="text-4xl text-[var(--clr-secondary-text)]">
+                        <span className="text-4xl text-(--clr-secondary-text)">
                           {profile.name_perfil.charAt(0).toUpperCase()}
                         </span>
                       )}
@@ -81,12 +79,12 @@ function SelectProfileView() {
                 onClick={() => navigate("/mi-ecuavisa/perfiles/nuevo")}
                 className="flex flex-col items-center gap-3 group cursor-pointer py-8"
               >
-                <div className="w-36 h-36 rounded-full bg-[var(--clr-secondary)] flex items-center justify-center group-hover:border-[var(--foc-primary)] transition-all duration-300 border-3 border-transparent">
-                  <span className="text-5xl text-[var(--clr-secondary-text)] group-hover:text-[var(--foc-primary)] transition-colors duration-300">
+                <div className="w-36 h-36 rounded-full bg-(--clr-secondary) flex items-center justify-center group-hover:border-(--foc-primary) transition-all duration-300 border-3 border-transparent">
+                  <span className="text-5xl text-(--clr-secondary-text) group-hover:text-(--foc-primary) transition-colors duration-300">
                     +
                   </span>
                 </div>
-                <span className="text-xl text-[var(--clr-secondary-text)] group-hover:text-(--clr-primary-title) transition-colors duration-200">
+                <span className="text-xl text-(--clr-secondary-text) group-hover:text-(--clr-primary-title) transition-colors duration-200">
                   Agregar perfil
                 </span>
               </button>
@@ -97,15 +95,15 @@ function SelectProfileView() {
 
       {/* Botones de acción */}
       <div className="flex justify-center gap-6 mt-8">
-        <Button
-          variant="secondary"
+        {/* <Button
+          variant="primary"
           onClick={toggleEditing}
         >
           {isEditing ? "Listo" : "Editar Perfiles"}
-        </Button>
+        </Button> */}
 
         <Button
-          variant="tertiary"
+          variant="secondary"
           onClick={() => logout()}
         >
           Cerrar sesión

@@ -26,8 +26,9 @@ function getEventsInWindow(
 
   return events
     .map((event) => {
-      const begin = new Date(event.beginTime);
-      const end = new Date(event.endTime);
+      const snapMs = 1000 * 60 * 5; // Redondear a los 5 minutos más cercanos para TV EPG
+      const begin = new Date(Math.round(new Date(event.beginTime).getTime() / snapMs) * snapMs);
+      const end = new Date(Math.round(new Date(event.endTime).getTime() / snapMs) * snapMs);
 
       const clampedStart = begin < windowStart ? windowStart : begin;
       const clampedEnd = end > windowEnd ? windowEnd : end;
@@ -57,23 +58,39 @@ function formatTime(date: Date): string {
   });
 }
 
-/** Genera las marcas de hora para el header */
+/** Genera las marcas de hora para el header con posiciones porcentuales */
 function getTimeMarks(
   windowStart: Date,
   windowEnd: Date,
-): { label: string; pct: number }[] {
-  const marks: { label: string; pct: number }[] = [];
+): { label: string; startPct: number; widthPct: number; isCurrent: boolean }[] {
   const windowMs = windowEnd.getTime() - windowStart.getTime();
+  if (windowMs <= 0) return [];
 
-  // Empezar desde la hora actual (floor), no la siguiente
+  const marks: { label: string; startPct: number; widthPct: number; isCurrent: boolean }[] = [];
+  const nowMs = Date.now();
+
+  // Empezar desde la hora actual (floor)
   const firstHour = new Date(windowStart);
   firstHour.setMinutes(0, 0, 0);
 
-  for (let t = firstHour; t <= windowEnd; t = new Date(t.getTime() + 3600000)) {
-    const pct = ((t.getTime() - windowStart.getTime()) / windowMs) * 100;
-    // Permitir pct negativo para la hora actual (el slot se mostrará parcialmente)
-    if (pct <= 100) {
-      marks.push({ label: formatTime(t), pct: Math.max(0, pct) });
+  for (let t = new Date(firstHour); t < windowEnd; t = new Date(t.getTime() + 3600000)) {
+    const nextT = new Date(t.getTime() + 3600000);
+
+    const rawStart = ((t.getTime() - windowStart.getTime()) / windowMs) * 100;
+    const rawEnd = ((nextT.getTime() - windowStart.getTime()) / windowMs) * 100;
+
+    const clampedStart = Math.max(0, rawStart);
+    const clampedEnd = Math.min(100, rawEnd);
+    const widthPct = clampedEnd - clampedStart;
+
+    if (widthPct > 0) {
+      const isCurrent = t.getTime() <= nowMs && nowMs < nextT.getTime();
+      marks.push({
+        label: formatTime(t),
+        startPct: clampedStart,
+        widthPct,
+        isCurrent,
+      });
     }
   }
 
@@ -100,7 +117,7 @@ function EPGGrid({
 
   // Calcular el fin de la ventana según el último evento del EPG
   const windowEnd = useMemo(() => {
-    let maxEnd = now.getTime() + VISIBLE_HOURS * 3600000; // mínimo VISIBLE_HOURS
+    let maxEnd = now.getTime() + VISIBLE_HOURS * 3600000;
     epg.forEach((ch) => {
       ch.events.forEach((ev) => {
         const end = new Date(ev.endTime).getTime();
@@ -217,24 +234,20 @@ function EPGGrid({
             className="flex-1 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
             onScroll={() => handleScroll(-1)}
           >
-            <div className="flex h-full gap-1" style={{ width: innerWidthPct }}>
-              {timeMarks.map((mark, idx) => {
-                const markTime = new Date(windowStart.getTime() + (mark.pct / 100) * (windowEnd.getTime() - windowStart.getTime()));
-                const nextMark = timeMarks[idx + 1];
-                const nextTime = nextMark
-                  ? new Date(windowStart.getTime() + (nextMark.pct / 100) * (windowEnd.getTime() - windowStart.getTime()))
-                  : windowEnd;
-                const isCurrentHour = markTime <= now && now < nextTime;
-
-                const spanPct = nextMark ? nextMark.pct - mark.pct : 100 - mark.pct;
-
-                return (
+            <div className="relative h-8" style={{ width: innerWidthPct }}>
+              {timeMarks.map((mark, idx) => (
+                <div
+                  key={`${mark.label}-${idx}`}
+                  className="absolute top-0 bottom-0 px-0.5"
+                  style={{
+                    left: `${mark.startPct}%`,
+                    width: `${mark.widthPct}%`,
+                  }}
+                >
                   <div
-                    key={`${mark.label}-${idx}`}
-                    className={`@container h-8 rounded-xl flex items-center px-4 text-xs font-medium tracking-wide transition-all duration-300 shrink-0 text-(--clr-primary-title)`}
+                    className={`@container h-full rounded-xl flex items-center px-4 text-xs font-medium tracking-wide transition-all duration-300 text-(--clr-primary-title)`}
                     style={{
-                      flex: `${spanPct} 0 0`,
-                      background: isCurrentHour
+                      background: mark.isCurrent
                         ? CURRENT_HOUR_BG
                         : 'rgba(255, 255, 255, 0.10)',
                     }}
@@ -244,8 +257,8 @@ function EPGGrid({
                       {mark.label}
                     </span>
                   </div>
-                );
-              })}
+                </div>
+              ))}
             </div>
           </div>
         </div>
@@ -297,37 +310,51 @@ function EPGGrid({
                   onScroll={() => handleScroll(rowIdx)}
                 >
                   <div
-                    className="flex h-full gap-1.5"
+                    className="relative h-full"
                     style={{ width: innerWidthPct }}
                   >
-                    {events.map(({ event, widthPct }) => {
+                    {events.map(({ event, startPct, widthPct }) => {
                       const begin = new Date(event.beginTime);
                       const end = new Date(event.endTime);
                       const isNow = begin <= now && end > now;
                       const useHighlight = isSelected && isNow;
 
+                      const visiblePct = widthPct * scrollRatio;
+                      const isSmall = visiblePct < 2.5;
+
                       return (
                         <div
                           key={event.id}
-                          className={`h-full rounded-lg px-3 py-2 flex flex-col justify-center overflow-hidden transition-all duration-300 shrink-0 border border-(--epg-accent)/40 ${!useHighlight && !isSelected
-                            ? "bg-(--clr-primary-title)/20"
-                            : ""
-                            }`}
+                          className="absolute top-0 bottom-0 py-0.5 px-0.5"
                           style={{
-                            flex: `${widthPct} 0 0`,
-                            ...(useHighlight && { background: CURRENT_HOUR_BG }),
-                            ...(isSelected && !isNow && { background: 'color-mix(in srgb, var(--epg-selected) 40%, transparent)' }),
+                            left: `${startPct}%`,
+                            width: `${widthPct}%`,
                           }}
-                          title={`${event.title} — ${formatTime(begin)} – ${formatTime(end)}`}
                         >
-                          <p className="text-xl font-bold text-(--clr-primary-title) truncate leading-tight">
-                            {event.title}
-                          </p>
-                          {widthPct > 3 && (
-                            <p className="text-base font-bold text-(--clr-primary-title) truncate">
-                              {formatTime(begin)} – {formatTime(end)}
+
+                          <div
+                            className={`h-full rounded-lg ${isSmall ? "px-0 text-center" : "px-3"
+                              } py-2 flex flex-col justify-center overflow-hidden transition-all duration-300 border border-(--epg-accent)/40 ${!useHighlight && !isSelected
+                                ? "bg-(--clr-primary-title)/20"
+                                : ""
+                              }`}
+                            style={{
+                              ...(useHighlight && { background: CURRENT_HOUR_BG }),
+                              ...(isSelected && !isNow && { background: 'color-mix(in srgb, var(--epg-selected) 40%, transparent)' }),
+                            }}
+                            title={`${event.title} — ${formatTime(begin)} – ${formatTime(end)}`}
+                          >
+                            <p className="text-xl font-bold text-(--clr-primary-title) truncate leading-tight">
+                              {!isSmall ? event.title : ""}
                             </p>
-                          )}
+                            {!isSmall && (
+                              <p className="text-base font-bold text-(--clr-primary-title) truncate">
+                                {formatTime(begin)} – {formatTime(end)}
+                              </p>
+                            )}
+                          </div>
+
+
                         </div>
                       );
                     })}

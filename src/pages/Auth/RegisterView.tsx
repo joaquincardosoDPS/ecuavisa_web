@@ -22,6 +22,7 @@ function RegisterView() {
     termsUrl,
     inputRefs,
     goNext,
+    goPrev,
     handleKeyDown,
     getSlideClass,
     togglePassword,
@@ -49,10 +50,31 @@ function RegisterView() {
           />
         </div>
 
-        {/* Contador de pasos */}
-        <p className="mb-2 text-(--clr-primary-title)/40 transition-opacity duration-300">
-          Paso {step + 1} de {STEPS.length}
-        </p>
+        {/* Contador de pasos con botón Volver */}
+        <div className="flex items-center gap-1.5 mb-2">
+          {step > 0 && (
+            <button
+              type="button"
+              onClick={goPrev}
+              disabled={isSubmitting || isAnimating}
+              className="p-1 -ml-1 text-(--clr-primary-title)/60 hover:text-(--clr-primary-title) transition-colors cursor-pointer disabled:opacity-50"
+              aria-label="Volver al paso anterior"
+            >
+              <svg
+                className="w-4 h-4"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth={3}
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+              </svg>
+            </button>
+          )}
+          <p className="text-sm text-(--clr-primary-title)/40 transition-opacity duration-300">
+            Paso {step + 1} de {STEPS.length}
+          </p>
+        </div>
 
         {/* Error de registro */}
         {submitError && (
@@ -93,7 +115,7 @@ function RegisterView() {
                   value={formData[s.id]}
                   onChange={(e) => setFieldValue(s.id, e.target.value)}
                   onKeyDown={handleKeyDown}
-                  className={`w-full text-base outline-none transition-all duration-300 bg-(--clr-secondary) rounded-md px-5 py-4 text-(--clr-primary-title) placeholder:text-(--clr-primary-title)/30 focus:border-(--foc-primary) focus:shadow-[0_0_0_3px_rgba(255,19,118,0.15)] ${errors[s.id]
+                  className={`w-full text-base outline-none transition-all duration-300 bg-(--clr-secondary) rounded-md px-5 py-4 text-(--clr-primary-title) placeholder:text-(--clr-primary-title)/30 focus:border-(--foc-primary) ${errors[s.id]
                     ? "border-2 border-red-500"
                     : "border-2 border-(--clr-primary-title)/10"
                     } ${s.id === "password" ? "pr-14" : ""}`}
@@ -157,9 +179,10 @@ function RegisterView() {
         {/* Botones */}
         <div className="flex gap-3 mt-6">
           <button
+            type="button"
             onClick={goNext}
             disabled={isSubmitting}
-            className="flex-1 py-3 text-base font-bold rounded-md transition-all duration-200 cursor-pointer bg-(--foc-primary) text-(--clr-primary-title) border-none hover:brightness-115 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full py-3 text-base font-bold rounded-md transition-all duration-200 cursor-pointer bg-(--foc-primary) text-(--clr-primary-title) border-none hover:brightness-115 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isSubmitting
               ? "Creando cuenta..."

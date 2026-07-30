@@ -33,7 +33,7 @@ interface UseEditProfileReturn {
   error: Error | null;
 
   // Actions
-  handleSubmit: (newName?: string, shouldNavigate?: boolean) => Promise<void>;
+  handleSubmit: (newName?: string, shouldNavigate?: boolean, newAvatar?: string | null) => Promise<void>;
   handleDelete: () => Promise<void>;
   getAvatarUrl: (avatar: AvatarItem) => string | null;
   logo: string;
@@ -89,7 +89,7 @@ export function useEditProfile(): UseEditProfileReturn {
     } else if (isCreateMode && !name && selectedAvatar === null) {
       clearDraft();
     }
-  }, [existingProfile, isCreateMode, id]);
+  }, [existingProfile, isCreateMode, id, name, selectedAvatar, setName, setSelectedAvatar, clearDraft]);
 
   const {
     data: avatarGroups,
@@ -111,11 +111,27 @@ export function useEditProfile(): UseEditProfileReturn {
     return avatar.images?.medium || avatar.images?.default || null;
   };
 
-  const handleSubmit = async (newName?: string, shouldNavigate = true) => {
+  const handleSubmit = async (
+    newName?: string,
+    shouldNavigate = true,
+    newAvatar?: string | null
+  ) => {
     if (!token) return;
-    const finalName = (newName !== undefined ? newName : name).trim();
+    const finalName = (
+      newName !== undefined ? newName : (name || existingProfile?.name_perfil || "")
+    ).trim();
     if (!finalName) {
       setSubmitError("El nombre del perfil es obligatorio.");
+      return;
+    }
+
+    const avatarToUse = newAvatar !== undefined ? newAvatar : selectedAvatar;
+    const avatarToSend = isCreateMode
+      ? avatarToUse
+      : (avatarToUse ?? existingProfile?.avatar ?? null);
+
+    if (isCreateMode && !avatarToSend) {
+      setSubmitError("Debes seleccionar un avatar obligatoriamente para crear el perfil.");
       return;
     }
 
@@ -123,13 +139,8 @@ export function useEditProfile(): UseEditProfileReturn {
     setSubmitError("");
 
     try {
-      // En edición, si no se eligió avatar, mantener el avatar actual del perfil
-      const avatarToSend = isCreateMode
-        ? selectedAvatar
-        : (selectedAvatar ?? existingProfile?.avatar ?? null);
-
       const response = isCreateMode
-        ? await profileService.create(token, finalName, avatarToSend)
+        ? await profileService.create(token, finalName, avatarToSend!)
         : await profileService.update(token, id!, finalName, avatarToSend);
 
       if (response.status === "error") {
@@ -152,7 +163,7 @@ export function useEditProfile(): UseEditProfileReturn {
       setSubmitSuccess(true);
       if (shouldNavigate) {
         clearDraft();
-        setTimeout(() => navigate("/mi-ecuavisa/perfiles"), 1500);
+        setTimeout(() => navigate("/mi-ecuavisa/perfiles"), 1200);
       }
     } catch (err) {
       console.error("[EditProfile] Error:", err);

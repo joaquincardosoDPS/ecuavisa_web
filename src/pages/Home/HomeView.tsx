@@ -8,6 +8,7 @@ import { useDocumentTitle } from "@/hooks/shared/useDocumentTitle";
 import Banner from "./components/Banner";
 import { useAppInitialization } from "@/hooks/shared/useAppInitilization";
 import HomeLiveGrid from "./components/HomeLiveGrid";
+import SingleEvent from "./components/SingleEvent";
 
 function HomeView() {
 	useDocumentTitle('Inicio', {
@@ -86,7 +87,7 @@ function HomeView() {
 				{/* Recomendados */}
 				{recommended.length > 0 && (
 					<div
-						className="pl-48 flex flex-col gap-5 mt-5 mb-5 | xs:max-md:px-7.5"
+						className="pl-25 flex flex-col gap-5 mt-5 mb-5 | xs:max-md:px-7.5"
 						style={{ fontFamily: "var(--font-family-category)" }}
 					>
 						<h2 className="text-2xl font-bold text-(--clr-primary-title) line-height-7">
@@ -97,12 +98,15 @@ function HomeView() {
 				)}
 
 				{/* Listado de categorías */}
-				{categories.map(
-					(category) =>
-						category.programs.length > 0 && (
-							<CarrouselContainerHome key={category.key} category={category} />
-						),
-				)}
+				{categories.map((category) => {
+					if (category.programs.length > 1) {
+						return <CarrouselContainerHome key={category.key} category={category} />;
+					}
+					if (category.programs.length === 1 && category.format === "event") {
+						return <SingleEvent key={category.key} category={category} />;
+					}
+					return null;
+				})}
 
 				{/* Sentinel para infinite scroll */}
 				<div ref={sentinelRef} className="h-1" />

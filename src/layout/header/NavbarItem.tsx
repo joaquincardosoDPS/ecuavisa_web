@@ -37,9 +37,12 @@ export function NavbarItem({
             className={`${baseClasses} ${stateClasses}`}
             onClick={handleSelect}
         >
-            <span className='flex items-center justify-center mr-2 rounded-md' style={{ width: '1.375rem', height: '1.375rem' }}>
-                <SidebarIcon name={item.icon} size={22} />
-            </span>
+            {item.icon && (
+                <span className='flex items-center justify-center mr-2 rounded-md' style={{ width: '1.375rem', height: '1.375rem' }}>
+                    <SidebarIcon name={item.icon} size={22} />
+                </span>
+
+            )}
             <span className=''>{item.title}</span>
         </li>
     );
