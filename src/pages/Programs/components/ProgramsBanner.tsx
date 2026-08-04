@@ -10,7 +10,7 @@ export default function ProgramsBanner({ activeProgram }: ProgramsBannerProps) {
 	const currentBgImage =
 		activeProgram?.image_slider?.big || activeProgram?.image_background?.big || activeProgram?.image_land?.big || "";
 
-	const logo = activeProgram?.image_logo?.default || activeProgram?.image_logo?.default;
+	// const logo = activeProgram?.image_logo?.default || activeProgram?.image_logo?.default;
 
 	const [images, setImages] = useState<{ src: string; loaded: boolean }[]>(
 		currentBgImage ? [{ src: currentBgImage, loaded: true }] : [],

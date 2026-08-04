@@ -149,6 +149,7 @@
 
 html {
 	scrollbar-width: none;
+	font-size: 16px;
 	/* Firefox */
 }
 
@@ -204,13 +205,11 @@ body {
 
 .banner-overlay {
 	background: linear-gradient(to bottom, var(--clr-primary) 0%, transparent 20%, transparent 50%, var(--clr-primary) 100%);
-	background: linear-gradient(
-		to bottom,
-		color-mix(in srgb, var(--clr-primary) 80%, transparent) 0%,
-		transparent 20%,
-		transparent 40%,
-		color-mix(in srgb, var(--clr-primary) 40%, transparent) 60%,
-		color-mix(in srgb, var(--clr-primary) 80%, transparent) 80%,
-		var(--clr-primary) 100%
-	);
+	background: linear-gradient(to bottom,
+			color-mix(in srgb, var(--clr-primary) 80%, transparent) 0%,
+			transparent 20%,
+			transparent 40%,
+			color-mix(in srgb, var(--clr-primary) 40%, transparent) 60%,
+			color-mix(in srgb, var(--clr-primary) 80%, transparent) 80%,
+			var(--clr-primary) 100%);
 }

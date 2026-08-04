@@ -1,4 +1,4 @@
-import type { Chapter, Segment } from "@/interfaces/catalog.interface";
+import type { Chapter, ChapterWithHistory, Segment } from "@/interfaces/catalog.interface";
 import { useChapters } from "@/hooks/program/useChapters";
 import { useEffect } from "react";
 import ChapterCard from "@/pages/Event/components/ChapterCard";
@@ -25,24 +25,20 @@ function ChaptersContainer({
   showChapter = true,
 }: Props) {
   const {
-    chapters: chaptersData,
+    chaptersWithHistory,
     isLoading: isLoadingChapters,
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,
   } = useChapters(slug, activeSeason, activeSegment?.key || null);
 
-  const chapters =
-    chaptersData?.pages?.flatMap((page) => page?.data || []) || [];
-
   useEffect(() => {
     if (!isLoadingChapters && onLoaded) {
       onLoaded();
     }
-    if (!isLoadingChapters && chapters.length > 0 && onFirstChapter) {
-      onFirstChapter(chapters[0]);
+    if (!isLoadingChapters && chaptersWithHistory.length > 0 && onFirstChapter) {
+      onFirstChapter(chaptersWithHistory[0]);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- only fire when loading state changes, not when callbacks change identity
   }, [isLoadingChapters]);
 
   return (
@@ -67,16 +63,18 @@ function ChaptersContainer({
 
       {isLoadingChapters ? (
         <p className="text-(--clr-primary-title)">Cargando capítulos...</p>
-      ) : chapters && chapters.length > 0 ? (
+      ) : chaptersWithHistory && chaptersWithHistory.length > 0 ? (
         <>
           <div className="grid grid-cols-5 gap-x-6 gap-y-10">
-            {chapters.map((chapter, index) => (
+            {chaptersWithHistory.map((chapter: ChapterWithHistory, index: number) => (
               <ChapterCard
                 key={`${chapter.key}-${index}`}
                 chapter={chapter}
                 index={index + 1}
                 programKey={programKey}
                 showChapter={showChapter}
+                playbackTime={chapter.playbackTime}
+                isFinished={chapter.isFinished}
               />
             ))}
           </div>

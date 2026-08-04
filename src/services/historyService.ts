@@ -12,6 +12,8 @@ export const historyService = {
             token: params.token,
             profile: params.profile,
             ...(params.program && { program: params.program }),
+            ...(params.segment && { segment: params.segment }),
+            ...(params.season !== undefined && { season: params.season }),
             ...(params.page && { page: params.page }),
             ...(params.limit && { limit: params.limit }),
             ...(params.end !== undefined && { end: params.end }),

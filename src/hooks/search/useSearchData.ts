@@ -1,6 +1,5 @@
-import { useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { useInfiniteQuery } from "@tanstack/react-query";
-import { useDebounce } from "@/hooks/shared/useDebounce";
 import { catalogService } from "@/services/catalogService";
 import type { Program } from "@/interfaces/catalog.interface";
 
@@ -10,6 +9,7 @@ interface UseSearchDataReturn {
   query: string;
   setQuery: (value: string) => void;
   programs: Program[];
+  totalRecords: number;
   isLoading: boolean;
   isError: boolean;
   fetchNextPage: () => void;
@@ -18,8 +18,17 @@ interface UseSearchDataReturn {
 }
 
 export function useSearchData(): UseSearchDataReturn {
-  const [query, setQuery] = useState("");
-  const debouncedQuery = useDebounce(query, 500);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const query = searchParams.get("q") || "";
+
+  const setQuery = (newQuery: string) => {
+    const trimmed = newQuery.trim();
+    if (trimmed) {
+      setSearchParams({ q: trimmed }, { replace: true });
+    } else {
+      setSearchParams({}, { replace: true });
+    }
+  };
 
   const {
     data,
@@ -29,10 +38,10 @@ export function useSearchData(): UseSearchDataReturn {
     hasNextPage,
     isFetchingNextPage,
   } = useInfiniteQuery({
-    queryKey: ["search", debouncedQuery],
-    queryFn: ({ pageParam }) =>
+    queryKey: ["search", query],
+    queryFn: ({ pageParam = 1 }) =>
       catalogService.searchPrograms({
-        search: debouncedQuery,
+        search: query,
         limit: SEARCH_LIMIT,
         page: pageParam,
       }),
@@ -43,17 +52,18 @@ export function useSearchData(): UseSearchDataReturn {
       }
       return undefined;
     },
-    enabled:
-      debouncedQuery.trim().length === 0 ||
-      debouncedQuery.trim().length >= 3,
+    enabled: true,
   });
 
   const programs = data?.pages.flatMap((page) => page.data) ?? [];
+  const firstPage = data?.pages[0];
+  const totalRecords = firstPage?.total_records ?? firstPage?.total_display_records ?? programs.length;
 
   return {
     query,
     setQuery,
     programs,
+    totalRecords,
     isLoading,
     isError,
     fetchNextPage,

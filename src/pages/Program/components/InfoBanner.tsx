@@ -41,7 +41,7 @@ function InfoBanner({ program, firstChapter }: InfoBannerProps) {
     <div className="animate-in fade-in slide-in-from-left-10 duration-1000 pt-25 h-[85vh] flex flex-col justify-between">
       <BackButton />
       <div>
-        <div className="h-55 mb-3">
+        <div className="h-45 mb-3">
           {logoImg ? (
             <img
               src={logoImg}

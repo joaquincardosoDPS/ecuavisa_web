@@ -5,7 +5,11 @@ interface ChapterCardProps {
     chapter: Chapter;
     index: number;
     programKey: string;
-    showChapter?: boolean
+    showChapter?: boolean;
+    /** Tiempo de reproducción en segundos (0 = sin progreso) */
+    playbackTime?: number;
+    /** Si el capítulo fue marcado como finalizado */
+    isFinished?: boolean;
 }
 
 function formatDuration(seconds: number): string {
@@ -14,13 +18,24 @@ function formatDuration(seconds: number): string {
     return hrs > 0 ? `${hrs} hrs ${mins} min` : `${mins} min`;
 }
 
-function ChapterCard({ chapter, programKey, showChapter = true }: ChapterCardProps) {
+function getProgress(playbackTime: number, durationSeg: number): number {
+    if (durationSeg <= 0 || playbackTime <= 0) return 0;
+    return Math.min(100, (playbackTime / durationSeg) * 100);
+}
+
+function ChapterCard({ chapter, programKey, showChapter = true, playbackTime = 0, isFinished = false }: ChapterCardProps) {
     const navigate = useNavigate();
     const imageSrc = chapter.image_land.small;
 
     const handleClick = () => {
-        navigate(`/play/${programKey}/${chapter.key_segment}/${chapter.season}/${chapter.chapter}`);
+        navigate(
+            `/play/${programKey}/${chapter.key_segment}/${chapter.season}/${chapter.chapter}`,
+            playbackTime > 0 && !isFinished ? { state: { resumeTime: playbackTime } } : undefined,
+        );
     };
+
+    const progress = isFinished ? 100 : getProgress(playbackTime, chapter.duration_seg);
+    const hasProgress = progress > 0;
 
     return (
         <div className="flex flex-col gap-3" onClick={handleClick}>
@@ -34,12 +49,22 @@ function ChapterCard({ chapter, programKey, showChapter = true }: ChapterCardPro
                     className='w-full h-full object-cover rounded-[inherit]'
                     loading='lazy'
                 />
+
+                {/* Barra de progreso */}
+                {hasProgress && (
+                    <div className="absolute bottom-0 left-0 right-0 h-1.25 bg-white/20">
+                        <div
+                            className="h-full bg-(--foc-primary,#FF0069) transition-all duration-300"
+                            style={{ width: `${progress}%` }}
+                        />
+                    </div>
+                )}
             </div>
             <div className="text-lg text-(--clr-primary-title)">
                 {showChapter ?
                     <>
                         <h1 className="">Capítulo {chapter.chapter}</h1>
-                        <h2 className="text-(--clr-text-primary-button) line-clamp-2 2xl:line-clamp-3 text-sm 2xl:text-base">{chapter.title}</h2>
+                        <h2 className="text-(--clr-primary-text) line-clamp-2 2xl:line-clamp-3 text-sm 2xl:text-base">{chapter.title}</h2>
                     </>
                     :
                     <div className="flex flex-col gap-2">

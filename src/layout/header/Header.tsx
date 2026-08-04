@@ -1,16 +1,12 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useAuthStore } from "@/features/auth/authStore";
 import { useConfigStore } from "@/features/config/useConfigStore";
-
-
 import type { Profile } from "@/interfaces/profile.interface";
 import { NAVBAR_ITEMS } from "./constants";
 import { NavbarItem } from "./NavbarItem";
 import { SidebarIcon } from "./SidebarIcons";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import logoFallback from '@/assets/img/logo.svg';
-
-
 
 function getProfileAvatarUrl(profile: Profile): string | null {
 	if (Array.isArray(profile.images)) return null;
@@ -23,11 +19,20 @@ function Header() {
 	const activeProfile = useAuthStore((s) => s.activeProfile);
 	const [searchMode, setSearchMode] = useState(false);
 	const [searchQuery, setSearchQuery] = useState('');
+	const [searchParams] = useSearchParams();
+	const location = useLocation();
 	const inputRef = useRef<HTMLInputElement>(null);
 	const centerRef = useRef<HTMLDivElement>(null);
 	const [naturalWidth, setNaturalWidth] = useState(0);
 	const navigate = useNavigate();
 
+	// Pre-fill query if present on /buscar page
+	useEffect(() => {
+		const q = searchParams.get('q');
+		if (q) {
+			setSearchQuery(q);
+		}
+	}, [searchParams]);
 
 	/* ── Avatar ── */
 	const avatarUrl = activeProfile ? getProfileAvatarUrl(activeProfile) : null;
@@ -37,42 +42,36 @@ function Header() {
 		navigate(isAuthenticated ? `/mi-ecuavisa/perfiles` : '/auth/login', { replace: true });
 	}, [isAuthenticated, navigate]);
 
-
 	/* ── Search ── */
 	const openSearch = useCallback(() => {
-		// Capture natural width before expanding
 		if (centerRef.current && naturalWidth === 0) {
 			setNaturalWidth(centerRef.current.offsetWidth);
 		}
 		setSearchMode(true);
-		setSearchQuery('');
 		setTimeout(() => inputRef.current?.focus(), 100);
 	}, [naturalWidth]);
 
 	const closeSearch = useCallback(() => {
 		setSearchMode(false);
-		setSearchQuery('');
 	}, []);
 
 	const handleSearchSubmit = useCallback(() => {
-		if (searchQuery.trim()) {
-			navigate(`/buscar?q=${encodeURIComponent(searchQuery.trim())}`, { replace: true });
+		const trimmed = searchQuery.trim();
+		if (trimmed) {
+			navigate(`/buscar?q=${encodeURIComponent(trimmed)}`);
+			setSearchMode(false);
+		} else if (location.pathname !== '/buscar') {
+			navigate('/buscar');
 			setSearchMode(false);
 		}
-	}, [searchQuery, navigate]);
-
-	// Close search on Back key
-	useEffect(() => {
-		if (!searchMode) return;
-	}, [searchMode, closeSearch]);
-
+	}, [searchQuery, navigate, location.pathname]);
 
 	return (
 		<div>
 			{searchMode && (
 				<div
 					className='fixed inset-0 z-40 transition-opacity duration-300 backdrop-blur-sm'
-					style={{ background: 'color-mix(in srgb, var(--grad-roubdsds) 80%, transparent)' }}
+					style={{ background: 'color-mix(in srgb, var(--clr-primary) 70%, transparent)' }}
 					onClick={closeSearch}
 				/>
 			)}
@@ -110,13 +109,12 @@ function Header() {
 					</button>
 				</div>
 
-				{/* Center: nav bar that expands to 2x on search */}
 				<div
 					ref={centerRef}
 					className='relative flex items-center justify-center border border-(--clr-primary-title)/15 rounded-full h-12 overflow-hidden transition-all duration-400 ease-in-out mx-auto min-w-120'
 					style={{
 						width: naturalWidth
-							? (searchMode ? naturalWidth : naturalWidth)
+							? (searchMode ? `${Math.max(naturalWidth * 1.3, 560)}px` : `${naturalWidth}px`)
 							: undefined,
 						backgroundColor: searchMode ? 'color-mix(in srgb, var(--clr-primary) 95%, transparent)' : 'color-mix(in srgb, var(--clr-primary-title) 20%, transparent)',
 					}}
@@ -160,9 +158,15 @@ function Header() {
 							transform: searchMode ? 'translateY(0)' : 'translateY(6px)',
 						}}
 					>
-						<span className='flex items-center justify-center shrink-0'>
+						<button
+							type="button"
+							onClick={handleSearchSubmit}
+							className='flex items-center justify-center shrink-0 cursor-pointer text-(--clr-primary-title) hover:text-(--clr-secondary-button) transition-colors'
+							tabIndex={searchMode ? 0 : -1}
+							title="Buscar"
+						>
 							<SidebarIcon name="search" size={20} />
-						</span>
+						</button>
 						<input
 							ref={inputRef}
 							type="text"
@@ -173,13 +177,14 @@ function Header() {
 								if (e.key === 'Enter') handleSearchSubmit();
 								if (e.key === 'Escape') closeSearch();
 							}}
-							className='ml-3 flex-1 bg-transparent border-none outline-none text-[1.1rem] text-(--clr-primary-text) placeholder:text-(--clr-primary-title)/25'
+							className='ml-3 flex-1 bg-transparent border-none outline-none text-[1.1rem] text-(--clr-primary-text) placeholder:text-(--clr-primary-title)/35'
 							autoComplete="off"
 							maxLength={100}
 							tabIndex={searchMode ? 0 : -1}
 						/>
 						<button
-							className='ml-2 w-8 h-8 flex items-center justify-center rounded-full opacity-50 hover:opacity-100 hover:bg-(--clr-primary-title)/10 cursor-pointer transition-opacity duration-150'
+							type="button"
+							className='ml-2 w-8 h-8 flex items-center justify-center rounded-full opacity-50 hover:opacity-100 hover:bg-(--clr-primary-title)/10 cursor-pointer transition-opacity duration-150 text-(--clr-primary-title)'
 							onClick={closeSearch}
 							tabIndex={searchMode ? 0 : -1}
 						>

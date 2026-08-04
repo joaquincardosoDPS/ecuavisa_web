@@ -47,6 +47,8 @@ export interface GetHistoryParams {
     token: string;
     profile: string;
     program?: string;
+    segment?: string;
+    season?: number;
     page?: number;
     limit?: number;
     end?: 0 | 1;

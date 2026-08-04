@@ -176,6 +176,13 @@ export interface Chapter {
     title_complete: string;
 }
 
+export interface ChapterWithHistory extends Chapter {
+    /** Tiempo de reproducción en segundos (0 si no hay historial) */
+    playbackTime: number;
+    /** Si el episodio fue marcado como finalizado */
+    isFinished: boolean;
+}
+
 export interface ChaptersResponse {
     status: string;
     code: number;

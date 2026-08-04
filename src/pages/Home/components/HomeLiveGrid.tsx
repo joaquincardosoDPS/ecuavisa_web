@@ -1,3 +1,4 @@
+import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import useEmblaCarousel from 'embla-carousel-react';
 import type { EmblaOptionsType } from 'embla-carousel';
@@ -91,7 +92,7 @@ function EPGCard({ channel, event, onPress }: EPGCardProps) {
                 )}
 
                 {/* Barra de progreso */}
-                <div className="absolute bottom-0 left-0 right-0 h-[5px] bg-white/20">
+                <div className="absolute bottom-0 left-0 right-0 h-1.25 bg-white/20">
                     <div
                         className="h-full bg-(--foc-primary) transition-all duration-1000"
                         style={{ width: `${progress}%` }}
@@ -117,6 +118,7 @@ function EPGCard({ channel, event, onPress }: EPGCardProps) {
 
 /* ── Grid principal ── */
 function HomeLiveGrid() {
+    const navigate = useNavigate();
     const { data: channels, isLoading } = useQuery<EPGChannel[]>({
         queryKey: ['global-epg'],
         queryFn: async () => {
@@ -197,7 +199,7 @@ function HomeLiveGrid() {
                                     key={ch.key_live}
                                     channel={ch}
                                     event={event}
-                                    onPress={() => window.location.href = `/en-vivo?signal=${ch.key_live}`}
+                                    onPress={() => navigate(`/live?signal=${ch.key_live}`)}
                                 />
                             );
                         })}
