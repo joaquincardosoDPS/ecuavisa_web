@@ -25,7 +25,9 @@ function getProgress(playbackTime: number, durationSeg: number): number {
 
 function ChapterCard({ chapter, programKey, showChapter = true, playbackTime = 0, isFinished = false }: ChapterCardProps) {
     const navigate = useNavigate();
-    const imageSrc = chapter.image_land.small;
+
+    console.log("DEBUG ->>>>>>", chapter)
+    const imageSrc = chapter.image_land?.small || chapter.image || '';
 
     const handleClick = () => {
         navigate(
@@ -43,12 +45,19 @@ function ChapterCard({ chapter, programKey, showChapter = true, playbackTime = 0
             <div
                 className='group relative shrink-0 overflow-hidden cursor-pointer transition-all duration-300 hover:z-10 hover:ring-2 hover:ring-(--foc-primary) hover:shadow-[0_0_20px_rgba(255,19,118,0.3)] focus:outline-none focus:z-10 focus:ring-2 focus:ring-(--foc-primary) focus:shadow-[0_0_20px_rgba(255,19,118,0.3)] bg-(--clr-primary) embla_slide aspect-video rounded-lg'
             >
-                <img
-                    src={imageSrc}
-                    alt={chapter.title}
-                    className='w-full h-full object-cover rounded-[inherit]'
-                    loading='lazy'
-                />
+                {imageSrc ? (
+                    <img
+                        src={imageSrc}
+                        alt={chapter.title}
+                        className='w-full h-full object-cover rounded-[inherit]'
+                        loading='lazy'
+                    />
+                ) : (
+                    <div className="w-full h-full flex flex-col justify-center items-center text-center p-4 text-(--clr-primary-text) rounded-[inherit]">
+                        <span className="font-bold text-sm line-clamp-2">{chapter.name_program}</span>
+                        <span className="text-xs opacity-80 line-clamp-2 mt-1">{chapter.title}</span>
+                    </div>
+                )}
 
                 {/* Barra de progreso */}
                 {hasProgress && (

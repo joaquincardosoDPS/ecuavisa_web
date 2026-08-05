@@ -1,9 +1,13 @@
 import { useNavigate } from "react-router-dom";
 
-export function BackButton({ fallback = "/" }: { fallback?: string }) {
+export function BackButton({ fallback = "/", to }: { fallback?: string, to?: string }) {
 	const navigate = useNavigate();
 
 	const handleBack = () => {
+		if (to) {
+			navigate(to);
+			return;
+		}
 		// React Router v6 stores the history index in window.history.state.idx
 		if (window.history.state && window.history.state.idx > 0) {
 			navigate(-1);

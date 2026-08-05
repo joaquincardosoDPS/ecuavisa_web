@@ -39,12 +39,11 @@ export default function ProgramsBanner({ activeProgram }: ProgramsBannerProps) {
 			{images.map((img) => (
 				<div
 					key={img.src}
-					className={`fixed inset-0 -z-20 w-full h-full origin-center transition-all duration-1000 ease-in-out ${img.loaded ? "opacity-100 scale-100" : "opacity-0 scale-105"}`}
+					className={`fixed inset-0 -z-20 w-full h-full origin-center transition-[opacity,transform] duration-1000 ease-in-out will-change-[opacity,transform] ${img.loaded ? "opacity-100 scale-100" : "opacity-0 scale-105"}`}
 					style={{
 						backgroundImage: `url(${img.src})`,
 						backgroundSize: "cover",
 						backgroundPosition: "center",
-						backgroundColor: "var(--clr-primary)",
 						backgroundRepeat: "no-repeat",
 					}}
 					ref={(el) => {

@@ -7,7 +7,22 @@ import axios from 'axios';
 import type { EPGChannel, EPGEvent } from '@/interfaces/catalog.interface';
 import logoSvg from '@/assets/img/logo.svg';
 
+const PLAYLIST_URL = '/api-proxy/assets/ecuavisa/playlists/static/playlist.json';
 const EPG_URL = 'https://assets.rudo.video/assets/ecuavisa/playlists/global_epg.json';
+
+let playlistKeysPromise: Promise<Set<string>> | null = null;
+
+function getPlaylistKeys() {
+    if (!playlistKeysPromise) {
+        playlistKeysPromise = axios.get<{ data: { key_live: string }[] }>(PLAYLIST_URL)
+            .then(res => new Set((res.data?.data || []).map(item => item.key_live)))
+            .catch((err) => {
+                console.error('Error fetching playlist:', err);
+                return new Set<string>();
+            });
+    }
+    return playlistKeysPromise;
+}
 
 /* ── Helpers ── */
 
@@ -122,8 +137,15 @@ function HomeLiveGrid() {
     const { data: channels, isLoading } = useQuery<EPGChannel[]>({
         queryKey: ['global-epg'],
         queryFn: async () => {
-            const { data } = await axios.get<EPGChannel[]>(EPG_URL);
-            return data;
+            const [epgRes, validKeys] = await Promise.all([
+                axios.get<EPGChannel[]>(EPG_URL),
+                getPlaylistKeys()
+            ]);
+            if (validKeys.size > 0) {
+                return epgRes.data.filter(channel => validKeys.has(channel.key_live));
+            }
+            console.log(channels)
+            return epgRes.data;
         },
         staleTime: 1000 * 60 * 5,
         refetchInterval: 1000 * 60,

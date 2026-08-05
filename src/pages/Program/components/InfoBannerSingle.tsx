@@ -6,6 +6,7 @@ import FavoriteButton from '@/components/ui/FavoriteButton';
 import { useNavigate } from 'react-router-dom';
 import { formatDuration } from '@/utils/formatDuration';
 import ProgressBar from '@/components/ui/ProgressBar';
+import { BackButton } from '@/components/ui/BackButton';
 
 function InfoBannerSingle({ program, chapter }: {
     program: Program,
@@ -47,7 +48,8 @@ function InfoBannerSingle({ program, chapter }: {
 
     return (
         <div className="animate-in fade-in slide-in-from-left-10 duration-1000 mt-25 ml-25">
-            <div className="h-40 2xl:h-55 flex items-end">
+            <BackButton to="/programas" />
+            <div className="h-40 2xl:h-55 flex items-end mt-4">
                 {logoImg ? (
                     <img
                         src={logoImg}

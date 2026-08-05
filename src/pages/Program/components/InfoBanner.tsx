@@ -39,7 +39,7 @@ function InfoBanner({ program, firstChapter }: InfoBannerProps) {
   // const genderNames = program.genders?.map((gender) => gender.name).join(", ");
   return (
     <div className="animate-in fade-in slide-in-from-left-10 duration-1000 pt-25 h-[85vh] flex flex-col justify-between">
-      <BackButton />
+      <BackButton to="/programas" />
       <div>
         <div className="h-45 mb-3">
           {logoImg ? (

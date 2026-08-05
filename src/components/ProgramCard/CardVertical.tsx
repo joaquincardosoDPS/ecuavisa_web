@@ -1,5 +1,7 @@
 import type { Program, Event } from "@/interfaces/catalog.interface";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
+import { useProgramsStore } from "@/features/programs/programsStore";
+import { useRef } from "react";
 import RankingIcon from "@/assets/img/icons/iconos-ranking.svg";
 import { getEventStatus } from "@/utils/eventStatus";
 
@@ -24,6 +26,26 @@ function CardVertical({ program, format, index }: CardVerticalProps) {
   const eventStatus = isEvent && eventData ? getEventStatus(eventData) : null;
   const showDate = eventStatus !== null && eventStatus.label === "Próximamente";
 
+  const { pathname } = useLocation();
+  const isProgramsView = pathname === "/programas";
+  const setActiveProgram = useProgramsStore((state) => state.setActiveProgram);
+  const hoverTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const FOCUS_DELAY_MS = 200;
+
+  const handleFocusEnter = () => {
+    if (!isProgramsView || isEvent) return;
+    hoverTimeout.current = setTimeout(() => {
+      setActiveProgram(program as Program);
+    }, FOCUS_DELAY_MS);
+  };
+
+  const handleFocusLeave = () => {
+    if (!isProgramsView) return;
+    if (hoverTimeout.current) {
+      clearTimeout(hoverTimeout.current);
+    }
+  };
+
   const handleClick = () => {
     if (isEvent && eventData) {
       if (eventData.skip_view && eventData.program_associated?.key) {
@@ -42,6 +64,10 @@ function CardVertical({ program, format, index }: CardVerticalProps) {
         tabIndex={0}
         className="group relative shrink-0 overflow-hidden cursor-pointer transition-all duration-300 hover:z-10 hover:ring-2 hover:ring-(--foc-primary) hover:shadow-[0_0_20px_rgba(255,19,118,0.3)] focus:outline-none focus:z-10 focus:ring-2 focus:ring-(--foc-primary) focus:shadow-[0_0_20px_rgba(255,19,118,0.3)] bg-(--clr-primary) embla_slide aspect-9/16 rounded-xl"
         style={{ width: "var(--card-w-vertical)" }}
+        onMouseEnter={handleFocusEnter}
+        onMouseLeave={handleFocusLeave}
+        onFocus={handleFocusEnter}
+        onBlur={handleFocusLeave}
         onClick={handleClick}
       >
         {/* Ranking badge */}

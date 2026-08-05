@@ -15,8 +15,8 @@ export const useProgramsData = () => {
             const res = await catalogService.getCategories({
                 limit: 10,
                 page: pageParam,
-                show_event: true,
-                show_ranking: true
+                show_event: false,
+                show_ranking: false
             });
             if (res.status === 'error' || !res.data) {
                 throw new Error(res.msj || 'Error fetching categories');
