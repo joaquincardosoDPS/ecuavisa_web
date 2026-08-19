@@ -74,14 +74,14 @@ export function BannerInfo({ program }: BannerInfoProps) {
 					variant="primary"
 					onClick={handleClick}
 				>
-					<PlayButton className="mr-2 shrink-0" width={30} height={30} />
+					<PlayButton className="mr-2 shrink-0" width={24} height={24} />
 					Ver en vivo
 				</Button>
 				<Button
 					variant="primary"
 					onClick={handleClick}
 				>
-					<InfoCircle className="mr-2 shrink-0" width={30} height={30} />
+					<InfoCircle className="mr-2 shrink-0" width={24} height={24} />
 					Información
 				</Button>
 			</div>

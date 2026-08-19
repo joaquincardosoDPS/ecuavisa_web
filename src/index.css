@@ -213,3 +213,18 @@ body {
 			color-mix(in srgb, var(--clr-primary) 80%, transparent) 80%,
 			var(--clr-primary) 100%);
 }
+
+@keyframes banner-bg-fade-in {
+	from {
+		opacity: 0;
+		transform: scale(1.05);
+	}
+	to {
+		opacity: 1;
+		transform: scale(1);
+	}
+}
+
+.banner-bg-animate {
+	animation: banner-bg-fade-in 1000ms ease-in-out forwards;
+}

@@ -1,28 +1,11 @@
 import { useNavigate } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
 import useEmblaCarousel from 'embla-carousel-react';
 import type { EmblaOptionsType } from 'embla-carousel';
 import { useState, useEffect, useCallback } from 'react';
-import axios from 'axios';
+import { useLiveChannels } from '@/hooks/live/useLiveChannels';
+import { useLiveEpg } from '@/hooks/live/useLiveEpg';
 import type { EPGChannel, EPGEvent } from '@/interfaces/catalog.interface';
 import logoSvg from '@/assets/img/logo.svg';
-
-const PLAYLIST_URL = '/api-proxy/assets/ecuavisa/playlists/static/playlist.json';
-const EPG_URL = 'https://assets.rudo.video/assets/ecuavisa/playlists/global_epg.json';
-
-let playlistKeysPromise: Promise<Set<string>> | null = null;
-
-function getPlaylistKeys() {
-    if (!playlistKeysPromise) {
-        playlistKeysPromise = axios.get<{ data: { key_live: string }[] }>(PLAYLIST_URL)
-            .then(res => new Set((res.data?.data || []).map(item => item.key_live)))
-            .catch((err) => {
-                console.error('Error fetching playlist:', err);
-                return new Set<string>();
-            });
-    }
-    return playlistKeysPromise;
-}
 
 /* ── Helpers ── */
 
@@ -48,26 +31,25 @@ function getProgress(event: EPGEvent): number {
     return ((now - begin) / (end - begin)) * 100;
 }
 
-/** Formatea horario: "Lunes | 08:00 a 09:00" */
-// function formatSchedule(event: EPGEvent): string {
-//     const days = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
-//     const begin = new Date(event.beginTime);
-//     const end = new Date(event.endTime);
-//     const day = days[begin.getDay()];
-//     const fmt = (d: Date) => d.toLocaleTimeString('es-EC', { hour: '2-digit', minute: '2-digit', hour12: false });
-//     return `${day} | ${fmt(begin)} a ${fmt(end)}`;
-// }
-
 /* ── Card individual de canal EPG ── */
+
+/** Datos ya resueltos por señal: el programa en emisión (EPG) con fallback a la señal */
+interface LiveCard {
+    key: string;
+    channelName: string;
+    title: string;
+    image: string;
+    event: EPGEvent | null;
+}
+
 interface EPGCardProps {
-    channel: EPGChannel;
-    event: EPGEvent;
+    card: LiveCard;
     onPress?: () => void;
 }
 
-function EPGCard({ channel, event, onPress }: EPGCardProps) {
-    const progress = getProgress(event);
-    const coverImage = event.pictures?.poster || event.pictures?.photo || event.pictures?.cover || event.pictures?.background || '';
+function EPGCard({ card, onPress }: EPGCardProps) {
+    const progress = card.event ? getProgress(card.event) : 100;
+    const isOnAir = card.event ? progress > 0 && progress < 100 : true;
 
     return (
         <div
@@ -75,18 +57,18 @@ function EPGCard({ channel, event, onPress }: EPGCardProps) {
             onClick={onPress}
         >
             {/* Card imagen */}
-            <div className="relative w-full aspect-9/16 rounded-xl overflow-hidden bg-(--clr-secondary,#054668) transition-all duration-300 group-hover:ring-2 group-hover:ring-(--foc-primary,#ff1376) group-hover:shadow-[0_0_20px_rgba(255,19,118,0.3)]">
-                {coverImage ? (
+            <div className="relative w-full aspect-2/3 rounded-xl overflow-hidden bg-(--clr-secondary,#054668) transition-all duration-300 group-hover:ring-2 group-hover:ring-(--foc-primary,#ff1376) group-hover:shadow-[0_0_20px_rgba(255,19,118,0.3)]">
+                {card.image ? (
                     <img
-                        src={coverImage}
-                        alt={event.title}
+                        src={card.image}
+                        alt={card.title}
                         className="w-full h-full object-cover transition-transform duration-300 scale-110 group-hover:scale-100"
                         draggable={false}
                         decoding="async"
                     />
                 ) : (
                     <div className="w-full h-full flex items-center justify-center">
-                        <span className="text-(--clr-primary-title)/40 text-sm">{event.title}</span>
+                        <span className="text-(--clr-primary-title)/40 text-sm">{card.title}</span>
                     </div>
                 )}
 
@@ -99,33 +81,32 @@ function EPGCard({ channel, event, onPress }: EPGCardProps) {
                 />
 
                 {/* Badge En Vivo */}
-                {progress > 0 && progress < 100 && (
+                {isOnAir && (
                     <span className="absolute bottom-4 left-2 bg-(--foc-primary) text-(--clr-primary-title) text-[0.65rem] font-bold px-2 py-0.5 rounded tracking-wider uppercase flex items-center" style={{ columnGap: '0.25rem' }}>
                         <span className="w-1.5 h-1.5 rounded-full bg-(--clr-primary-title) animate-pulse" />
                         En Vivo
                     </span>
                 )}
 
-                {/* Barra de progreso */}
-                <div className="absolute bottom-0 left-0 right-0 h-1.25 bg-white/20">
-                    <div
-                        className="h-full bg-(--foc-primary) transition-all duration-1000"
-                        style={{ width: `${progress}%` }}
-                    />
-                </div>
+                {/* Barra de progreso (solo si hay EPG) */}
+                {card.event && (
+                    <div className="absolute bottom-0 left-0 right-0 h-1.25 bg-white/20">
+                        <div
+                            className="h-full bg-(--foc-primary) transition-all duration-1000"
+                            style={{ width: `${progress}%` }}
+                        />
+                    </div>
+                )}
             </div>
 
             {/* Info debajo del card */}
             <div className="mt-2 px-0.5">
                 <p className="text-(--clr-primary-title) text-sm font-semibold tracking-wider">
-                    {channel.channel}
+                    {card.channelName}
                 </p>
                 <p className="text-(--clr-primary-title) text-base uppercase font-bold line-clamp-1 mt-0.5">
-                    {event.title}
+                    {card.title}
                 </p>
-                {/* <p className="text-(--clr-primary-title) text-base mt-0.5">
-                    {formatSchedule(event)}
-                </p> */}
             </div>
         </div>
     );
@@ -134,22 +115,12 @@ function EPGCard({ channel, event, onPress }: EPGCardProps) {
 /* ── Grid principal ── */
 function HomeLiveGrid() {
     const navigate = useNavigate();
-    const { data: channels, isLoading } = useQuery<EPGChannel[]>({
-        queryKey: ['global-epg'],
-        queryFn: async () => {
-            const [epgRes, validKeys] = await Promise.all([
-                axios.get<EPGChannel[]>(EPG_URL),
-                getPlaylistKeys()
-            ]);
-            if (validKeys.size > 0) {
-                return epgRes.data.filter(channel => validKeys.has(channel.key_live));
-            }
-            console.log(channels)
-            return epgRes.data;
-        },
-        staleTime: 1000 * 60 * 5,
-        refetchInterval: 1000 * 60,
-    });
+
+    // Señales en vivo desde el playlist base
+    const { data: signals, isLoading: signalsLoading } = useLiveChannels();
+
+    // EPG global: programa actual en cada señal
+    const { data: channels, isLoading: epgLoading } = useLiveEpg();
 
     const [emblaRef, emblaApi] = useEmblaCarousel({
         align: 'start',
@@ -177,11 +148,43 @@ function HomeLiveGrid() {
         };
     }, [emblaApi, onSelect]);
 
-    if (isLoading || !channels || channels.length === 0) return null;
+    const isLoading = signalsLoading || epgLoading;
+
+    if (isLoading || !signals || signals.length === 0) return null;
+
+    // Mapa key_live → canal EPG
+    const epgMap = new Map<string, EPGChannel>();
+    (channels || []).forEach((ch) => epgMap.set(ch.key_live, ch));
+
+    // Resolver el programa en emisión por señal, con fallback a la señal
+    const cards: LiveCard[] = signals.map((signal) => {
+        const channel = epgMap.get(signal.key_live);
+        const event = channel ? getCurrentEvent(channel.events) : null;
+
+        const title = event?.title || signal.title || signal.active_item_data?.title || signal.name_live;
+
+        const image =
+            event?.pictures?.poster ||
+            event?.pictures?.photo ||
+            event?.pictures?.cover ||
+            event?.pictures?.background ||
+            signal.active_item_data?.image ||
+            signal.background_image ||
+            signal.logo ||
+            '';
+
+        return {
+            key: signal.key_live,
+            channelName: signal.name_live,
+            title,
+            image,
+            event,
+        };
+    });
 
     return (
         <div className="pl-25" data-section="live-epg">
-            <h2 className="text-[1.5rem] font-bold text-(--clr-primary-title) capitalize mb-4">Noticias</h2>
+            <h2 className="text-[1.5rem] font-bold text-(--clr-primary-title) capitalize mb-4">Programación en Vivo</h2>
             <div className="group/carousel relative">
                 {/* Flecha izquierda */}
                 <button
@@ -213,18 +216,13 @@ function HomeLiveGrid() {
                     className="overflow-hidden cursor-grab active:cursor-grabbing py-1 -ml-1 pl-1"
                 >
                     <div className="flex items-stretch transform-gpu will-change-transform" style={{ columnGap: '1.25rem' }}>
-                        {channels.map((ch) => {
-                            const event = getCurrentEvent(ch.events);
-                            if (!event) return null;
-                            return (
-                                <EPGCard
-                                    key={ch.key_live}
-                                    channel={ch}
-                                    event={event}
-                                    onPress={() => navigate(`/live?signal=${ch.key_live}`)}
-                                />
-                            );
-                        })}
+                        {cards.map((card) => (
+                            <EPGCard
+                                key={card.key}
+                                card={card}
+                                onPress={() => navigate(`/live?signal=${card.key}`)}
+                            />
+                        ))}
                         <div className="flex-none w-16" />
                     </div>
                 </div>
@@ -234,4 +232,3 @@ function HomeLiveGrid() {
 }
 
 export default HomeLiveGrid;
-

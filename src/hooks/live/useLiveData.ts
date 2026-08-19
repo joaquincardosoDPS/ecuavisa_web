@@ -1,26 +1,16 @@
-import { catalogService } from '@/services/catalogService';
-import { useQuery } from '@tanstack/react-query';
+import { useLiveChannels } from '@/hooks/live/useLiveChannels';
+import { useLiveEpg } from '@/hooks/live/useLiveEpg';
 
 
 export const useLiveData = () => {
 
-    const playlistPremiumQuery = useQuery({
-        queryKey: ['home', 'playlist-premium'],
-        queryFn: () => catalogService.getPlaylistPremium(),
-        staleTime: 1000 * 60 * 5,
-    });
-
-    const epgQuery = useQuery({
-        queryKey: ['live', 'epg'],
-        queryFn: () => catalogService.getChannelList(),
-        staleTime: 1000 * 60 * 5,
-        refetchInterval: 1000 * 60 * 5, // Refrescar cada 5 minutos
-    });
+    const channelsQuery = useLiveChannels();
+    const epgQuery = useLiveEpg();
 
     return {
-        playlistPremium: playlistPremiumQuery.data?.data || [],
+        playlistPremium: channelsQuery.data || [],
         epg: epgQuery.data || [],
-        isLoading: playlistPremiumQuery.isLoading || epgQuery.isLoading,
-        isError: playlistPremiumQuery.isError || epgQuery.isError
+        isLoading: channelsQuery.isLoading || epgQuery.isLoading,
+        isError: channelsQuery.isError || epgQuery.isError
     };
 };

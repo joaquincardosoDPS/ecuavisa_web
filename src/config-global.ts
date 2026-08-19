@@ -15,7 +15,7 @@ if (localStorage.getItem(LS_VERSION_KEY) !== LS_CURRENT_VERSION) {
 
 
 // export const CLIENT = resolveClient();
-export const CLIENT = 'dps';
+export const CLIENT = 'ecuavisa';
 export const BASENAME = import.meta.env.BASE_URL.replace(/\/+$/, '') || '/';
 
 export const ADS_FALLBACK_DOMAIN = 'https://www.ecuavisa.com';
@@ -30,7 +30,9 @@ export const RUDO_DEVICE_CODE_URL = `${RUDO_BASE_USER}/device_code`
 export const RUDO_DEVICE_VERIFY_URL = `${RUDO_BASE_USER}/device_verify`
 export const RUDO_DEVICE_PAIR_URL = `${RUDO_BASE_USER}/device_pair`
 
-//export const RUDO_PLAYLIST_URL = `${RUDO_CDN_URL}/assets/${CLIENT}/playlists/static/playlist.json`;
+export const RUDO_PLAYLIST_URL = `${RUDO_CDN_URL}/assets/${CLIENT}/playlists/static/playlist.json`;
+
+export const RUDO_CHANNELS_URL = `https://rudo.video/channels/${CLIENT}/list.json`;
 
 export const RUDO_PLAYLIST_PREMIUM_URL = `${RUDO_CDN_URL}/assets/${CLIENT}/playlists/static/playlist_premium.json`;
 

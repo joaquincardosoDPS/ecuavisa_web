@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import CarrouselContainer from "@/components/ProgramCard/CarrouselContainer";
 import ProgramsBanner from "./components/ProgramsBanner";
 import { useProgramsStore } from "@/features/programs/programsStore";
@@ -7,6 +7,20 @@ import { useProgramsData } from "@/hooks/program/useProgramsData";
 import { useImagePreloader } from "@/hooks/shared/useImagePreloader";
 import { useDocumentTitle } from "@/hooks/shared/useDocumentTitle";
 import { FullScreenSpinner } from "@/components/ui/FullScreenSpinner";
+
+// Misma cadena de fallback que usa el banner para el fondo de un programa
+function getBannerBg(program: Program): string {
+	return program.image_slider?.big || program.image_background?.big || program.image_land?.big || "";
+}
+
+// Calienta la caché del navegador en segundo plano sin bloquear el render
+function preloadImages(urls: string[]): void {
+	urls.forEach((src) => {
+		if (!src) return;
+		const img = new Image();
+		img.src = src;
+	});
+}
 
 
 function ProgramsView() {
@@ -35,6 +49,7 @@ function ProgramsView() {
 	}, [categories, activeProgram, setActiveProgram]);
 
 
+	// Misma cadena de fallback que usa el banner para el fondo de un programa
 	const criticalImages = useMemo(() => {
 		if (!categories || categories.length === 0) return [];
 		const urls: string[] = [];
@@ -43,9 +58,9 @@ function ProgramsView() {
 		);
 		if (firstCategory) {
 			const firstProg = firstCategory.programs[0] as Program;
-			const bg = firstProg.image_slider?.big || firstProg.image_land?.big;
+			const bg = getBannerBg(firstProg);
 			if (bg) urls.push(bg);
-			const progLogo = firstProg.image_logo?.default || firstProg.image_logo?.default;
+			const progLogo = firstProg.image_logo?.default;
 			if (progLogo) urls.push(progLogo);
 		}
 		return urls;
@@ -53,9 +68,39 @@ function ProgramsView() {
 
 	const imagesReady = useImagePreloader(criticalImages, !isLoading && categories.length > 0);
 
+	const sectionRef = useRef<HTMLDivElement | null>(null);
+	const preloadedCarousels = useRef<Set<string>>(new Set());
 
+	// Precarga los fondos de cada carrusel cuando se acerca al viewport,
+	// para que el fade del banner arranque desde una imagen ya cacheada.
+	// No bloquea el render: solo calienta la caché del navegador.
+	useEffect(() => {
+		if (isLoading) return;
+		const section = sectionRef.current;
+		if (!section) return;
 
-	// Infinite scroll observer (Scroll Listener version)
+		const observer = new IntersectionObserver(
+			(entries) => {
+				entries.forEach((entry) => {
+					if (!entry.isIntersecting) return;
+					const key = entry.target.getAttribute("data-carousel-key");
+					if (!key || preloadedCarousels.current.has(key)) return;
+					preloadedCarousels.current.add(key);
+
+					const category = categories.find((c) => c.key === key);
+					if (!category) return;
+					preloadImages((category.programs as Program[]).map(getBannerBg));
+				});
+			},
+			{ rootMargin: "0px 0px 800px 0px" },
+		);
+
+		section
+			.querySelectorAll("[data-carousel-key]")
+			.forEach((el) => observer.observe(el));
+
+		return () => observer.disconnect();
+	}, [categories, isLoading]);
 	useEffect(() => {
 		const handleScroll = () => {
 			if (isLoading || !hasNextPage || isFetchingNextPage) return;
@@ -81,11 +126,11 @@ function ProgramsView() {
 		<>
 			<ProgramsBanner activeProgram={activeProgram} />
 
-			<div className="relative z-10 py-25 | xs:max-md:pb-5">
+			<div ref={sectionRef} className="relative z-10 py-25 | xs:max-md:pb-5">
 				{categories
 					?.filter((category) => category.format === "default")
 					.map((category) => (
-						<div key={category.key}>
+						<div key={category.key} data-carousel-key={category.key}>
 							<CarrouselContainer category={category} />
 						</div>
 					))}

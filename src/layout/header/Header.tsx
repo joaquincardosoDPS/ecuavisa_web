@@ -79,34 +79,17 @@ function Header() {
 				className={[
 					'fixed top-0 left-0 right-0 z-50',
 					'flex items-center',
-					'px-[1.25vw] h-20',
+					'px-[3.25vw] h-20',
 				].join(' ')}
 			>
 				{/* Left: avatar */}
-				<div className='flex items-center shrink-0 w-30'>
-					<button
-						className={[
-							'w-12 h-12 rounded-xl overflow-hidden',
-							'border-2 transition-all duration-200 cursor-pointer',
-							'flex items-center justify-center',
-							'bg-(--clr-secondary)',
-						].join(' ')}
-						onClick={goToProfile}
-					>
-						{avatarUrl ? (
-							<img
-								src={avatarUrl}
-								alt={activeProfile?.name_perfil || 'Avatar'}
-								className='w-full h-full object-cover'
-								draggable={false}
-								decoding="async"
-							/>
-						) : (
-							<span className='text-[1.2rem] font-bold text-(--clr-primary-title)'>
-								{avatarInitial}
-							</span>
-						)}
-					</button>
+				<div className='flex items-center justify-start shrink-0 w-30'>
+					<img
+						src={configLogo || logoFallback}
+						alt="Logo"
+						className='h-10 w-auto object-contain'
+						draggable={false}
+					/>
 				</div>
 
 				<div
@@ -194,13 +177,32 @@ function Header() {
 				</div>
 
 				{/* Right: logo */}
-				<div className='flex items-center justify-end shrink-0 w-30'>
-					<img
-						src={configLogo || logoFallback}
-						alt="Logo"
-						className='h-10 w-auto object-contain'
-						draggable={false}
-					/>
+
+				<div className='flex items-center justify-end shrink-0 w-40'>
+					<div className="mr-2">Mi perfil</div>
+					<button
+						className={[
+							'w-12 h-12 rounded-xl overflow-hidden',
+							'border-2 transition-all duration-200 cursor-pointer',
+							'flex items-center justify-center',
+							'bg-(--clr-secondary)',
+						].join(' ')}
+						onClick={goToProfile}
+					>
+						{avatarUrl ? (
+							<img
+								src={avatarUrl}
+								alt={activeProfile?.name_perfil || 'Avatar'}
+								className='w-full h-full object-cover'
+								draggable={false}
+								decoding="async"
+							/>
+						) : (
+							<span className='text-[1.2rem] font-bold text-(--clr-primary-title)'>
+								{avatarInitial}
+							</span>
+						)}
+					</button>
 				</div>
 			</nav>
 		</div>

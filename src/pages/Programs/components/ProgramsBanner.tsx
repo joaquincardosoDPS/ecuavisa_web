@@ -5,6 +5,13 @@ interface ProgramsBannerProps {
 	activeProgram: Program | null;
 }
 
+interface BgImage {
+	src: string;
+	loaded: boolean;
+	/** true cuando la imagen fue revelada tras cargarse (aplica fade-in animado) */
+	animate: boolean;
+}
+
 export default function ProgramsBanner({ activeProgram }: ProgramsBannerProps) {
 	// Carga la imagen de fondo
 	const currentBgImage =
@@ -12,8 +19,8 @@ export default function ProgramsBanner({ activeProgram }: ProgramsBannerProps) {
 
 	// const logo = activeProgram?.image_logo?.default || activeProgram?.image_logo?.default;
 
-	const [images, setImages] = useState<{ src: string; loaded: boolean }[]>(
-		currentBgImage ? [{ src: currentBgImage, loaded: true }] : [],
+	const [images, setImages] = useState<BgImage[]>(
+		currentBgImage ? [{ src: currentBgImage, loaded: true, animate: false }] : [],
 	);
 
 	// Actualiza la imagen de fondo cuando cambia el programa seleccionado
@@ -28,9 +35,46 @@ export default function ProgramsBanner({ activeProgram }: ProgramsBannerProps) {
 			}
 			const lastLoaded = prev.filter((img) => img.loaded).slice(-1);
 
-			return [...lastLoaded, { src: currentBgImage, loaded: false }];
+			return [...lastLoaded, { src: currentBgImage, loaded: false, animate: false }];
 		});
 	}, [currentBgImage]);
+
+	// Carga y decodifica la nueva imagen ANTES de revelarla, para que el
+	// fade no "salte" cuando el fondo aún no está en caché.
+	useEffect(() => {
+		const pending = images.find((img) => !img.loaded);
+		if (!pending) return;
+
+		const loader = new Image();
+		let cancelled = false;
+
+		const reveal = () => {
+			if (cancelled) return;
+			setImages((prev) =>
+				prev.map((i) =>
+					i.src === pending.src ? { ...i, loaded: true, animate: true } : i,
+				),
+			);
+		};
+
+		loader.onload = () => {
+			// decode() garantiza que el navegador puede pintar la imagen
+			// de inmediato; sin esto el fade empieza con el fondo vacío
+			// y la imagen aparece de golpe al final.
+			if (typeof loader.decode === "function") {
+				loader.decode().then(reveal).catch(reveal);
+			} else {
+				reveal();
+			}
+		};
+		loader.onerror = reveal;
+
+		loader.src = pending.src;
+
+		return () => {
+			cancelled = true;
+		};
+	}, [images]);
 
 	if (!activeProgram) return null;
 
@@ -39,25 +83,16 @@ export default function ProgramsBanner({ activeProgram }: ProgramsBannerProps) {
 			{images.map((img) => (
 				<div
 					key={img.src}
-					className={`fixed inset-0 -z-20 w-full h-full origin-center transition-[opacity,transform] duration-1000 ease-in-out will-change-[opacity,transform] ${img.loaded ? "opacity-100 scale-100" : "opacity-0 scale-105"}`}
+					className={`fixed inset-0 -z-20 w-full h-full origin-center will-change-[opacity,transform] ${img.loaded
+						? img.animate
+							? "banner-bg-animate"
+							: "opacity-100"
+						: "opacity-0"}`}
 					style={{
-						backgroundImage: `url(${img.src})`,
+						backgroundImage: img.loaded ? `url(${img.src})` : undefined,
 						backgroundSize: "cover",
 						backgroundPosition: "center",
 						backgroundRepeat: "no-repeat",
-					}}
-					ref={(el) => {
-						if (el && !img.loaded) {
-							const preload = new Image();
-							preload.onload = () => {
-								setImages((prev) =>
-									prev.map((i) =>
-										i.src === img.src ? { ...i, loaded: true } : i,
-									),
-								);
-							};
-							preload.src = img.src;
-						}
 					}}
 				/>
 			))}

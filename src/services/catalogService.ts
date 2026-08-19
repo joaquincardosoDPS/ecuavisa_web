@@ -2,6 +2,7 @@ import api from './api';
 import {
     RUDO_VOD_BANNER,
     RUDO_VOD_CATEGORY,
+    RUDO_CHANNELS_URL,
     RUDO_PLAYLIST_PREMIUM_URL,
     RUDO_VOD_FEATURED,
     RUDO_VOD_SEARCH,
@@ -36,6 +37,11 @@ export const catalogService = {
         show_ranking?: boolean;
     }): Promise<CategoriesResponse> => {
         const { data } = await api.post<CategoriesResponse>(RUDO_VOD_CATEGORY, { ...options });
+        return data;
+    },
+
+    getPlaylist: async (): Promise<PlaylistPremiumResponse> => {
+        const { data } = await api.get(`${RUDO_CHANNELS_URL}?random=${Math.random()}`);
         return data;
     },
 
