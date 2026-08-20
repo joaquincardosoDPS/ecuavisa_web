@@ -18,13 +18,13 @@ export function BackButton({ fallback = "/", to }: { fallback?: string, to?: str
 
 	return (
 		<button
-			className="flex items-center text-[40px] font-bold mb-12 cursor-pointer"
+			className="flex items-center text-[40px] font-bold cursor-pointer"
 			onClick={handleBack}
 		>
 			<svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
 				<polyline points="15 18 9 12 15 6" />
 			</svg>
-			<h2 className="pl-4">Volver</h2>
+			{/* <h2 className="pl-4">Volver</h2> */}
 		</button>
 	);
 }

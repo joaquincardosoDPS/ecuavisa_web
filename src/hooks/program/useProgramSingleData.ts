@@ -1,14 +1,19 @@
 import { useState, useEffect, useRef } from "react";
 import type { Program, Segment, Chapter } from "@/interfaces/catalog.interface";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useInfiniteQuery } from "@tanstack/react-query";
 import { catalogService } from "@/services/catalogService";
 import { useAnalytics } from "@/layout/AnalyticsWrapper";
 import type { ActiveTab } from "@/pages/Program/components/TabsSingle";
+
+const RELATED_LIMIT = 8;
 
 interface UseProgramSingleDataReturn {
   chapter: Chapter | null;
   relatedPrograms: Program[];
   isLoadingRelatedPrograms: boolean;
+  fetchNextPage: () => void;
+  hasNextPage: boolean;
+  isFetchingNextPage: boolean;
   segments: Segment[];
   hasSegments: boolean;
   activeTab: ActiveTab;
@@ -31,23 +36,41 @@ export function useProgramSingleData(
     queryFn: () =>
       catalogService.getChapters({
         program: program.key,
-        no_segments: true,
+        page: 1,
+        limit: 1,
       }),
     enabled: !!program.key,
   });
 
-  const { data: relatedProgramsData, isLoading: isLoadingRelatedPrograms } =
-    useQuery({
-      queryKey: ["relatedPrograms", program.key],
-      queryFn: () =>
-        catalogService.searchPrograms({
-          slug_exclude: program.key,
-          category: program.name_category,
-        }),
-      enabled: !!program.key,
-    });
+  const category = program.category?.slug || program.name_category;
 
-  const relatedPrograms = relatedProgramsData?.data ?? [];
+  const {
+    data: relatedProgramsData,
+    isLoading: isLoadingRelatedPrograms,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useInfiniteQuery({
+    queryKey: ["relatedPrograms", program.key, category],
+    queryFn: ({ pageParam = 1 }) =>
+      catalogService.searchPrograms({
+        slug_exclude: program.key,
+        category,
+        page: pageParam,
+        limit: RELATED_LIMIT,
+      }),
+    initialPageParam: 1,
+    getNextPageParam: (lastPage, _allPages, lastPageParam) => {
+      if (lastPageParam < lastPage.last_page) {
+        return lastPageParam + 1;
+      }
+      return undefined;
+    },
+    enabled: !!program.key,
+  });
+
+  const relatedPrograms =
+    relatedProgramsData?.pages.flatMap((page) => page.data) ?? [];
   const chapter = chapterData?.data?.[0] ?? null;
   const segments = program.segments ?? [];
   const hasSegments = segments.length > 0;
@@ -57,7 +80,7 @@ export function useProgramSingleData(
     hasSegments ? segments[0] : "related"
   );
   const [activeSeason, setActiveSeason] = useState<number | null>(
-    hasSegments ? (segments[0].all_temp?.[0] ?? 1) : null
+    hasSegments ? (segments[0].all_temp?.[0] ?? null) : null
   );
 
   const tabsRef = useRef<HTMLDivElement>(null);
@@ -122,6 +145,9 @@ export function useProgramSingleData(
     chapter,
     relatedPrograms,
     isLoadingRelatedPrograms,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
     segments,
     hasSegments,
     activeTab,

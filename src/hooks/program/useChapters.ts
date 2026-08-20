@@ -8,7 +8,7 @@ export const useChapters = (slug: string, season: number | null, segmentSlug: st
         queryKey: ['chapters', slug, season, segmentSlug],
         queryFn: ({ pageParam = 1 }) => catalogService.getChapters({
             program: slug,
-            season: season!,
+            ...(season !== null ? { season } : {}),
             segment: segmentSlug!,
             page: pageParam,
             // order_type: "desc",
@@ -19,7 +19,7 @@ export const useChapters = (slug: string, season: number | null, segmentSlug: st
             const totalPages = lastPage.last_page || 0;
             return allPages.length < totalPages ? allPages.length + 1 : undefined;
         },
-        enabled: !!slug && season !== null && !!segmentSlug,
+        enabled: !!slug && !!segmentSlug,
         staleTime: 1000 * 60 * 5, // 5 minutes
     });
 

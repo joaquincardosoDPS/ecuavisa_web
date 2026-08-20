@@ -96,8 +96,8 @@ function Banner({ event }: { event: Event | null }) {
                         <span
                             className="px-3 py-1 rounded-md text-sm uppercase tracking-wide font-bold"
                             style={{
-                                backgroundColor: now < eventDate ? '#FFA500' : '#e11d48',
-                                color: now < eventDate ? '#000' : '#fff',
+                                backgroundColor: now < eventDate ? 'var(--foc-tertiary)' : '#e11d48',
+                                color: now < eventDate ? 'var(--clr-text-tertiary-button)' : '#fff',
                             }}
                         >
                             {eventStatus}
@@ -117,9 +117,6 @@ function Banner({ event }: { event: Event | null }) {
                             </span>
                         )}
                     </div>
-                    <Button variant="primary" showArrow onClick={handlePlay}>
-                        Ver ahora
-                    </Button>
                     <div className="h-30 flex flex-row items-center gap-5">
                         {logoCat && (
                             <img src={logoCat} alt="" className="w-auto h-20 object-contain" />
@@ -128,6 +125,9 @@ function Banner({ event }: { event: Event | null }) {
                     </div>
                     <h1 className="text-xl 2xl:text-4xl font-title font-bold">{event.title}</h1>
                     <p className="text-base 2xl:text-xl font-medium max-w-2xl">{event.description_short}</p>
+                    <Button variant="primary" showArrow onClick={handlePlay}>
+                        Ver ahora
+                    </Button>
 
                 </div>
             </div>

@@ -16,7 +16,7 @@ interface InfoBannerProps {
 
 function InfoBanner({ program, firstChapter }: InfoBannerProps) {
   const navigate = useNavigate();
-  const { isFavorited, isEnabled, toggleFavorite } = useFavorite(
+  const { isFavorited, isEnabled, toggleFavorite, isToggling } = useFavorite(
     program.key,
   );
   const { item: continueWatchingItem } = useContinueWatching(program.key);
@@ -36,38 +36,67 @@ function InfoBanner({ program, firstChapter }: InfoBannerProps) {
 
   const logoImg = program?.image_logo?.big;
   // const maxSeasons = program.segments?.[0]?.max_temp || 0;
-  // const genderNames = program.genders?.map((gender) => gender.name).join(", ");
+  const genderNames = program.genders?.map((gender) => gender.name).join(", ");
+
   return (
-    <div className="animate-in fade-in slide-in-from-left-10 duration-1000 pt-25 h-[85vh] flex flex-col justify-between">
+    <div className="animate-in fade-in slide-in-from-left-10 duration-1000 mt-25 h-[65vh]">
       <BackButton to="/programas" />
       <div>
-        <div className="h-45 mb-3">
+        <div className="h-40 2xl:h-55 flex items-end mt-4">
           {logoImg ? (
             <img
               src={logoImg}
               alt={program.title}
-              className="w-auto h-full object-contain"
+              className="w-auto max-w-60 h-full object-contain"
             />
           ) : null}
         </div>
-        <h2 className="text-6xl mb-6 font-title font-black text-(--clr-primary-title) drop-shadow-2xl">
+        <h2 className="text-2xl mb-3 font-title font-bold text-(--clr-primary-title) drop-shadow-2xl">
           {program.title}
         </h2>
+        <div className="text-lg font-medium flex items-center gap-2 mb-3">
+          <span className="px-2 bg-(--clr-secondary) py-1 rounded-md">
+            {program.classification}
+          </span>
+          {program.anio_production && (
+            <span>
+              {program.anio_production} {"-"}
+            </span>
+          )}
+
+
+        </div>
+        {genderNames && <span>{genderNames}</span>}
+        <div className="flex flex-row items-center gap-4 my-6">
+          <Button variant="primary" showArrow onClick={handlePlay} className="uppercase">
+            {continueWatchingItem ? "Reanudar" : "Ver ahora"}
+          </Button>
+          {isEnabled && (
+            <Button variant="primary" showArrow={false} onClick={toggleFavorite} disabled={isToggling} className={`w-14 h-14 p-0 flex items-center justify-center rounded-full text-3xl font-light ${isFavorited ? " text-white bg-(--foc-secondary)" : "bg-black border-white"}`}>
+              {isToggling ? (
+                <div className="w-6 h-6 rounded-full border-2 border-current border-t-transparent animate-spin" />
+              ) : isFavorited ? (
+                <HeartIcon filled size={24} />
+              ) : (
+                "+"
+              )}
+            </Button>
+          )}
+        </div>
+
+        {/* Barra de progreso "Seguir viendo" */}
+        {continueWatchingItem && (
+          <ProgressBar
+            duration={continueWatchingItem.duration}
+            time={continueWatchingItem.time}
+          />
+        )}
+
         <p className="text-lg font-text mb-6 font-medium drop-shadow-md leading-8 h-25 max-w-4xl ">
           {program.description_short}
         </p>
 
 
-        <div className="flex flex-row items-center gap-4 mb-6">
-          <Button variant="primary" showArrow onClick={handlePlay} className="uppercase">
-            {continueWatchingItem ? "Reanudar" : "Ver ahora"}
-          </Button>
-          {isEnabled && (
-            <Button variant="primary" showArrow={false} onClick={toggleFavorite} className={`w-14 h-14 p-0 flex items-center justify-center rounded-full text-3xl font-light ${isFavorited ? " text-white bg-(--foc-secondary)" : "bg-black border-white"}`}>
-              {isFavorited ? <HeartIcon filled size={24} /> : "+"}
-            </Button>
-          )}
-        </div>
 
         {/* Barra de progreso "Seguir viendo" */}
         {continueWatchingItem && (

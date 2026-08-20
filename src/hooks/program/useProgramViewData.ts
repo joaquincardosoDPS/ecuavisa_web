@@ -1,14 +1,15 @@
 import { useState, useEffect, useRef } from "react";
 import type { Program, Segment, Chapter } from "@/interfaces/catalog.interface";
 import { useAnalytics } from "@/layout/AnalyticsWrapper";
+import type { ActiveTab } from "@/pages/Program/components/Tabs";
 
 interface UseProgramViewDataReturn {
+  activeTab: ActiveTab;
+  setActiveTab: (tab: ActiveTab) => void;
   activeSegment: Segment | null;
-  setActiveSegment: (segment: Segment | null) => void;
+  showDetails: boolean;
   activeSeason: number | null;
   setActiveSeason: (season: number | null) => void;
-  showDetails: boolean;
-  setShowDetails: (show: boolean) => void;
   firstChapter: Chapter | null;
   setFirstChapter: (chapter: Chapter | null) => void;
   tabsRef: React.RefObject<HTMLDivElement | null>;
@@ -22,14 +23,24 @@ export function useProgramViewData(
   slug: string,
   setIsLoading: (loading: boolean) => void
 ): UseProgramViewDataReturn {
-  const [activeSegment, setActiveSegment] = useState<Segment | null>(null);
-  const [activeSeason, setActiveSeason] = useState<number | null>(null);
-  const [showDetails, setShowDetails] = useState(false);
+  const firstSegment = program.segments?.[0] ?? null;
+
+  const [activeTab, setActiveTabState] = useState<ActiveTab>(
+    firstSegment ?? "details"
+  );
+  const [activeSeason, setActiveSeason] = useState<number | null>(
+    firstSegment?.all_temp?.[0] ?? null
+  );
   const [firstChapter, setFirstChapter] = useState<Chapter | null>(null);
   const tabsRef = useRef<HTMLDivElement>(null);
   const pendingScroll = useRef(false);
 
   const { trackPage } = useAnalytics();
+
+  // Segmento activo derivado del tab
+  const activeSegment: Segment | null =
+    typeof activeTab === "object" ? activeTab : null;
+  const showDetails = activeTab === "details";
 
   // Override del path para GA4: /programas/{slug}/{segmento}
   const analyticsPath = activeSegment?.key
@@ -52,6 +63,12 @@ export function useProgramViewData(
     pendingScroll.current = true;
   };
 
+  // Wrapper para setActiveTab que también dispara scroll
+  const setActiveTab = (tab: ActiveTab) => {
+    setActiveTabState(tab);
+    requestScroll();
+  };
+
   // Solo hace scroll si se pidió desde un clic en tab
   const handleChaptersLoaded = () => {
     setIsLoading(false);
@@ -61,38 +78,20 @@ export function useProgramViewData(
     }
   };
 
-  // Inicialización por defecto
-  useEffect(() => {
-    if (
-      program?.segments &&
-      program.segments.length > 0 &&
-      !activeSegment
-    ) {
-      const firstSegment = program.segments[0];
-       
-      setActiveSegment(firstSegment);
-      if (firstSegment.all_temp && firstSegment.all_temp.length > 0) {
-         
-        setActiveSeason(firstSegment.all_temp[0]);
-      }
-    }
-  }, [program, activeSegment]);
-
   // Reset de temporada al cambiar de segmento manualmente
   useEffect(() => {
     if (activeSegment?.all_temp && activeSegment.all_temp.length > 0) {
-       
       setActiveSeason(activeSegment.all_temp[0]);
     }
   }, [activeSegment]);
 
   return {
+    activeTab,
+    setActiveTab,
     activeSegment,
-    setActiveSegment,
+    showDetails,
     activeSeason,
     setActiveSeason,
-    showDetails,
-    setShowDetails,
     firstChapter,
     setFirstChapter,
     tabsRef,

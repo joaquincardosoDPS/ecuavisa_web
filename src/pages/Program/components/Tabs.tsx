@@ -1,62 +1,58 @@
 import type { RefObject } from "react";
 import type { Program, Segment } from "@/interfaces/catalog.interface";
 
+type ActiveTab = "details" | Segment;
+
 interface TabsProps {
   program: Program;
-  activeSegment: Segment | null;
-  setActiveSegment: (segment: Segment) => void;
-  showDetails: boolean;
-  setShowDetails: (show: boolean) => void;
+  activeTab: ActiveTab;
+  setActiveTab: (tab: ActiveTab) => void;
   tabsRef: RefObject<HTMLDivElement | null>;
   scrollToTabs: () => void;
-  requestScroll: () => void;
 }
 
 function Tabs({
   program,
-  activeSegment,
-  setActiveSegment,
-  showDetails,
-  setShowDetails,
+  activeTab,
+  setActiveTab,
   tabsRef,
+  scrollToTabs,
 }: TabsProps) {
+
+  const tabClass = (isActive: boolean) =>
+    `pb-5 px-2 h-full cursor-pointer border-b-4 -mb-[2px] transition-colors ${isActive
+      ? "border-(--clr-primary-title) text-(--clr-primary-title)"
+      : "border-transparent text-(--clr-secondary-text) hover:text-(--clr-primary-title) hover:border-(--clr-primary-title)"
+    }`;
+
   return (
     <div
       ref={tabsRef}
-      className="text-xl font-medium scroll-mt-0 h-[15vh] flex flex-col justify-center"
+      className="border-b-2 border-(--clr-primary-title)/25 text-xl font-medium mt-10 scroll-mt-23.5"
     >
-      <div className="flex flex-row items-center gap-6">
-        {program.segments.map((segment, idx) => {
-          const isActive = !showDetails && activeSegment?.id === segment.id;
+      <div className="flex flex-row gap-10">
+        {program.segments.map((segment) => {
+          const isActive =
+            typeof activeTab === "object" && activeTab.id === segment.id;
           return (
-            <div key={segment.key} className="flex items-center gap-6">
-              {idx > 0 && <span className="w-px h-10 bg-(--clr-primary-title)" />}
-              <button
-                onClick={() => {
-                  setActiveSegment(segment);
-                  setShowDetails(false);
-                  // requestScroll();
-                }}
-                className={`cursor-pointer transition-colors text-3xl ${isActive
-                  ? "text-(--clr-primary-title) font-bold"
-                  : "text-(--clr-primary-title)"
-                  }`}
-              >
-                {segment.name}
-              </button>
-            </div>
+            <button
+              key={segment.key}
+              onClick={() => {
+                setActiveTab(segment);
+                scrollToTabs();
+              }}
+              className={tabClass(isActive)}
+            >
+              {segment.name}
+            </button>
           );
         })}
-        <span className="w-px h-10 bg-(--clr-primary-title)" />
         <button
           onClick={() => {
-            setShowDetails(true);
-            // scrollToTabs();
+            setActiveTab("details");
+            scrollToTabs();
           }}
-          className={`cursor-pointer transition-colors text-3xl ${showDetails
-            ? "text-(--clr-primary-title) font-bold"
-            : "text-(--clr-primary-title)"
-            }`}
+          className={tabClass(activeTab === "details")}
         >
           Detalles
         </button>
@@ -66,3 +62,4 @@ function Tabs({
 }
 
 export default Tabs;
+export type { ActiveTab };

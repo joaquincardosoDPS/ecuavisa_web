@@ -228,3 +228,31 @@ body {
 .banner-bg-animate {
 	animation: banner-bg-fade-in 1000ms ease-in-out forwards;
 }
+
+@keyframes vertical-marquee-scroll {
+	0% {
+		transform: translateY(0);
+	}
+	40% {
+		transform: translateY(0);
+	}
+	50% {
+		transform: translateY(calc(-1 * var(--marquee-distance, 0px)));
+	}
+	90% {
+		transform: translateY(calc(-1 * var(--marquee-distance, 0px)));
+	}
+	100% {
+		transform: translateY(0);
+	}
+}
+
+.vertical-marquee {
+	animation: vertical-marquee-scroll 4s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.vertical-marquee {
+		animation: none;
+	}
+}

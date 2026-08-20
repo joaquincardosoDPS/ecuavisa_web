@@ -14,36 +14,32 @@ interface ProgramViewProps {
 function ProgramView({ program: programDetail, slug, setIsLoading }: ProgramViewProps) {
 
   const {
+    activeTab,
+    setActiveTab,
     activeSegment,
-    setActiveSegment,
+    showDetails,
     activeSeason,
     setActiveSeason,
-    showDetails,
-    setShowDetails,
     firstChapter,
     setFirstChapter,
     tabsRef,
     scrollToTabs,
-    requestScroll,
     handleChaptersLoaded,
   } = useProgramViewData(programDetail, slug, setIsLoading);
 
   return (
-    <div className="ml-40">
+    <div className="mx-25">
       <Banner program={programDetail} firstChapter={firstChapter} />
       <div className="">
         <Tabs
           program={programDetail}
-          activeSegment={activeSegment}
-          setActiveSegment={setActiveSegment}
-          showDetails={showDetails}
-          setShowDetails={setShowDetails}
+          activeTab={activeTab}
+          setActiveTab={setActiveTab}
           tabsRef={tabsRef}
           scrollToTabs={scrollToTabs}
-          requestScroll={requestScroll}
         />
 
-        <div className="mb-10 2xl:mb-20">
+        <div className="mt-5 2xl:mt-10 mb-10 2xl:mb-20">
           {showDetails ? (
             <DetailsProgram programDetail={programDetail} />
           ) : (

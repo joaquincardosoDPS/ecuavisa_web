@@ -17,6 +17,9 @@ function ProgramSingleView({ program: programDetail, setIsLoading }: ProgramSing
         chapter,
         relatedPrograms,
         isLoadingRelatedPrograms,
+        fetchNextPage,
+        hasNextPage,
+        isFetchingNextPage,
         segments,
         activeTab,
         setActiveTab,
@@ -55,6 +58,9 @@ function ProgramSingleView({ program: programDetail, setIsLoading }: ProgramSing
                     <RelatedProgramsContainer
                         programs={relatedPrograms}
                         isLoading={isLoadingRelatedPrograms}
+                        isFetchingNextPage={isFetchingNextPage}
+                        hasNextPage={hasNextPage}
+                        fetchNextPage={fetchNextPage}
                     />
                 )}
             </div>

@@ -54,6 +54,7 @@ export interface Program {
     actors?: string;
     skip_view?: boolean;
     name_category: string;
+    category?: { slug: string; name: string };
 
 }
 

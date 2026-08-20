@@ -43,23 +43,25 @@ function ChaptersContainer({
 
   return (
     <div className="flex flex-col mr-40 gap-5 2xl:gap-10 animate-in fade-in duration-500 min-h-[calc(100vh-281px)]">
-      <div className="grid grid-cols-5 2xl:grid-cols-8 gap-5">
-        {activeSegment?.all_temp.map((temp) => {
-          const isSeasonActive = activeSeason === temp;
-          return (
-            <div
-              key={temp}
-              onClick={() => setActiveSeason(temp)}
-              className={`shrink-0 font-bold text-base transition-colors cursor-pointer ${isSeasonActive
-                ? "text-(--clr-primary-title)"
-                : "text-(--clr-secondary-text) hover:text-(--clr-primary-title)"
-                }`}
-            >
-              Temporada {temp}
-            </div>
-          );
-        })}
-      </div>
+      {activeSegment?.all_temp && activeSegment.all_temp.length > 0 && (
+        <div className="grid grid-cols-5 2xl:grid-cols-8 gap-5">
+          {activeSegment.all_temp.map((temp) => {
+            const isSeasonActive = activeSeason === temp;
+            return (
+              <div
+                key={temp}
+                onClick={() => setActiveSeason(temp)}
+                className={`shrink-0 font-bold text-base transition-colors cursor-pointer ${isSeasonActive
+                  ? "text-(--clr-primary-title)"
+                  : "text-(--clr-secondary-text) hover:text-(--clr-primary-title)"
+                  }`}
+              >
+                Temporada {temp}
+              </div>
+            );
+          })}
+        </div>
+      )}
 
       {isLoadingChapters ? (
         <p className="text-(--clr-primary-title)">Cargando capítulos...</p>

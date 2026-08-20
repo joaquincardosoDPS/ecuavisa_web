@@ -62,7 +62,7 @@ export function BannerInfo({ program }: BannerInfoProps) {
 					<h2 className="text-[4rem] font-black leading-20 mb-4">
 						{program.title}
 					</h2>
-					<p className="text-[1.5rem] font-bold leading-10 line-clamp-2">
+					<p className="text-[1.5rem] leading-10 line-clamp-4">
 						{program.description_short}
 					</p>
 				</div>
@@ -75,7 +75,7 @@ export function BannerInfo({ program }: BannerInfoProps) {
 					onClick={handleClick}
 				>
 					<PlayButton className="mr-2 shrink-0" width={24} height={24} />
-					Ver en vivo
+					Ver ahora
 				</Button>
 				<Button
 					variant="primary"

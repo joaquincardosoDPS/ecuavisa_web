@@ -130,24 +130,11 @@ export function usePlayerEpisode() {
         const seasonNum = parseInt(season, 10);
         const chapterNum = parseInt(chapter, 10);
 
-        // Obtener detalle del programa para saber si es single_episode
-        const programDetail = program
-          ? (await catalogService.getProgramDetail(program))?.data
-          : null;
-        const isNoSegments = programDetail?.single_episode === true;
-
-        // Cargar capítulo actual
+        // Cargar capítulo actual (segment/temporada/capítulo resuelve tanto en
+        // single_episode como en programas con segmentos)
         let chapterData: import("@/interfaces/catalog.interface").Chapter | undefined;
 
-        if (isNoSegments) {
-          // Programa single_episode: obtener capítulos sin segmento
-          const response = await catalogService.getChapters({
-            program: program!,
-            no_segments: true,
-          });
-          chapterData = response?.data?.[0];
-        } else {
-          // Programa con segmentos: obtener capítulo específico
+        try {
           const response = await catalogService.getChapterBySlug({
             program,
             segment,
@@ -155,6 +142,30 @@ export function usePlayerEpisode() {
             chapter: chapterNum,
           });
           chapterData = response?.data;
+        } catch {
+          chapterData = undefined;
+        }
+
+        // Solo si no resolvió, consultar el detalle del programa para detectar
+        // single_episode y reintentar sin segmento
+        let isNoSegments = false;
+
+        if (!chapterData?.key && program) {
+          try {
+            const programDetail = (await catalogService.getProgramDetail(program))?.data;
+            isNoSegments = programDetail?.single_episode === true;
+          } catch {
+            isNoSegments = false;
+          }
+
+          if (isNoSegments) {
+            const response = await catalogService.getChapters({
+              program,
+              page: 1,
+              limit: 1,
+            });
+            chapterData = response?.data?.[0];
+          }
         }
 
         if (!chapterData?.key) {

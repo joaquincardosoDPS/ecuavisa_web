@@ -3,6 +3,7 @@ import { useProgramsStore } from "@/features/programs/programsStore";
 import { useRef } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { getEventStatus } from "@/utils/eventStatus";
+import VerticalMarquee from "@/components/ui/VerticalMarquee";
 
 interface CardHorizontalProps {
   program: Program | Event;
@@ -106,16 +107,18 @@ function CardHorizontal({ program, format }: CardHorizontalProps) {
               return `${day} | ${time}`;
             })()}
           </p>
-          <p className="text-(--clr-primary-title) text-base uppercase font-bold line-clamp-1 mt-0.5">
-            {program.title}
-          </p>
+          <VerticalMarquee
+            text={program.title}
+            className="text-(--clr-primary-title) text-base uppercase font-bold mt-0.5"
+          />
         </div>
       )}
       {isEvent && !showDate && eventData && (
         <div className="mt-2 px-0.5">
-          <p className="text-(--clr-primary-title) text-base font-bold line-clamp-1">
-            {program.title}
-          </p>
+          <VerticalMarquee
+            text={program.title}
+            className="text-(--clr-primary-title) text-base font-bold"
+          />
           <p className="text-(--clr-primary-title)/60 text-sm mt-0.5 line-clamp-2">
             {eventData.category?.name || eventData.description_short || ''}
           </p>
@@ -123,9 +126,10 @@ function CardHorizontal({ program, format }: CardHorizontalProps) {
       )}
       {!isEvent && programData && (
         <div className="mt-2 px-0.5">
-          <p className="text-(--clr-primary-title) text-base font-bold line-clamp-1">
-            {program.title}
-          </p>
+          <VerticalMarquee
+            text={program.title}
+            className="text-(--clr-primary-title) text-base font-bold"
+          />
           <p className="text-(--clr-primary-title)/60 text-sm mt-0.5">
             {(() => {
               const parts: string[] = [];

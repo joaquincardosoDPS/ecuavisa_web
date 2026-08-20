@@ -23,6 +23,7 @@ function SingleEvent({ category }: SingleEventProps) {
             }
         }
     };
+    console.log(event)
 
     return (
         <div
@@ -32,6 +33,14 @@ function SingleEvent({ category }: SingleEventProps) {
             <div className="absolute inset-0 bg-linear-to-r from-black/85 via-black/50 to-transparent z-0" />
 
             <div className="relative z-10 flex flex-col items-start gap-4 max-w-2xl">
+                {event?.image_logo?.big && (
+                    <img
+                        src={event.image_logo.big}
+                        alt={event?.title || category.title}
+                        className="w-60 max-h-45 object-contain drop-shadow-xl"
+                    />
+                )}
+
                 {/* Event status badge */}
                 {eventStatus && (
                     <span

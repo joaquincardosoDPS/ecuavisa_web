@@ -4,11 +4,12 @@ import { useDocumentTitle } from "@/hooks/shared/useDocumentTitle";
 import { useParams } from "react-router-dom";
 import ProgramSingleView from "./ProgramSingleView";
 import ProgramView from "./ProgramView";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 function ProgramPage() {
     const { slug } = useParams<{ slug: string }>();
     const [isChildLoading, setIsChildLoading] = useState(true);
+    const [activeSlug, setActiveSlug] = useState(slug);
     const {
         data: programDetail,
         isLoading: isLoadingProgramDetail,
@@ -16,6 +17,19 @@ function ProgramPage() {
     } = useProgramDetail(slug || "");
 
     useDocumentTitle(programDetail?.title);
+
+    // Al navegar entre programas (misma ruta /programas/:slug), resetear el
+    // loading en fase de render (antes de montar la nueva vista) para no pisar
+    // el setIsLoading(false) que el hijo reporta al terminar de cargar.
+    if (slug !== activeSlug) {
+        setActiveSlug(slug);
+        setIsChildLoading(true);
+    }
+
+    // Scroll al inicio al cambiar de programa
+    useEffect(() => {
+        window.scrollTo(0, 0);
+    }, [slug]);
 
     const showSpinner = isLoadingProgramDetail || isChildLoading;
 
@@ -31,17 +45,20 @@ function ProgramPage() {
         );
     }
 
+
     return (
         <>
             {showSpinner && <FullScreenSpinner />}
             <div style={{ visibility: showSpinner ? "hidden" : "visible" }}>
                 {programDetail.single_episode === true ? (
                     <ProgramSingleView
+                        key={slug}
                         program={programDetail}
                         setIsLoading={setIsChildLoading}
                     />
                 ) : (
                     <ProgramView
+                        key={slug}
                         program={programDetail}
                         slug={slug || ""}
                         setIsLoading={setIsChildLoading}

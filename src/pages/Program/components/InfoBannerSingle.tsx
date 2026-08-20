@@ -25,6 +25,8 @@ function InfoBannerSingle({ program, chapter }: {
                 `/play/${program.key}/${continueWatchingItem.key_segment}/${continueWatchingItem.season}/${continueWatchingItem.chapter}`,
                 { state: { resumeTime: continueWatchingItem.time } },
             );
+        } else if (chapter) {
+            navigate(`/play/${program.key}/${chapter.key_segment}/${chapter.season}/${chapter.chapter}`);
         } else {
             const firstSegment = program.segments?.[0];
             if (firstSegment) {
@@ -97,7 +99,7 @@ function InfoBannerSingle({ program, chapter }: {
                 />
             )}
 
-            <p className="text-lg font-text font-medium drop-shadow-md leading-8 h-[100px] max-w-4xl ">
+            <p className="text-lg font-text font-medium drop-shadow-md leading-8 h-25 max-w-4xl ">
                 {program.description_short}
             </p>
         </div>

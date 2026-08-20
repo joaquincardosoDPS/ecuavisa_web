@@ -15,7 +15,9 @@ function FavoriteButton({ isFavorited, isToggling, onClick }: FavoriteButtonProp
                 }`}
             aria-label={isFavorited ? "Quitar de Mi Lista" : "Agregar a Mi Lista"}
         >
-            {isFavorited ? (
+            {isToggling ? (
+                <div className="w-5 h-5 rounded-full border-2 border-current border-t-transparent animate-spin" />
+            ) : isFavorited ? (
                 <svg
                     width="24"
                     height="24"

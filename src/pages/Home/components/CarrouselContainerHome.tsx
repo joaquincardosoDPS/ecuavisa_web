@@ -15,11 +15,9 @@ function CarrouselContainer({ category }: CarrouselContainerProps) {
 
 	const finalOrientation = format === "ranking"
 		? "vertical"
-		: (format === "event" && hasBgImage)
-			? "horizontal"
-			: category.image_orientation === "portrait"
-				? "vertical"
-				: "horizontal";
+		: category.image_orientation === "portrait"
+			? "vertical"
+			: "horizontal";
 
 	if (category.programs.length === 0) return null;
 

@@ -4,6 +4,7 @@ import { useProgramsStore } from "@/features/programs/programsStore";
 import { useRef } from "react";
 import RankingIcon from "@/assets/img/icons/iconos-ranking.svg";
 import { getEventStatus } from "@/utils/eventStatus";
+import VerticalMarquee from "@/components/ui/VerticalMarquee";
 
 interface CardVerticalProps {
   program: Program | Event;
@@ -133,6 +134,12 @@ function CardVertical({ program, format, index }: CardVerticalProps) {
             </span>
           </div>
         )}
+      </div>
+      <div className="mt-2 px-0.5">
+        <VerticalMarquee
+          text={program.title}
+          className="text-(--clr-primary-title) text-base font-bold"
+        />
       </div>
     </div>
   );
