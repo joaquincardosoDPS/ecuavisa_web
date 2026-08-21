@@ -18,7 +18,7 @@ interface ButtonProps {
 }
 
 const baseClasses =
-    "relative inline-flex items-center justify-center px-[0.8rem] py-[0.8rem] border-2 border-transparent rounded-2xl text-[1.2rem] leading-[25.6px] tracking-[-0.02em] font-bold font-button cursor-pointer whitespace-nowrap transition-all duration-200 ease-out disabled:opacity-50 disabled:cursor-not-allowed";
+    "relative inline-flex items-center justify-center px-6 py-[0.8rem] border-2 border-transparent rounded-full text-[1.2rem] leading-[25.6px] tracking-[-0.02em] font-bold font-button cursor-pointer whitespace-nowrap transition-all duration-200 ease-out disabled:opacity-50 disabled:cursor-not-allowed";
 
 const variantClasses: Record<ButtonVariant, string> = {
     primary: [

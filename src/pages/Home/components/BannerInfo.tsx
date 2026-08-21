@@ -59,10 +59,10 @@ export function BannerInfo({ program }: BannerInfoProps) {
 					null
 				)}
 				<div>
-					<h2 className="text-[4rem] font-black leading-20 mb-4">
+					<h2 className="text-4xl font-bold leading-20 mb-4">
 						{program.title}
 					</h2>
-					<p className="text-[1.5rem] leading-10 line-clamp-4">
+					<p className="text-xl leading-8 line-clamp-4">
 						{program.description_short}
 					</p>
 				</div>

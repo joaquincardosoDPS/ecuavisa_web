@@ -220,7 +220,7 @@ function HomeLiveGrid() {
                             <EPGCard
                                 key={card.key}
                                 card={card}
-                                onPress={() => navigate(`/live?signal=${card.key}`)}
+                                onPress={() => navigate(`/live?signal=${card.key}&expanded=true`)}
                             />
                         ))}
                         <div className="flex-none w-16" />

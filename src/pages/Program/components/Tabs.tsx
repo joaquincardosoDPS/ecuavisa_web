@@ -28,7 +28,7 @@ function Tabs({
   return (
     <div
       ref={tabsRef}
-      className="border-b-2 border-(--clr-primary-title)/25 text-xl font-medium mt-10 scroll-mt-23.5"
+      className="mx-25 border-b-2 border-(--clr-primary-title)/25 text-xl font-medium mt-10 scroll-mt-23.5"
     >
       <div className="flex flex-row gap-10">
         {program.segments.map((segment) => {

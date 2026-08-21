@@ -28,7 +28,9 @@ export function useLiveSignal(): UseLiveSignalReturn {
   });
 
   // Expand state local
-  const [expanded, setExpanded] = useState(false);
+  const [expanded, setExpanded] = useState(() => {
+    return searchParams.get("expanded") === "true";
+  });
 
   // Si llegamos por location.state, migrarlo al query param y limpiar el state
   // para evitar que al volver atrás quede un state "fantasma".

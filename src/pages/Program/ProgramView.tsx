@@ -28,7 +28,7 @@ function ProgramView({ program: programDetail, slug, setIsLoading }: ProgramView
   } = useProgramViewData(programDetail, slug, setIsLoading);
 
   return (
-    <div className="mx-25">
+    <div className="min-h-screen w-full relative">
       <Banner program={programDetail} firstChapter={firstChapter} />
       <div className="">
         <Tabs
@@ -39,7 +39,7 @@ function ProgramView({ program: programDetail, slug, setIsLoading }: ProgramView
           scrollToTabs={scrollToTabs}
         />
 
-        <div className="mt-5 2xl:mt-10 mb-10 2xl:mb-20">
+        <div className="mx-25 mt-5 2xl:mt-10 mb-10 2xl:mb-20">
           {showDetails ? (
             <DetailsProgram programDetail={programDetail} />
           ) : (

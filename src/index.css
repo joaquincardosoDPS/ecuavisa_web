@@ -2,26 +2,18 @@
 @import "tailwindcss";
 
 @font-face {
-	font-family: "Gotham";
-	src: url("@/assets/fonts/Gotham Book.otf") format("opentype");
-	font-weight: 400;
+	font-family: "Archivo";
+	src: url("@/assets/fonts/Archivo/Archivo-VariableFont_wdth,wght.ttf") format("truetype");
+	font-weight: 100 900;
 	font-style: normal;
 	font-display: swap;
 }
 
 @font-face {
-	font-family: "Gotham";
-	src: url("@/assets/fonts/Gotham Bold.otf") format("opentype");
-	font-weight: 700;
-	font-style: normal;
-	font-display: swap;
-}
-
-@font-face {
-	font-family: "Gotham";
-	src: url("@/assets/fonts/Gotham Black.otf") format("opentype");
-	font-weight: 900;
-	font-style: normal;
+	font-family: "Archivo";
+	src: url("@/assets/fonts/Archivo/Archivo-Italic-VariableFont_wdth,wght.ttf") format("truetype");
+	font-weight: 100 900;
+	font-style: italic;
 	font-display: swap;
 }
 
@@ -82,11 +74,11 @@
 	--font-weight-subtext: normal;
 	--font-weight-button: bold;
 
-	--font-family-title: "Gotham", Arial, Helvetica, sans-serif;
-	--font-family-subtitle: "Gotham", Arial, Helvetica, sans-serif;
-	--font-family-text: "Gotham", Arial, Helvetica, sans-serif;
-	--font-family-button: "Gotham", Arial, Helvetica, sans-serif;
-	--font-family-category: "Gotham", Arial, Helvetica, sans-serif;
+	--font-family-title: "Archivo", Arial, Helvetica, sans-serif;
+	--font-family-subtitle: "Archivo", Arial, Helvetica, sans-serif;
+	--font-family-text: "Archivo", Arial, Helvetica, sans-serif;
+	--font-family-button: "Archivo", Arial, Helvetica, sans-serif;
+	--font-family-category: "Archivo", Arial, Helvetica, sans-serif;
 
 	/* Bordes y Sombras */
 	--bor-primary-radius: 5rem;

@@ -26,7 +26,7 @@ function getProgress(playbackTime: number, durationSeg: number): number {
 function ChapterCard({ chapter, programKey, showChapter = true, playbackTime = 0, isFinished = false }: ChapterCardProps) {
     const navigate = useNavigate();
 
-    console.log("DEBUG ->>>>>>", chapter)
+    // console.log("DEBUG ->>>>>>", chapter)
     const imageSrc = chapter.image_land?.small || chapter.image || '';
 
     const handleClick = () => {

@@ -83,7 +83,7 @@ function ChaptersContainer({
           {hasNextPage && (
             <div className="flex justify-center">
               <Button
-                variant="tertiary"
+                variant="primary"
                 onClick={() => fetchNextPage()}
                 disabled={isFetchingNextPage}
                 className="rounded-full"

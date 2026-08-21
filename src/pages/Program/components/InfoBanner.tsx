@@ -36,38 +36,46 @@ function InfoBanner({ program, firstChapter }: InfoBannerProps) {
 
   const logoImg = program?.image_logo?.big;
   // const maxSeasons = program.segments?.[0]?.max_temp || 0;
+  console.log(program)
   const genderNames = program.genders?.map((gender) => gender.name).join(", ");
 
   return (
-    <div className="animate-in fade-in slide-in-from-left-10 duration-1000 mt-25 h-[65vh]">
+    <div className="animate-in fade-in slide-in-from-left-10 duration-1000 mt-25 ml-25 flex flex-col justify-between h-[65vh]">
       <BackButton to="/programas" />
       <div>
-        <div className="h-40 2xl:h-55 flex items-end mt-4">
+        <div className="h-20 2xl:h-30 flex items-end">
           {logoImg ? (
             <img
               src={logoImg}
               alt={program.title}
-              className="w-auto max-w-60 h-full object-contain"
-            />
-          ) : null}
+              className="w-auto max-w-60 h-full object-contain mb-3"
+            />)
+            : <h2 className="text-3xl font-title font-bold text-(--clr-primary-title) drop-shadow-2xl">
+              {program.title}
+            </h2>
+          }
         </div>
-        <h2 className="text-2xl mb-3 font-title font-bold text-(--clr-primary-title) drop-shadow-2xl">
-          {program.title}
-        </h2>
-        <div className="text-lg font-medium flex items-center gap-2 mb-3">
+
+        {genderNames && <span>{genderNames}</span>}
+        <div className="text-lg font-medium flex items-center gap-2 my-3">
           <span className="px-2 bg-(--clr-secondary) py-1 rounded-md">
             {program.classification}
           </span>
           {program.anio_production && (
             <span>
-              {program.anio_production} {"-"}
+              {program.anio_production}
             </span>
           )}
 
 
         </div>
-        {genderNames && <span>{genderNames}</span>}
-        <div className="flex flex-row items-center gap-4 my-6">
+
+        <p className="text-lg font-text font-medium drop-shadow-md leading-8 max-w-4xl ">
+          {program.description_short}
+        </p>
+
+        {/* Botones de acción */}
+        <div className="flex flex-row items-center gap-4 mt-6">
           <Button variant="primary" showArrow onClick={handlePlay} className="uppercase">
             {continueWatchingItem ? "Reanudar" : "Ver ahora"}
           </Button>
@@ -91,22 +99,6 @@ function InfoBanner({ program, firstChapter }: InfoBannerProps) {
             time={continueWatchingItem.time}
           />
         )}
-
-        <p className="text-lg font-text mb-6 font-medium drop-shadow-md leading-8 h-25 max-w-4xl ">
-          {program.description_short}
-        </p>
-
-
-
-        {/* Barra de progreso "Seguir viendo" */}
-        {continueWatchingItem && (
-          <ProgressBar
-            duration={continueWatchingItem.duration}
-            time={continueWatchingItem.time}
-          />
-        )}
-
-
       </div>
     </div>
   );

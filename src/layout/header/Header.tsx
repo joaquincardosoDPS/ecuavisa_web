@@ -5,7 +5,7 @@ import type { Profile } from "@/interfaces/profile.interface";
 import { NAVBAR_ITEMS } from "./constants";
 import { NavbarItem } from "./NavbarItem";
 import { SidebarIcon } from "./SidebarIcons";
-import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
+import { Link, useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import logoFallback from '@/assets/img/logo.svg';
 
 function getProfileAvatarUrl(profile: Profile): string | null {
@@ -82,15 +82,15 @@ function Header() {
 					'px-[3.25vw] h-20',
 				].join(' ')}
 			>
-				{/* Left: avatar */}
-				<div className='flex items-center justify-start shrink-0 w-30'>
+				{/* Left: logo */}
+				<Link to="/" className='flex items-center justify-start shrink-0 w-30 cursor-pointer'>
 					<img
 						src={configLogo || logoFallback}
 						alt="Logo"
 						className='h-10 w-auto object-contain'
 						draggable={false}
 					/>
-				</div>
+				</Link>
 
 				<div
 					ref={centerRef}

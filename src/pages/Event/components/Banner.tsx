@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import type { Event } from "@/interfaces/catalog.interface";
 import Button from "@/components/ui/Button";
+import { useFavorite } from "@/hooks/mylist/useFavorite";
 
 function Banner({ event }: { event: Event | null }) {
     const navigate = useNavigate();
@@ -25,7 +26,7 @@ function Banner({ event }: { event: Event | null }) {
 
     const handlePlay = () => {
         if (event.live_associated?.key) {
-            navigate(`/en-vivo?signal=${event.live_associated.key}`);
+            navigate(`/live?signal=${event.live_associated.key}&expanded=true`);
         } else if (event.program_associated?.key) {
             navigate(`/programas/${event.program_associated.key}`);
         }
@@ -41,6 +42,11 @@ function Banner({ event }: { event: Event | null }) {
     const logoEvent = event?.image_logo?.default;
 
     const isLive = event?.live_associated?.key ? true : false;
+    const isProgram = !!event?.program_associated?.key;
+    const programSlug = event?.program_associated?.key || "";
+
+    // Solo usamos el hook si hay programSlug; de lo contrario no hará match o dará false.
+    const { isFavorited, isToggling, toggleFavorite } = useFavorite(programSlug);
     const classification = event?.classification;
     let categoryName = '';
 
@@ -52,7 +58,8 @@ function Banner({ event }: { event: Event | null }) {
 
     const eventDate = new Date(event?.gmt0_unlocked?.replace(" ", "T") + "Z");
     const now = new Date();
-    const eventStatus = now < eventDate
+    const isUnlocked = now >= eventDate;
+    const eventStatus = !isUnlocked
         ? `Próximamente · ${eventDate.toLocaleDateString("es-CL", { day: "2-digit", month: "2-digit", year: "numeric" })}, ${eventDate.toLocaleTimeString("es-CL", { hour: "2-digit", minute: "2-digit", hour12: false })}`
         : isLive
             ? "En vivo ahora"
@@ -107,7 +114,7 @@ function Banner({ event }: { event: Event | null }) {
                         <img
                             src={logoEvent}
                             alt={event.title}
-                            className="max-w-80 max-h-30 2xl:max-w-100 2xl:max-h-40 object-contain drop-shadow-xl"
+                            className="max-w-80 max-h-10 2xl:max-w-100 2xl:max-h-15 object-contain drop-shadow-xl"
                         />
                     )}
                     <div className="flex flex-row gap-5">
@@ -125,10 +132,39 @@ function Banner({ event }: { event: Event | null }) {
                     </div>
                     <h1 className="text-xl 2xl:text-4xl font-title font-bold">{event.title}</h1>
                     <p className="text-base 2xl:text-xl font-medium max-w-2xl">{event.description_short}</p>
-                    <Button variant="primary" showArrow onClick={handlePlay}>
-                        Ver ahora
-                    </Button>
 
+                    {isUnlocked ? (
+                        <Button variant="primary" showArrow onClick={handlePlay}>
+                            Ver ahora
+                        </Button>
+                    ) : isProgram ? (
+                        <Button
+                            variant="secondary"
+                            onClick={toggleFavorite}
+                            disabled={isToggling}
+                            className={`flex items-center gap-2 px-6 ${isFavorited ? "bg-(--foc-secondary) text-white border-transparent" : ""}`}
+                        >
+                            {isToggling ? (
+                                <div className="w-5 h-5 rounded-full border-2 border-current border-t-transparent animate-spin mr-2" />
+                            ) : (
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    width="24"
+                                    height="24"
+                                    viewBox="0 0 24 24"
+                                    fill={isFavorited ? "currentColor" : "none"}
+                                    stroke="currentColor"
+                                    strokeWidth="2"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    className="w-5 h-5"
+                                >
+                                    <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" />
+                                </svg>
+                            )}
+                            {isFavorited ? "Quitar de mi lista" : "Añadir a mi lista"}
+                        </Button>
+                    ) : null}
                 </div>
             </div>
         </>
